@@ -115,10 +115,13 @@ When you enable mods and click **Apply Order**:
 
 ---
 
-## 🧩 Mod Manifest Format
+````markdown
+## 🧩 Mod Manifest Format (for Mod Makers)
 
-Every mod must include a `manifest.json` file at its root.  
-Example:
+Every mod must include a `manifest.json` file in its root folder.  
+This file tells FMMLoader26 where to install the mod’s files and for which platform (Windows or macOS).
+
+### 📄 Example Manifest
 
 ```json
 {
@@ -134,18 +137,100 @@ Example:
 }
 ````
 
-### 🔧 Supported fields
+---
 
-| Key           | Type   | Description                                                                       |
-| ------------- | ------ | --------------------------------------------------------------------------------- |
-| `name`        | string | Name of the mod                                                                   |
-| `version`     | string | Version number                                                                    |
-| `type`        | string | Defines install location (`bundle`, `tactics` `misc`, `ui`, etc.) |
-| `author`      | string | Creator name                                                                      |
-| `homepage`    | string | Optional link                                                                     |
-| `description` | string | Shown in app details                                                              |
-| `files`       | array  | List of `{ source, target_subpath, platform }` objects                            |
-| `platform`    | string | `"windows"`, `"mac"`, or omitted for both                                         |
+### 🔧 Supported Fields
+
+| Key           | Type   | Description                                                                                                        |
+| ------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| `name`        | string | Display name for the mod. Must be unique within the `mods` folder.                                                 |
+| `version`     | string | Mod version (e.g. `1.0.2`). Used for update comparison.                                                            |
+| `type`        | string | Determines **where the mod installs**. See table below.                                                            |
+| `author`      | string | The mod creator or team name.                                                                                      |
+| `homepage`    | string | *(Optional)* A website, forum, or download link.                                                                   |
+| `description` | string | *(Optional)* Summary text displayed in the manager.                                                                |
+| `files`       | array  | A list of objects describing which files to copy and where. Each entry must include `source` and `target_subpath`. |
+| `platform`    | string | `"mac"`, `"windows"`, or omit to apply to both platforms.                                                          |
+
+---
+
+### 📁 File Entries Explained
+
+Each file entry in the `files` array should look like this:
+
+```json
+{ "source": "ui-panelids_assets_all Windows.bundle", "target_subpath": "ui-panelids_assets_all.bundle", "platform": "windows" }
+```
+
+| Key              | Description                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| `source`         | The file or folder path **relative to the mod’s root directory**. Example: `"data/training.fmf"`. |
+| `target_subpath` | The filename or subpath relative to the game’s **target install folder** (depending on `type`).   |
+| `platform`       | Optional — limits installation to mac or Windows only. Leave blank to support both.               |
+
+---
+
+### 🗂️ Install Locations by Type
+
+| Type            | Installs To                                                                                                                                                                  | Notes                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `bundle` / `ui` | Game installation directory → `fm_Data/StreamingAssets/aa/Standalone[Platform]`                                                                                              | For UI and game data bundles (.bundle, .fmf, etc). **Use this for UI mods instead of `skins`.** |
+| `tactics`       | User folder → `Documents/Sports Interactive/Football Manager 26/tactics` (Windows) or `~/Library/Application Support/Sports Interactive/Football Manager 26/tactics` (macOS) | For `.fmf` tactic or formation files.                                                           |
+| `graphics`      | User folder → `.../Football Manager 26/graphics`                                                                                                                             | For facepacks, logos, or kits.                                                                  |
+| `editor-data`   | User folder → `.../Football Manager 26/editor data`                                                                                                                          | For `.fmf` database mods.                                                                       |
+| `schedules`     | User folder → `.../Football Manager 26/schedules`                                                                                                                            | For training schedule packs.                                                                    |
+| `misc`          | User folder root (`Football Manager 26/`)                                                                                                                                    | For any other files not covered above.                                                          |
+
+> 🧠 **UI mods note:**
+> In FM26, **UI and interface bundles no longer belong in `/skins/`**.
+> Instead, use `"type": "ui"` (or `"bundle"`) so the manager installs them directly into the game’s internal StreamingAssets folder.
+
+---
+
+### 🪶 Relative Paths and How They Work
+
+* All paths in your manifest are **relative to your mod’s root folder**.
+  For example, if your folder looks like this:
+
+  ```
+  MyCoolMod/
+  ├─ manifest.json
+  ├─ data/
+  │  └─ training.fmf
+  └─ ui/
+     └─ ui-panelids_assets_all Windows.bundle
+  ```
+
+  Then your entries might be:
+
+  ```json
+  "files": [
+    { "source": "data/training.fmf", "target_subpath": "training.fmf" },
+    { "source": "ui/ui-panelids_assets_all Windows.bundle", "target_subpath": "ui-panelids_assets_all.bundle", "platform": "windows" }
+  ]
+  ```
+
+* `target_subpath` defines the final file name inside the destination folder determined by `type`.
+  For example:
+
+  * If `type = "tactics"` → the file installs into your FM *tactics folder*.
+  * If `type = "ui"` → the file installs into your FM *StreamingAssets* data folder.
+
+---
+
+### ✅ Good Practices
+
+* Always **include platform entries** if your mod uses different builds for Windows and macOS.
+* Keep names short and unique; folder name = mod name.
+* Test using **Enable → Apply Order → Disable → Apply Order** to ensure clean installation and removal.
+* Do **not** put huge archives (like graphics megapacks) directly in one file — split them by category for faster load and conflict detection.
+
+---
+
+### ⚠️ Conflict Rules
+
+Two mods conflict if they both define the same `target_subpath`.
+If you try to apply such mods simultaneously, FMMLoader26 will show a **Conflict Manager** prompt before writing any files.
 
 ---
 
@@ -168,7 +253,7 @@ Finder-safe mode is already built in (no recursive reveals). If it still hangs, 
 `~/Library/Application Support/FMMLoader26/logs`
 
 **🚫 “Permission denied” when writing mods:**
-Ensure Football Manager isn’t running, and that your Steam or Epic installation folder isn’t sandboxed (right-click → Get Info → unlock permissions).
+Ensure Football Manager isn’t running, and that your Steam or Epic installation folder isn’t sandboxed (right-click → Get Info → unlock permissions), or run as administrator.
 
 **🧩 FM not detected automatically:**
 Use **Set Target…** and navigate manually (see above paths).
