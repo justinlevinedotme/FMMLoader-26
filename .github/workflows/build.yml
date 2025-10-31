@@ -40,7 +40,7 @@ jobs:
             --onefile ^
             --name "FM26 Mod Manager" ^
             --icon src\assets\icon.ico ^
-            src\fm26_mod_manager_gui.py
+            src\fmmloader26.py
         shell: cmd
 
       - name: Build with PyInstaller (macOS)
@@ -53,7 +53,7 @@ jobs:
             --onefile \
             --name "FM26 Mod Manager" \
             --icon src/assets/icon.icns \
-            src/fm26_mod_manager_gui.py
+            src/fmmloader26.py
         shell: bash
 
       # Package artifacts per-OS (zip the .app on macOS; rename exe on Windows)

@@ -1,0 +1,29 @@
+name: Bug Report
+description: Report a problem or unexpected behavior
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Please describe what went wrong."
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: "Explain what you were doing when the bug occurred"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      placeholder: "macOS 14 / Windows 11"
+  - type: input
+    id: version
+    attributes:
+      label: FMMLoader26 version
+      placeholder: "v0.0.2"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpt (optional)
