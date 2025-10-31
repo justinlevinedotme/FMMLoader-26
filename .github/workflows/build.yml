@@ -28,11 +28,20 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean --noconfirm \
-          --windowed \
-          --name "FM26 Mod Manager" \
-          --icon "src/assets/icon.ico" \
-          src/fm26_mod_manager_gui.py
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            pyinstaller --clean --noconfirm \
+              --windowed \
+              --name "FM26 Mod Manager" \
+              --icon "src/assets/icon.icns" \
+              src/fm26_mod_manager_gui.py
+          else
+            pyinstaller --clean --noconfirm ^
+              --windowed ^
+              --onefile ^
+              --name "FM26 Mod Manager" ^
+              --icon "src/assets/icon.ico" ^
+              src/fm26_mod_manager_gui.py
+          fi
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
