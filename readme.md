@@ -2,9 +2,11 @@
 
 **Cross-platform mod manager** for *Football Manager 2026*, built to make installing, organizing, and troubleshooting mods easy — on both **macOS** and **Windows**.  
 
-Developed by Justin Levine and presented with the great help of **The FM Match Lab Team**.
+Developed by [Justin Levine](https://justinlevine.me) / notJalco and presented with the great help of **The FM Match Lab Team**.
 
-Join us on [Discord](https://discord.gg/QCW7QhWdAs)
+Join us on [Discord](https://discord.gg/QCW7QhWdAs) to discuss, ask questions, or contribute.
+
+## NOTE: This applicaiton involves modifying your FM game files. Some mods work, some mods don't. It is not a substitute or plug-and-play solution. It simply makes the distrubtion and installation of mods simpler. You should know how to verify your game files, and undo any changes if need be. 
 
 ---
 
