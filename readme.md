@@ -8,7 +8,9 @@ Developed by [Justin Levine](https://justinlevine.me) / notJalco and presented w
 
 Join us on [Discord](https://discord.gg/QCW7QhWdAs) to discuss, ask questions, or contribute.
 
-## NOTE: This applicaiton involves modifying your FM game files. Some mods work, some mods don't. It is not a substitute or plug-and-play solution. It simply makes the distrubtion and installation of mods simpler. You should know how to verify your game files, and undo any changes if need be. 
+A sample modification, BassyBoy's Speedster Modification, has been included in this repository in the `examples` folder. A special thanks to him for allowing me to include it with the files as reference for mod makers, as well as for users to instantly use this program.
+
+### NOTE: This applicaiton involves modifying your FM game files. Some mods work, some mods don't. It is not a substitute or plug-and-play solution. It simply makes the distrubtion and installation of mods simpler. You should know how to verify your game files, and undo any changes if need be. 
 
 ---
 
