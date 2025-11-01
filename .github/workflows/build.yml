@@ -3,7 +3,7 @@ name: Build & Release FM26 Mod Manager
 on:
   push:
     tags:
-      - "v*" # e.g., v0.4.0
+      - "v*"     # e.g., v0.4.2
   workflow_dispatch:
 
 jobs:
@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest]
-
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -25,26 +24,36 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
-          if [ -f src\requirements.txt ]; then pip install -r requirements.txt; fi
-        shell: bash
+          if [ -f src/requirements.txt ]; then pip install -r src/requirements.txt; fi
 
+      # ---------- WINDOWS ----------
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
+        shell: cmd
         run: |
           pyinstaller ^
             --clean ^
             --noconfirm ^
             --windowed ^
             --onefile ^
-            --name "FM26 Mod Manager" ^
+            --name "FMMLoader26" ^
             --icon src\assets\icon.ico ^
             src\fmmloader26.py
-        shell: cmd
 
+      - name: Package artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: |
+          mkdir upload
+          copy "dist\FMMLoader26.exe" "upload\FMMLoader26.exe"
+
+      # ---------- macOS ----------
       - name: Build with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
+        shell: bash
         run: |
           pyinstaller \
             --clean \
@@ -54,30 +63,21 @@ jobs:
             --name "FMMLoader26" \
             --icon src/assets/icon.icns \
             src/fmmloader26.py
-        shell: bash
-
-      # Package artifacts per-OS (zip the .app on macOS; rename exe on Windows)
-      - name: Package artifact (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          mkdir -p upload
-          copy "dist\FMMLoader26.exe" "upload\FMMLoader26.exe"
-        shell: cmd
 
       - name: Package artifact (macOS)
         if: matrix.os == 'macos-latest'
+        shell: bash
         run: |
           mkdir -p upload
-          # PyInstaller produces a .app bundle; zip it for upload
           cd dist
-          zip -r "../upload/FMMLoader26.zip" "FMMLoader27.app"
+          zip -r "../upload/FMMLoader26-macOS.zip" "FMMLoader26.app"
           cd ..
-        shell: bash
 
+      # ---------- Upload ----------
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os == 'windows-latest' && 'FM26 Mod Manager (Windows)' || 'FM26 Mod Manager (macOS)' }}
+          name: ${{ matrix.os == 'windows-latest' && 'FMMLoader26-Windows' || 'FMMLoader26-macOS' }}
           path: upload/*
 
   release:
@@ -87,7 +87,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
 
     permissions:
-      contents: write # 👈 REQUIRED for creating releases
+      contents: write
       packages: write
       actions: read
 
@@ -95,14 +95,14 @@ jobs:
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
-          name: FM26 Mod Manager (Windows)
+          name: FMMLoader26-Windows
           path: artifacts/windows
         continue-on-error: true
 
       - name: Download macOS artifact
         uses: actions/download-artifact@v4
         with:
-          name: FM26 Mod Manager (macOS)
+          name: FMMLoader26-macOS
           path: artifacts/macos
         continue-on-error: true
 
@@ -115,8 +115,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/windows/FM26 Mod Manager-Windows.exe
-            artifacts/macos/FM26 Mod Manager-macOS.zip
+            artifacts/windows/FMMLoader26.exe
+            artifacts/macos/FMMLoader26-macOS.zip
           draft: false
           prerelease: false
         env:
