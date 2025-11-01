@@ -32,7 +32,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.4.2"
+VERSION = "0.0.3"
 
 
 # -----------------------
