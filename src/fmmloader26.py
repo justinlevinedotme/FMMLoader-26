@@ -32,7 +32,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 
 # -----------------------
@@ -305,6 +305,27 @@ def is_fm_running():
     return False
 
 
+def _copy_any(src: Path, dst: Path):
+    """
+    Merge-copy src -> dst.
+    - If src is a file: copy2(src, dst)
+    - If src is a directory: recursively copy its contents into dst (dirs_exist_ok)
+    """
+    if src.is_dir():
+        dst.mkdir(parents=True, exist_ok=True)
+        for child in src.rglob("*"):
+            rel = child.relative_to(src)
+            out = dst / rel
+            if child.is_dir():
+                out.mkdir(parents=True, exist_ok=True)
+            else:
+                out.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(child, out)
+    else:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+
+
 def fm_user_dir():
     """Return FM user folder (for tactics, skins, graphics, etc.)."""
     if sys.platform.startswith("win"):
@@ -317,38 +338,124 @@ def fm_user_dir():
         )
 
 
-def get_target_for_type(mod_type: str):
-    """Return the appropriate install target depending on mod type."""
-    # Bundles/UI must go to Standalone target (game data aa/Standalone...).
-    # User content types go to user dir subfolders.
-    base_user = fm_user_dir()
-    type_map = {
-        # Game data (Standalone target)
-        "bundle": get_target(),
-        "ui": get_target(),
-        # User content
-        "tactics": base_user / "tactics",
-        "graphics": base_user / "graphics",
-        "misc": base_user,
-    }
-    return type_map.get(mod_type, base_user)
+# --- add this helper near your other utils ---
+def _find_mod_root(path: Path) -> tuple[Path, Path | None]:
+    """
+    Return (mod_root, temp_dir).
+    - If `path` is a directory: prefer that dir when it has manifest.json,
+      otherwise search one level deep for a dir that has it.
+    - If `path` is a .zip: extract to a temp dir, then search as above.
+    temp_dir (if created) must be cleaned up by the caller.
+    """
+
+    def _has_manifest(p: Path) -> bool:
+        # Be forgiving about case (manifest.json / Manifest.json)
+        for name in ("manifest.json", "Manifest.json", "MANIFEST.JSON"):
+            if (p / name).exists():
+                return True
+        return False
+
+    if path.is_file() and path.suffix.lower() == ".zip":
+        tmp = Path(tempfile.mkdtemp(prefix="fm26_import_"))
+        with zipfile.ZipFile(path, "r") as z:
+            z.extractall(tmp)
+        # 1) root
+        if _has_manifest(tmp):
+            return tmp, tmp
+        # 2) any first-level dir with manifest
+        for d in sorted([d for d in tmp.iterdir() if d.is_dir()]):
+            if _has_manifest(d):
+                return d, tmp
+        # 3) if exactly one subdir, try it anyway
+        subs = [d for d in tmp.iterdir() if d.is_dir()]
+        if len(subs) == 1:
+            return subs[0], tmp
+        # No manifest found
+        return tmp, tmp
+
+    # Directory path
+    if path.is_dir():
+        if _has_manifest(path):
+            return path, None
+        for d in sorted([d for d in path.iterdir() if d.is_dir()]):
+            if _has_manifest(d):
+                return d, None
+        # if exactly one subdir, try that
+        subs = [d for d in path.iterdir() if d.is_dir()]
+        if len(subs) == 1:
+            return subs[0], None
+    return path, None
+
+
+def get_target_for_type(mod_type: str, mod_name: str = "") -> Path:
+    """
+    Return the appropriate install directory depending on mod type and mod name.
+    Auto-creates /graphics and its subfolders (kits, faces, logos) if missing.
+    """
+    base = fm_user_dir()
+    graphics_base = base / "graphics"
+    mod_type = (mod_type or "").lower()
+    mod_name = (mod_name or "").lower()
+
+    # UI/bundle mods go to the main FM install location
+    if mod_type in ("ui", "bundle"):
+        return get_target()
+
+    # Tactics mods go to the user's tactics folder
+    if mod_type == "tactics":
+        path = base / "tactics"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    # Graphics and its subtypes
+    if mod_type == "graphics":
+        graphics_base.mkdir(parents=True, exist_ok=True)
+        if any(x in mod_name for x in ("kit", "kits")):
+            path = graphics_base / "kits"
+        elif any(x in mod_name for x in ("face", "faces", "portraits")):
+            path = graphics_base / "faces"
+        elif any(x in mod_name for x in ("logo", "logos", "badges")):
+            path = graphics_base / "logos"
+        else:
+            path = graphics_base
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    # Default fallback (misc mods)
+    base.mkdir(parents=True, exist_ok=True)
+    return base
 
 
 # -------------
 # Mod actions
 # -------------
+# Helper: works like Path.is_relative_to but compatible everywhere
+def _is_under(child: Path, root: Path) -> bool:
+    try:
+        child.resolve().relative_to(root.resolve())
+        return True
+    except Exception:
+        return False
+
+
 def enable_mod(mod_name: str, log):
     mod_dir = MODS_DIR / mod_name
     if not mod_dir.exists():
         raise FileNotFoundError(f"Mod not found: {mod_name} in {MODS_DIR}")
+
     mf = read_manifest(mod_dir)
     mod_type = (mf.get("type") or "misc").strip().lower()
-    base = get_target_for_type(mod_type)
+
+    # Pass mod name so graphics/* routing (kits/faces/logos) can work
+    base = get_target_for_type(mod_type, mf.get("name", mod_name))
+
     if not base:
         raise RuntimeError("No valid FM26 target set. Use Detect or Set Target.")
+
     if not base.exists():
-        # Try to mkdir only for user-dir types; Standalone should already exist.
-        if base.is_relative_to(fm_user_dir()):
+        # Only auto-create for user-dir installs (tactics/graphics/etc.),
+        # not for the game's Standalone... directory.
+        if _is_under(base, fm_user_dir()):
             base.mkdir(parents=True, exist_ok=True)
         else:
             raise RuntimeError("No valid FM26 target set. Use Detect or Set Target.")
@@ -356,40 +463,51 @@ def enable_mod(mod_name: str, log):
     files = mf.get("files", [])
     if not files:
         raise ValueError("Manifest has no 'files' entries.")
+
     plat = _platform_tag()
     log(f"[enable] {mf.get('name', mod_name)} ({mod_type}) → {base}")
     log(f"  [context] platform={plat} files={len(files)}")
+
     wrote = skipped = backed_up = errors = 0
+
     for e in files:
-        ep = e.get("platform")
+        ep = (e.get("platform") or "").strip().lower()
         src_rel = e.get("source")
         tgt_rel = e.get("target_subpath")
+
         if ep and ep != plat:
             log(f"  [skip/platform] {src_rel} (entry platform={ep})")
             skipped += 1
             continue
+
         if not src_rel or not tgt_rel:
             log(f"  [error/entry] Missing 'source' or 'target_subpath' in {e}")
             errors += 1
             continue
+
         src = mod_dir / src_rel
         tgt = resolve_target(base, tgt_rel)
+
         if not src.exists():
             log(f"  [error/missing] Source not found: {src}")
             errors += 1
             continue
+
         try:
-            tgt.parent.mkdir(parents=True, exist_ok=True)
-            if tgt.exists():
+            # Back up only when the target is an existing FILE
+            if tgt.exists() and tgt.is_file():
                 b = backup_original(tgt)
                 log(f"  [backup] {tgt_rel}  ←  {b.name if b else 'skipped'}")
                 backed_up += 1
-            shutil.copy2(src, tgt)
-            log(f"  [write] {src_rel}  →  {tgt_rel}")
-            wrote += 1
+
+            # Directory-aware copy (merges folders, supports packs like logos/kits/faces)
+            _copy_any(src, tgt)
+            log(f"  [write] {src_rel}  →  {tgt_rel}{' (dir)' if src.is_dir() else ''}")
+
         except Exception as ex:
             log(f"  [error/copy] {src_rel} → {tgt_rel} :: {ex}")
             errors += 1
+
     log(
         f"[enable/done] wrote={wrote} backup={backed_up} skipped={skipped} errors={errors}"
     )
@@ -460,23 +578,34 @@ def install_mod_from_folder(src_folder: Path, name_override: str | None, log=Non
 # Conflict detect
 # ----------------
 def build_mod_index(names=None):
+    """Index target_subpath -> [unique mods touching it], for THIS platform only."""
     if names is None:
         names = [p.name for p in MODS_DIR.iterdir() if p.is_dir()]
     manifests = {}
-    idx = {}
+    idx = {}  # target_subpath -> set of mod names
+    plat = _platform_tag()
+
     for m in names:
         mf = read_manifest(MODS_DIR / m)
         manifests[m] = mf
         for f in mf.get("files", []):
+            # 1) Skip other platforms
+            ep = f.get("platform")
+            if ep and ep != plat:
+                continue
+            # 2) Guard + dedupe
             tgt = f.get("target_subpath")
             if not tgt:
                 continue
-            idx.setdefault(tgt, []).append(m)
+            idx.setdefault(tgt, set()).add(m)
+
+    # Convert sets to lists for stable downstream use
+    idx = {t: sorted(list(ms)) for t, ms in idx.items()}
     return idx, manifests
 
 
 def find_conflicts(names=None):
-    """Return {target_subpath: [mods...]} and manifests dict."""
+    """Return {target_subpath: [mods...]} and manifests dict, deduped and platform-filtered."""
     idx, manifests = build_mod_index(names)
     conflicts = {t: ms for t, ms in idx.items() if len(ms) > 1}
     return conflicts, manifests
@@ -827,44 +956,21 @@ class App(BaseTk):
                 title="Select Mod Folder (must contain manifest.json)"
             )
             return Path(folder) if folder else None
-
     def on_import_mod(self):
         if is_fm_running():
-            messagebox.showwarning(
-                "FM is Running", "Please close Football Manager before importing mods."
-            )
+            messagebox.showwarning("FM is Running", "Please close Football Manager before importing mods.")
             return
         choice = self._choose_import_source()
         if not choice:
             return
-        temp_dir = None
+        mod_root, temp_dir = _find_mod_root(choice)
         try:
-            if choice.is_file() and choice.suffix.lower() == ".zip":
-                temp_dir = Path(tempfile.mkdtemp(prefix="fm26_import_"))
-                with zipfile.ZipFile(choice, "r") as z:
-                    z.extractall(temp_dir)
-                # try to find a child folder with manifest.json, else use root
-                candidates = [
-                    d
-                    for d in temp_dir.iterdir()
-                    if d.is_dir() and (d / "manifest.json").exists()
-                ]
-                src_folder = (
-                    candidates[0]
-                    if candidates
-                    else (temp_dir if (temp_dir / "manifest.json").exists() else None)
-                )
-                if src_folder is None:
-                    # fallback: if there's exactly one directory, use it; else use temp root
-                    subs = [d for d in temp_dir.iterdir() if d.is_dir()]
-                    src_folder = subs[0] if subs else temp_dir
-            else:
-                src_folder = choice
-            newname = install_mod_from_folder(src_folder, None, log=self._log)
+            if not (mod_root / "manifest.json").exists() and not (mod_root / "Manifest.json").exists():
+                raise FileNotFoundError("Selected folder does not contain a manifest.json")
+            newname = install_mod_from_folder(mod_root, None, log=self._log)
             order = get_load_order()
             if newname not in order:
-                order.append(newname)
-                set_load_order(order)
+                order.append(newname); set_load_order(order)
             self.refresh_mod_list()
             messagebox.showinfo("Import", f"Imported '{newname}'.")
         except Exception as e:
@@ -873,7 +979,6 @@ class App(BaseTk):
             if temp_dir:
                 shutil.rmtree(temp_dir, ignore_errors=True)
 
-    # Drag & Drop import (optional)
     def on_drop(self, event):
         if is_fm_running():
             messagebox.showwarning(
@@ -881,22 +986,21 @@ class App(BaseTk):
             )
             return
         raw = event.data.strip()
-        # On mac/win, tkinterdnd2 may wrap paths with {} when spaces exist
         if raw.startswith("{") and raw.endswith("}"):
             raw = raw[1:-1]
         path = Path(raw)
         if not path.exists():
             return
-        temp = None
+        mod_root, temp_dir = _find_mod_root(path)
         try:
-            if path.suffix.lower() == ".zip":
-                temp = Path(tempfile.mkdtemp(prefix="fm26_drop_"))
-                with zipfile.ZipFile(path, "r") as z:
-                    z.extractall(temp)
-                folder = next((d for d in temp.iterdir() if d.is_dir()), temp)
-            else:
-                folder = path
-            newname = install_mod_from_folder(folder, None, log=self._log)
+            if (
+                not (mod_root / "manifest.json").exists()
+                and not (mod_root / "Manifest.json").exists()
+            ):
+                raise FileNotFoundError(
+                    "Dropped file/folder does not contain a manifest.json"
+                )
+            newname = install_mod_from_folder(mod_root, None, log=self._log)
             order = get_load_order()
             if newname not in order:
                 order.append(newname)
@@ -906,8 +1010,9 @@ class App(BaseTk):
         except Exception as e:
             messagebox.showerror("Import Error", str(e))
         finally:
-            if temp:
-                shutil.rmtree(temp, ignore_errors=True)
+            if temp_dir:
+                shutil.rmtree(temp_dir, ignore_errors=True)
+
 
     def on_enable_selected(self):
         name = self.selected_mod_name()
