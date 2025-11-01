@@ -161,7 +161,9 @@ ___
 
 ## Modders Info
 
-Modders can visit [Modders Docs](modders.md) for more information on how to properly package their mods and skins for FMMLoader.
+Modders can visit [Modders Docs](MODDERS.md) for more information on how to properly package their mods and skins for FMMLoader.
+
+**Example Mods are also contained in the `example mods` directory of this repository. Thank you to knap and bassyboy for allowing me to include them with this release.**
 ___
 
 ## Contributing
