@@ -1338,17 +1338,25 @@ class App(BaseTk):
                 shutil.rmtree(temp_dir, ignore_errors=True)
 
     def on_drop(self, event):
-        if is_fm_running():
-            messagebox.showwarning(
-                "FM is Running", "Please close Football Manager before importing mods."
-            )
-            return
+        """Handle drag-and-drop events. Defers processing to avoid UI freezing."""
         raw = event.data.strip()
         if raw.startswith("{") and raw.endswith("}"):
             raw = raw[1:-1]
         path = Path(raw)
         if not path.exists():
             return
+
+        # Defer processing to let the drop event complete and avoid beach ball
+        self.after(100, lambda: self._process_dropped_file(path))
+
+    def _process_dropped_file(self, path: Path):
+        """Process a dropped file/folder after the drop event has completed."""
+        if is_fm_running():
+            messagebox.showwarning(
+                "FM is Running", "Please close Football Manager before importing mods."
+            )
+            return
+
         mod_root, temp_dir = _find_mod_root(path)
         try:
             # Check if manifest exists
