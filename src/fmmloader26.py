@@ -93,6 +93,40 @@ def safe_open_path(path: Path):
         messagebox.showerror("Open Error", f"Could not open:\n{path}\n\n{e}")
 
 
+def cleanup_old_backups(keep=10):
+    """Keep only the most recent N backups, delete older ones."""
+    try:
+        backups = sorted(
+            [p for p in BACKUP_DIR.glob("*") if p.is_file()],
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for old_backup in backups[keep:]:
+            try:
+                old_backup.unlink()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+def cleanup_old_restore_points(keep=10):
+    """Keep only the most recent N restore points, delete older ones."""
+    try:
+        restore_points = sorted(
+            [p for p in RESTORE_POINTS_DIR.iterdir() if p.is_dir()],
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for old_rp in restore_points[keep:]:
+            try:
+                shutil.rmtree(old_rp)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
 def _init_storage():
     for p in (BACKUP_DIR, MODS_DIR, LOGS_DIR, RESTORE_POINTS_DIR):
         p.mkdir(parents=True, exist_ok=True)
@@ -109,6 +143,10 @@ def _init_storage():
             LAST_LINK.write_text(str(RUN_LOG), encoding="utf-8")
     except Exception:
         pass
+
+    # Clean up old backups and restore points on startup
+    cleanup_old_backups(keep=10)
+    cleanup_old_restore_points(keep=10)
 
 
 def migrate_legacy_storage_copy_only():
@@ -894,6 +932,10 @@ def create_restore_point(base: Path, log):
                 # Count files in the directory
                 backed_up += sum(1 for _ in dst.rglob("*") if _.is_file())
     log(f"Restore point created: {rp.name} (backed up {backed_up} file(s))")
+
+    # Clean up old restore points, keeping only the 10 most recent
+    cleanup_old_restore_points(keep=10)
+
     return rp.name
 
 
@@ -1145,6 +1187,10 @@ class App(BaseTk):
 
     # ---- UI layout ----
     def create_widgets(self):
+        # Create custom style for orange Apply button
+        style = ttk.Style()
+        style.configure("Orange.TButton", foreground="#ff4f00", font=("TkDefaultFont", 10, "bold"))
+
         # Menus
         menubar = tk.Menu(self)
         file_menu = tk.Menu(menubar, tearoff=0)
@@ -1165,7 +1211,7 @@ class App(BaseTk):
         menubar.add_cascade(label="File", menu=file_menu)
 
         actions_menu = tk.Menu(menubar, tearoff=0)
-        actions_menu.add_command(label="Apply Order\tF5", command=self.on_apply_order)
+        actions_menu.add_command(label="Apply\tF5", command=self.on_apply_order)
         actions_menu.add_command(label="Conflicts…", command=self.on_conflicts)
         actions_menu.add_command(label="Rollback…", command=self.on_rollback)
         menubar.add_cascade(label="Actions", menu=actions_menu)
@@ -1277,7 +1323,7 @@ class App(BaseTk):
         ttk.Button(right, text="Down (Order)", command=self.on_move_down).pack(
             fill=tk.X, pady=2
         )
-        ttk.Button(right, text="Apply Order", command=self.on_apply_order).pack(
+        ttk.Button(right, text="Apply", command=self.on_apply_order, style="Orange.TButton").pack(
             fill=tk.X, pady=(12, 2)
         )
         ttk.Button(right, text="Conflicts…", command=self.on_conflicts).pack(
@@ -1292,12 +1338,6 @@ class App(BaseTk):
         ttk.Button(
             right, text="Open Logs Folder", command=self.on_open_logs_folder
         ).pack(fill=tk.X, pady=2)
-        ttk.Button(right, text="Copy Log Path", command=self.on_copy_log_path).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(
-            right, text="Help (Manifest)", command=self.on_show_manifest_help
-        ).pack(fill=tk.X, pady=(12, 2))
 
         # Details pane
         det = ttk.LabelFrame(self, text="Details")
@@ -1320,11 +1360,6 @@ class App(BaseTk):
         ).pack()
 
     # ---- menu/button actions ----
-    def on_copy_log_path(self):
-        self.clipboard_clear()
-        self.clipboard_append(str(RUN_LOG))
-        self._log(f"Copied log path: {RUN_LOG}")
-
     def on_open_logs_folder(self):
         safe_open_path(LOGS_DIR)
 
@@ -1868,31 +1903,6 @@ class App(BaseTk):
 
     def on_open_logs_folder(self):
         safe_open_path(LOGS_DIR)
-
-    def on_show_manifest_help(self):
-        txt = (
-            "Each mod must include a manifest.json at its root:\n\n"
-            "{\n"
-            '  "name": "FM26 UI Pack",\n'
-            '  "version": "1.0.0",\n'
-            '  "type": "ui",\n'
-            '  "author": "You",\n'
-            '  "install_path": "/path/to/custom/install/location",  // optional\n'
-            '  "homepage": "https://example.com",\n'
-            '  "description": "Replaces panel IDs bundle",\n'
-            '  "files": [\n'
-            '    { "source": "ui-panelids_assets_all Mac.bundle", "target_subpath": "ui-panelids_assets_all.bundle", "platform": "mac" },\n'
-            '    { "source": "ui-panelids_assets_all Windows.bundle", "target_subpath": "ui-panelids_assets_all.bundle", "platform": "windows" }\n'
-            "  ]\n"
-            "}\n\n"
-            "• target_subpath is relative to the Standalone… folder (for bundle/ui types).\n"
-            "• Other types install under your FM user folder (tactics/skins/graphics/etc.).\n"
-            "• install_path (optional) overrides the default install location.\n"
-            "• Last-write-wins according to the load order.\n"
-            f"• Mods live in: {MODS_DIR}\n"
-            f"• Logs live in: {LOGS_DIR}\n"
-        )
-        messagebox.showinfo("Manifest format", txt)
 
     def on_select_row(self, _event):
         sel = self.tree.selection()
