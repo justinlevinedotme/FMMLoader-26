@@ -32,7 +32,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 
 
 # -----------------------
@@ -287,7 +287,6 @@ def is_fm_running():
         "fm.app",
         "fm26",
         "fm26.app",
-        "fm",
         "Football Manager 26.app",
     ]
     for proc in psutil.process_iter(["name", "exe", "cmdline"]):
@@ -339,21 +338,29 @@ def fm_user_dir():
 
 
 # --- add this helper near your other utils ---
+def _has_manifest(p: Path) -> bool:
+    """Check if a directory has a manifest.json file (case-insensitive)."""
+    for name in ("manifest.json", "Manifest.json", "MANIFEST.JSON"):
+        if (p / name).exists():
+            return True
+    return False
+
+
 def _find_mod_root(path: Path) -> tuple[Path, Path | None]:
     """
     Return (mod_root, temp_dir).
     - If `path` is a directory: prefer that dir when it has manifest.json,
       otherwise search one level deep for a dir that has it.
     - If `path` is a .zip: extract to a temp dir, then search as above.
+    - If `path` is a single .bundle or .fmf file: return its parent directory.
     temp_dir (if created) must be cleaned up by the caller.
     """
 
-    def _has_manifest(p: Path) -> bool:
-        # Be forgiving about case (manifest.json / Manifest.json)
-        for name in ("manifest.json", "Manifest.json", "MANIFEST.JSON"):
-            if (p / name).exists():
-                return True
-        return False
+    # Handle single .bundle or .fmf files
+    if path.is_file() and path.suffix.lower() in ('.bundle', '.fmf'):
+        # For single files, we'll treat them as standalone mods
+        # Return the file itself (caller will handle this specially)
+        return path, None
 
     if path.is_file() and path.suffix.lower() == ".zip":
         tmp = Path(tempfile.mkdtemp(prefix="fm26_import_"))
@@ -557,21 +564,181 @@ def disable_mod(mod_name: str, log):
     )
 
 
-def install_mod_from_folder(src_folder: Path, name_override: str | None, log=None):
+def _auto_detect_mod_type(path: Path) -> str:
+    """Auto-detect mod type based on file extensions and names."""
+    if path.is_file():
+        ext = path.suffix.lower()
+        name = path.name.lower()
+        if ext == '.fmf':
+            return 'tactics'
+        if ext == '.bundle':
+            if 'ui-' in name or 'panelids' in name:
+                return 'ui'
+            return 'bundle'
+
+    # For directories, check contents
+    if path.is_dir():
+        has_fmf = any(f.suffix.lower() == '.fmf' for f in path.rglob('*.fmf'))
+        has_bundle = any(f.suffix.lower() == '.bundle' for f in path.rglob('*.bundle'))
+        has_graphics = any(d.name.lower() in ('kits', 'faces', 'logos', 'graphics')
+                          for d in path.rglob('*') if d.is_dir())
+
+        if has_fmf:
+            return 'tactics'
+        if has_bundle:
+            return 'ui'
+        if has_graphics:
+            return 'graphics'
+
+    return 'misc'
+
+
+def _generate_manifest(mod_root: Path, mod_metadata: dict) -> dict:
+    """
+    Generate a manifest.json for a mod without one.
+    mod_metadata should contain: name, type, version (optional), author (optional), description (optional)
+    """
+    manifest = {
+        "name": mod_metadata.get("name", mod_root.name),
+        "version": mod_metadata.get("version", "1.0.0"),
+        "type": mod_metadata.get("type", "misc"),
+        "author": mod_metadata.get("author", ""),
+        "homepage": "",
+        "description": mod_metadata.get("description", ""),
+        "files": [],
+        "compatibility": {},
+        "dependencies": [],
+        "conflicts": [],
+        "load_after": [],
+        "license": ""
+    }
+
+    mod_type = manifest["type"]
+
+    # Handle single file mods (.bundle or .fmf)
+    if mod_root.is_file():
+        filename = mod_root.name
+        manifest["files"] = [{
+            "source": filename,
+            "target_subpath": filename
+        }]
+        return manifest
+
+    # Handle directory mods - auto-detect files
+    files = []
+
+    if mod_type == "tactics":
+        # For tactics, include all .fmf files
+        for fmf_file in sorted(mod_root.rglob("*.fmf")):
+            rel_path = fmf_file.relative_to(mod_root)
+            files.append({
+                "source": str(rel_path),
+                "target_subpath": fmf_file.name  # Tactics go flat to tactics folder
+            })
+
+    elif mod_type in ("ui", "bundle"):
+        # For UI/bundle, include all .bundle files
+        for bundle_file in sorted(mod_root.rglob("*.bundle")):
+            rel_path = bundle_file.relative_to(mod_root)
+            files.append({
+                "source": str(rel_path),
+                "target_subpath": bundle_file.name  # Usually goes to Standalone root
+            })
+
+    elif mod_type == "graphics":
+        # For graphics, preserve directory structure
+        for file in sorted(mod_root.rglob("*")):
+            if file.is_file() and not file.name.startswith('.'):
+                rel_path = file.relative_to(mod_root)
+                files.append({
+                    "source": str(rel_path),
+                    "target_subpath": str(rel_path)
+                })
+
+    else:
+        # For other types, include all files preserving structure
+        for file in sorted(mod_root.rglob("*")):
+            if file.is_file() and not file.name.startswith('.'):
+                rel_path = file.relative_to(mod_root)
+                files.append({
+                    "source": str(rel_path),
+                    "target_subpath": str(rel_path)
+                })
+
+    manifest["files"] = files
+    return manifest
+
+
+def install_mod_from_folder(src_folder: Path, name_override: str | None, log=None, generated_manifest: dict = None):
+    """
+    Install a mod from a folder. If generated_manifest is provided, it will be written to the mod directory.
+    """
     src_folder = Path(src_folder).resolve()
-    if not (src_folder / "manifest.json").exists():
-        raise FileNotFoundError("Selected folder does not contain a manifest.json")
-    mf = json.loads((src_folder / "manifest.json").read_text(encoding="utf-8"))
-    name = (name_override or mf.get("name") or src_folder.name).strip()
-    if not name:
-        raise ValueError("Mod name cannot be empty.")
-    dest = MODS_DIR / name
-    if dest.exists():
-        shutil.rmtree(dest)
-    shutil.copytree(src_folder, dest)
-    if log:
-        log(f"Installed mod '{name}' to {dest}")
-    return name
+
+    # Handle single file mods
+    is_single_file = src_folder.is_file()
+
+    if is_single_file:
+        # For single files, we need the generated_manifest
+        if not generated_manifest:
+            raise ValueError("Single file mods require a generated manifest")
+
+        filename = src_folder.name
+        name = (name_override or generated_manifest.get("name") or filename).strip()
+        if not name:
+            raise ValueError("Mod name cannot be empty.")
+
+        dest = MODS_DIR / name
+        if dest.exists():
+            shutil.rmtree(dest)
+        dest.mkdir(parents=True, exist_ok=True)
+
+        # Copy the single file to the mod directory
+        shutil.copy2(src_folder, dest / filename)
+
+        # Write the generated manifest
+        manifest_path = dest / "manifest.json"
+        manifest_path.write_text(json.dumps(generated_manifest, indent=2), encoding="utf-8")
+
+        if log:
+            log(f"Installed single-file mod '{name}' to {dest}")
+        return name
+
+    # Handle directory mods
+    if generated_manifest:
+        # Mod without original manifest - use generated one
+        name = (name_override or generated_manifest.get("name") or src_folder.name).strip()
+        if not name:
+            raise ValueError("Mod name cannot be empty.")
+
+        dest = MODS_DIR / name
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(src_folder, dest)
+
+        # Write the generated manifest
+        manifest_path = dest / "manifest.json"
+        manifest_path.write_text(json.dumps(generated_manifest, indent=2), encoding="utf-8")
+
+        if log:
+            log(f"Installed mod '{name}' with generated manifest to {dest}")
+        return name
+    else:
+        # Mod with existing manifest
+        if not (src_folder / "manifest.json").exists():
+            raise FileNotFoundError("Selected folder does not contain a manifest.json")
+
+        mf = json.loads((src_folder / "manifest.json").read_text(encoding="utf-8"))
+        name = (name_override or mf.get("name") or src_folder.name).strip()
+        if not name:
+            raise ValueError("Mod name cannot be empty.")
+        dest = MODS_DIR / name
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(src_folder, dest)
+        if log:
+            log(f"Installed mod '{name}' to {dest}")
+        return name
 
 
 # ----------------
@@ -673,6 +840,115 @@ def apply_enabled_mods_in_order(log):
 # ==========
 #   GUI
 # ==========
+class ModMetadataDialog(tk.Toplevel):
+    """Dialog for collecting mod metadata when manifest.json is missing."""
+
+    def __init__(self, parent, mod_path: Path, auto_detected_type: str):
+        super().__init__(parent)
+        self.title("Mod Metadata - No manifest.json found")
+        self.geometry("500x400")
+        self.resizable(False, False)
+
+        self.mod_path = mod_path
+        self.result = None
+
+        # Make dialog modal
+        self.transient(parent)
+        self.grab_set()
+
+        self._create_widgets(auto_detected_type)
+
+        # Center on parent
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() // 2) - (self.winfo_width() // 2)
+        y = parent.winfo_y() + (parent.winfo_height() // 2) - (self.winfo_height() // 2)
+        self.geometry(f"+{x}+{y}")
+
+    def _create_widgets(self, auto_detected_type: str):
+        # Info label
+        info_frame = ttk.Frame(self, padding=10)
+        info_frame.pack(fill=tk.X)
+        ttk.Label(
+            info_frame,
+            text="No manifest.json found. Please provide mod information:",
+            wraplength=460,
+            justify=tk.LEFT
+        ).pack(anchor=tk.W)
+
+        # Form frame
+        form = ttk.Frame(self, padding=10)
+        form.pack(fill=tk.BOTH, expand=True)
+
+        # Mod name
+        ttk.Label(form, text="Mod Name:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        self.name_var = tk.StringVar(value=self.mod_path.stem if self.mod_path.is_file() else self.mod_path.name)
+        ttk.Entry(form, textvariable=self.name_var, width=40).grid(row=0, column=1, pady=5, sticky=tk.EW)
+
+        # Mod type
+        ttk.Label(form, text="Mod Type:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.type_var = tk.StringVar(value=auto_detected_type)
+        type_combo = ttk.Combobox(
+            form,
+            textvariable=self.type_var,
+            width=38,
+            state="readonly",
+            values=["ui", "bundle", "tactics", "graphics", "skins", "database", "ruleset", "audio", "editor-data", "misc"]
+        )
+        type_combo.grid(row=1, column=1, pady=5, sticky=tk.EW)
+
+        # Version
+        ttk.Label(form, text="Version (optional):").grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.version_var = tk.StringVar(value="1.0.0")
+        ttk.Entry(form, textvariable=self.version_var, width=40).grid(row=2, column=1, pady=5, sticky=tk.EW)
+
+        # Author
+        ttk.Label(form, text="Author (optional):").grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.author_var = tk.StringVar()
+        ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
+
+        # Description
+        ttk.Label(form, text="Description (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
+        self.description_text = tk.Text(form, width=40, height=4)
+        self.description_text.grid(row=4, column=1, pady=5, sticky=tk.EW)
+
+        form.columnconfigure(1, weight=1)
+
+        # Buttons
+        button_frame = ttk.Frame(self, padding=10)
+        button_frame.pack(fill=tk.X)
+        ttk.Button(button_frame, text="Import", command=self._on_import).pack(side=tk.RIGHT, padx=5)
+        ttk.Button(button_frame, text="Cancel", command=self._on_cancel).pack(side=tk.RIGHT)
+
+    def _on_import(self):
+        name = self.name_var.get().strip()
+        if not name:
+            messagebox.showerror("Error", "Mod name is required.", parent=self)
+            return
+
+        mod_type = self.type_var.get().strip()
+        if not mod_type:
+            messagebox.showerror("Error", "Mod type is required.", parent=self)
+            return
+
+        self.result = {
+            "name": name,
+            "type": mod_type,
+            "version": self.version_var.get().strip() or "1.0.0",
+            "author": self.author_var.get().strip(),
+            "description": self.description_text.get("1.0", tk.END).strip()
+        }
+        self.destroy()
+
+    def _on_cancel(self):
+        self.result = None
+        self.destroy()
+
+    def get_result(self):
+        """Wait for dialog to close and return the result."""
+        self.wait_window()
+        return self.result
+
+
 BaseTk = TkinterDnD.Tk if DND_AVAILABLE else tk.Tk
 
 
@@ -943,19 +1219,78 @@ class App(BaseTk):
         self.refresh_target_display()
 
     def _choose_import_source(self) -> Path | None:
-        """Choose import from ZIP or Folder, then show proper dialog."""
-        if messagebox.askyesno(
-            "Import", "Import from a .zip file?\n\nClick 'No' to pick a folder instead."
-        ):
+        """Choose import from ZIP, Folder, or single file, then show proper dialog."""
+        # Create a custom dialog with 3 options
+        dialog = tk.Toplevel(self)
+        dialog.title("Import Mod")
+        dialog.geometry("400x200")
+        dialog.resizable(False, False)
+        dialog.transient(self)
+        dialog.grab_set()
+
+        result = {"choice": None}
+
+        ttk.Label(
+            dialog,
+            text="Select import source type:",
+            font=("TkDefaultFont", 10, "bold")
+        ).pack(pady=20)
+
+        def choose_zip():
+            result["choice"] = "zip"
+            dialog.destroy()
+
+        def choose_folder():
+            result["choice"] = "folder"
+            dialog.destroy()
+
+        def choose_file():
+            result["choice"] = "file"
+            dialog.destroy()
+
+        def cancel():
+            result["choice"] = None
+            dialog.destroy()
+
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(pady=10)
+
+        ttk.Button(button_frame, text="ZIP File", command=choose_zip, width=20).pack(pady=5)
+        ttk.Button(button_frame, text="Folder", command=choose_folder, width=20).pack(pady=5)
+        ttk.Button(button_frame, text="Single File (.bundle/.fmf)", command=choose_file, width=20).pack(pady=5)
+        ttk.Button(button_frame, text="Cancel", command=cancel, width=20).pack(pady=5)
+
+        # Center on parent
+        dialog.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (dialog.winfo_width() // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (dialog.winfo_height() // 2)
+        dialog.geometry(f"+{x}+{y}")
+
+        dialog.wait_window()
+
+        if result["choice"] == "zip":
             path = filedialog.askopenfilename(
                 title="Select Mod .zip", filetypes=[("Zip archives", "*.zip")]
             )
             return Path(path) if path else None
-        else:
+        elif result["choice"] == "folder":
             folder = filedialog.askdirectory(
-                title="Select Mod Folder (must contain manifest.json)"
+                title="Select Mod Folder"
             )
             return Path(folder) if folder else None
+        elif result["choice"] == "file":
+            path = filedialog.askopenfilename(
+                title="Select Mod File",
+                filetypes=[
+                    ("FM Mod Files", "*.bundle *.fmf"),
+                    ("Bundle Files", "*.bundle"),
+                    ("Tactic Files", "*.fmf"),
+                    ("All Files", "*.*")
+                ]
+            )
+            return Path(path) if path else None
+        else:
+            return None
     def on_import_mod(self):
         if is_fm_running():
             messagebox.showwarning("FM is Running", "Please close Football Manager before importing mods.")
@@ -965,12 +1300,34 @@ class App(BaseTk):
             return
         mod_root, temp_dir = _find_mod_root(choice)
         try:
-            if not (mod_root / "manifest.json").exists() and not (mod_root / "Manifest.json").exists():
-                raise FileNotFoundError("Selected folder does not contain a manifest.json")
-            newname = install_mod_from_folder(mod_root, None, log=self._log)
+            # Check if manifest exists
+            has_manifest = _has_manifest(mod_root) if mod_root.is_dir() else False
+
+            generated_manifest = None
+
+            if not has_manifest:
+                # Auto-detect mod type
+                auto_type = _auto_detect_mod_type(mod_root)
+
+                # Show metadata dialog
+                self._log(f"No manifest.json found. Opening metadata dialog...")
+                dialog = ModMetadataDialog(self, mod_root, auto_type)
+                metadata = dialog.get_result()
+
+                if not metadata:
+                    # User cancelled
+                    self._log("Import cancelled by user.")
+                    return
+
+                # Generate manifest
+                generated_manifest = _generate_manifest(mod_root, metadata)
+                self._log(f"Generated manifest for mod '{metadata['name']}' (type: {metadata['type']})")
+
+            newname = install_mod_from_folder(mod_root, None, log=self._log, generated_manifest=generated_manifest)
             order = get_load_order()
             if newname not in order:
-                order.append(newname); set_load_order(order)
+                order.append(newname)
+                set_load_order(order)
             self.refresh_mod_list()
             messagebox.showinfo("Import", f"Imported '{newname}'.")
         except Exception as e:
@@ -980,27 +1337,51 @@ class App(BaseTk):
                 shutil.rmtree(temp_dir, ignore_errors=True)
 
     def on_drop(self, event):
-        if is_fm_running():
-            messagebox.showwarning(
-                "FM is Running", "Please close Football Manager before importing mods."
-            )
-            return
+        """Handle drag-and-drop events. Defers processing to avoid UI freezing."""
         raw = event.data.strip()
         if raw.startswith("{") and raw.endswith("}"):
             raw = raw[1:-1]
         path = Path(raw)
         if not path.exists():
             return
+
+        # Defer processing to let the drop event complete and avoid beach ball
+        self.after(100, lambda: self._process_dropped_file(path))
+
+    def _process_dropped_file(self, path: Path):
+        """Process a dropped file/folder after the drop event has completed."""
+        if is_fm_running():
+            messagebox.showwarning(
+                "FM is Running", "Please close Football Manager before importing mods."
+            )
+            return
+
         mod_root, temp_dir = _find_mod_root(path)
         try:
-            if (
-                not (mod_root / "manifest.json").exists()
-                and not (mod_root / "Manifest.json").exists()
-            ):
-                raise FileNotFoundError(
-                    "Dropped file/folder does not contain a manifest.json"
-                )
-            newname = install_mod_from_folder(mod_root, None, log=self._log)
+            # Check if manifest exists
+            has_manifest = _has_manifest(mod_root) if mod_root.is_dir() else False
+
+            generated_manifest = None
+
+            if not has_manifest:
+                # Auto-detect mod type
+                auto_type = _auto_detect_mod_type(mod_root)
+
+                # Show metadata dialog
+                self._log(f"No manifest.json found in dropped file/folder. Opening metadata dialog...")
+                dialog = ModMetadataDialog(self, mod_root, auto_type)
+                metadata = dialog.get_result()
+
+                if not metadata:
+                    # User cancelled
+                    self._log("Import cancelled by user.")
+                    return
+
+                # Generate manifest
+                generated_manifest = _generate_manifest(mod_root, metadata)
+                self._log(f"Generated manifest for mod '{metadata['name']}' (type: {metadata['type']})")
+
+            newname = install_mod_from_folder(mod_root, None, log=self._log, generated_manifest=generated_manifest)
             order = get_load_order()
             if newname not in order:
                 order.append(newname)
