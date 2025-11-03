@@ -317,12 +317,14 @@ def is_fm_running():
     return False
 
 
-def _copy_any(src: Path, dst: Path):
+def _copy_any(src: Path, dst: Path) -> int:
     """
     Merge-copy src -> dst.
     - If src is a file: copy2(src, dst)
     - If src is a directory: recursively copy its contents into dst (dirs_exist_ok)
+    Returns the number of files copied.
     """
+    count = 0
     if src.is_dir():
         dst.mkdir(parents=True, exist_ok=True)
         for child in src.rglob("*"):
@@ -333,9 +335,12 @@ def _copy_any(src: Path, dst: Path):
             else:
                 out.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(child, out)
+                count += 1
     else:
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
+        count = 1
+    return count
 
 
 def fm_user_dir():
@@ -527,8 +532,9 @@ def enable_mod(mod_name: str, log):
                 backed_up += 1
 
             # Directory-aware copy (merges folders, supports packs like logos/kits/faces)
-            _copy_any(src, tgt)
-            log(f"  [write] {src_rel}  →  {tgt_rel}{' (dir)' if src.is_dir() else ''}")
+            copied = _copy_any(src, tgt)
+            wrote += copied
+            log(f"  [write] {src_rel}  →  {tgt_rel}{' (dir)' if src.is_dir() else ''} ({copied} file(s))")
 
         except Exception as ex:
             log(f"  [error/copy] {src_rel} → {tgt_rel} :: {ex}")
@@ -805,13 +811,21 @@ def create_restore_point(base: Path, log):
     rp = RESTORE_POINTS_DIR / ts
     rp.mkdir(parents=True, exist_ok=True)
     idx, _ = build_mod_index(get_enabled_mods())
+    backed_up = 0
     for rel in idx.keys():
         src = base / rel
-        if src.exists() and src.is_file():
+        if src.exists():
             dst = rp / rel
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
-    log(f"Restore point created: {rp.name}")
+            if src.is_file():
+                shutil.copy2(src, dst)
+                backed_up += 1
+            elif src.is_dir():
+                # Backup entire directory tree
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+                # Count files in the directory
+                backed_up += sum(1 for _ in dst.rglob("*") if _.is_file())
+    log(f"Restore point created: {rp.name} (backed up {backed_up} file(s))")
     return rp.name
 
 
@@ -819,13 +833,64 @@ def rollback_to_restore_point(name: str, base: Path, log):
     rp = RESTORE_POINTS_DIR / name
     if not rp.exists():
         raise FileNotFoundError("Restore point not found.")
+
+    # Build a set of all files in the restore point (these are the "good" files)
+    restore_files = set()
     for p in rp.rglob("*"):
         if p.is_file():
             rel = p.relative_to(rp)
-            dst = base / rel.as_posix()
+            restore_files.add(rel)
+
+    # Build a set of all paths that mods touch (these are the areas we manage)
+    idx, _ = build_mod_index(get_enabled_mods())
+    managed_paths = set(Path(rel) for rel in idx.keys())
+
+    # Delete orphaned files: files that exist in the target but not in the restore point
+    # Only delete files in managed paths
+    deleted = 0
+    for managed_path in managed_paths:
+        target_path = base / managed_path
+        if target_path.exists():
+            if target_path.is_file():
+                # If it's a file and not in the restore point, delete it
+                if managed_path not in restore_files:
+                    try:
+                        target_path.unlink()
+                        log(f"  [deleted orphan] {managed_path}")
+                        deleted += 1
+                    except Exception as ex:
+                        log(f"  [error deleting] {managed_path}: {ex}")
+            elif target_path.is_dir():
+                # If it's a directory, check all files within it
+                for file_in_dir in target_path.rglob("*"):
+                    if file_in_dir.is_file():
+                        rel = file_in_dir.relative_to(base)
+                        if rel not in restore_files:
+                            try:
+                                file_in_dir.unlink()
+                                log(f"  [deleted orphan] {rel}")
+                                deleted += 1
+                            except Exception as ex:
+                                log(f"  [error deleting] {rel}: {ex}")
+                # Clean up empty directories
+                for dir_in_path in sorted(target_path.rglob("*"), key=lambda x: len(str(x)), reverse=True):
+                    if dir_in_path.is_dir() and not any(dir_in_path.iterdir()):
+                        try:
+                            dir_in_path.rmdir()
+                        except Exception:
+                            pass
+
+    # Restore all files from the restore point
+    restored = 0
+    for p in rp.rglob("*"):
+        if p.is_file():
+            rel = p.relative_to(rp)
+            dst = base / rel
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(p, dst)
-    log(f"Rolled back to restore point: {name}")
+            restored += 1
+
+    log(f"Rolled back to restore point: {name} (restored {restored} file(s), deleted {deleted} orphan(s))")
 
 
 # --------------
