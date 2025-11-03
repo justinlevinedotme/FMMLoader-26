@@ -34,7 +34,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 GITHUB_REPO = "justinlevinedotme/FMMLoader-26"
 
 
@@ -1138,7 +1138,7 @@ class ModMetadataDialog(tk.Toplevel):
             textvariable=self.type_var,
             width=38,
             state="readonly",
-            values=["ui", "bundle", "tactics", "graphics", "skins", "database", "ruleset", "audio", "editor-data", "misc"]
+            values=["ui", "bundle", "tactics", "graphics", "misc"]
         )
         type_combo.grid(row=1, column=1, pady=5, sticky=tk.EW)
 
