@@ -20,7 +20,7 @@
   <a href="modders.md">Modders Info</a>
 </p>
 
-**A cross-platform mod manager** for *Football Manager 2026*, built to make installing, organizing, and troubleshooting mods easy on both macOS and Windows.  
+**A cross-platform mod manager** for *Football Manager 2026*, built to make installing, organizing, and troubleshooting mods easy on  macOS, Windows and Linux.  
 
 Developed by [Justin Levine](https://justinlevine.me) / notJalco and presented with the great help of [FM Match Lab](https://fmmatchlab.co.uk/)
 ___
