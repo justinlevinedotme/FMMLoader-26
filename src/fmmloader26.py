@@ -15,6 +15,8 @@ from pathlib import Path
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+import urllib.request
+import urllib.error
 
 # Optional deps
 try:
@@ -33,6 +35,56 @@ except Exception:
 
 APP_NAME = "FMMLoader26"
 VERSION = "0.0.7"
+GITHUB_REPO = "justinlevinedotme/FMMLoader-26"
+
+
+# -----------------------
+# Update checker
+# -----------------------
+def check_for_updates():
+    """
+    Check GitHub releases for a newer version.
+    Returns (has_update, latest_version, download_url) or (False, None, None) on error.
+    """
+    try:
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+        req = urllib.request.Request(url)
+        req.add_header("Accept", "application/vnd.github.v3+json")
+
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            latest_version = data.get("tag_name", "").lstrip("v")
+            download_url = data.get("html_url", "")
+
+            # Simple version comparison (assumes semantic versioning)
+            current = VERSION.split(".")
+            latest = latest_version.split(".")
+
+            # Pad to same length
+            while len(current) < len(latest):
+                current.append("0")
+            while len(latest) < len(current):
+                latest.append("0")
+
+            # Compare each part
+            for c, l in zip(current, latest):
+                try:
+                    if int(l) > int(c):
+                        return True, latest_version, download_url
+                    elif int(l) < int(c):
+                        return False, None, None
+                except ValueError:
+                    # If version parts aren't numbers, do string comparison
+                    if l > c:
+                        return True, latest_version, download_url
+                    elif l < c:
+                        return False, None, None
+
+            # Versions are equal
+            return False, None, None
+    except Exception:
+        # Silently fail if we can't check for updates
+        return False, None, None
 
 
 # -----------------------
@@ -1171,6 +1223,8 @@ class App(BaseTk):
         self.refresh_user_dir_display()
         self.refresh_mod_list()
         self._log("Ready.")
+        # Check for updates after a short delay (non-blocking)
+        self.after(1000, self._check_for_updates_async)
 
     # ---- logging ----
     def _log(self, msg: str):
@@ -1185,12 +1239,25 @@ class App(BaseTk):
         except Exception:
             pass
 
+    # ---- update checker ----
+    def _check_for_updates_async(self):
+        """Check for updates in the background and notify user if available."""
+        has_update, latest_version, download_url = check_for_updates()
+        if has_update:
+            self._log(f"Update available: v{latest_version}")
+            response = messagebox.askyesno(
+                "Update Available",
+                f"A new version of {APP_NAME} is available!\n\n"
+                f"Current version: v{VERSION}\n"
+                f"Latest version: v{latest_version}\n\n"
+                f"Would you like to visit the download page?",
+                icon='info'
+            )
+            if response and download_url:
+                webbrowser.open(download_url)
+
     # ---- UI layout ----
     def create_widgets(self):
-        # Create custom style for orange Apply button
-        style = ttk.Style()
-        style.configure("Orange.TButton", foreground="#ff4f00", font=("TkDefaultFont", 10, "bold"))
-
         # Menus
         menubar = tk.Menu(self)
         file_menu = tk.Menu(menubar, tearoff=0)
@@ -1323,7 +1390,7 @@ class App(BaseTk):
         ttk.Button(right, text="Down (Order)", command=self.on_move_down).pack(
             fill=tk.X, pady=2
         )
-        ttk.Button(right, text="Apply", command=self.on_apply_order, style="Orange.TButton").pack(
+        ttk.Button(right, text="Apply", command=self.on_apply_order).pack(
             fill=tk.X, pady=(12, 2)
         )
         ttk.Button(right, text="Conflicts…", command=self.on_conflicts).pack(
