@@ -32,7 +32,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 
 
 # -----------------------
@@ -955,7 +955,7 @@ BaseTk = TkinterDnD.Tk if DND_AVAILABLE else tk.Tk
 class App(BaseTk):
     def __init__(self):
         super().__init__()
-        self.title(f"FMMLoader26 v{VERSION} — Presented by the FM Match Lab Team")
+        self.title(f"FMMLoader26 v{VERSION} — Presented by the JALCO / Justin Levine")
         self.geometry("1120x820")
         self.minsize(1000, 700)
         if DND_AVAILABLE:
@@ -1132,7 +1132,7 @@ class App(BaseTk):
         footer = ttk.Frame(self)
         footer.pack(side=tk.BOTTOM, fill=tk.X, padx=8, pady=8)
         ttk.Label(
-            footer, text="Presented by the FM Match Lab Team", anchor="center"
+            footer, text="Presented by JALCO / Justin Levine", anchor="center"
         ).pack()
 
     # ---- menu/button actions ----

@@ -100,7 +100,7 @@ but by submitting them, you agree to share under these same terms.
 
 ## 💬 Need Help?
 
-If you’re unsure about something, open a **discussion** or start a thread in the project’s **Issues** tab. You can also visit the [FM Match Lab Discord](https://discord.gg/QCW7QhWdAs)
+If you’re unsure about something, open a **discussion** or start a thread in the project’s **Issues** tab. You can also visit my [Discord](https://discord.gg/Enbjbpdq7Z)
 We’re friendly, and good documentation starts with good questions.
 
 ---

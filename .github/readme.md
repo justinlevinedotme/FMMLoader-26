@@ -5,7 +5,7 @@
 <h1>FMMLoader 26</h1>
 
 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-fdfdfd?style=flat&labelColor=black&logo=creativecommons&logoColor=white&logoSize=auto&link=https%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby-nc-sa%2F4.0%2F" alt="CC BY NC SA 4.0"></a>
-<a href=""><img alt= "Discord Link" src="https://img.shields.io/badge/Discord-7289da?style=flat-round&logo=discord&logoColor=white"></a>
+<a href="https://discord.gg/AWmnsDUqYQ"><img alt= "Discord Link" src="https://img.shields.io/badge/Discord-7289da?style=flat-round&logo=discord&logoColor=white"></a>
 <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/justinlevinedotme/FMMLoader-26">
 <img alt="GitHub Release" src="https://img.shields.io/github/v/release/justinlevinedotme/FMMLoader-26">
 
@@ -18,11 +18,12 @@
   <a href="#Usage Guide">Usage Guide</a> •
   <a href="#License">License Info</a> •
   <a href="modders.md">Modders Info</a>
+  <a href="https://discord.gg/AWmnsDUqYQ">Join Discord</a>
 </p>
 
 **A cross-platform mod manager** for *Football Manager 2026*, built to make installing, organizing, and troubleshooting mods easy on  macOS, Windows and Linux.  
 
-Developed by [Justin Levine](https://justinlevine.me) / notJalco and presented with the great help of [FM Match Lab](https://fmmatchlab.co.uk/)
+Developed by [Justin Levine](https://justinlevine.me) / JALCO / notJalco.
 ___
 
 ## Installation
