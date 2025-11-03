@@ -1443,19 +1443,65 @@ class App(BaseTk):
             footer, text="Presented by JALCO / Justin Levine", anchor="w"
         ).pack(side=tk.LEFT)
 
-        # Right side: Discord link
-        discord_label = tk.Label(
-            footer,
-            text="Join our Discord",
-            foreground="blue",
+        # Right side: Social buttons
+        buttons_frame = ttk.Frame(footer)
+        buttons_frame.pack(side=tk.RIGHT)
+
+        # Ko-fi button
+        kofi_btn = tk.Frame(buttons_frame, bg="#FF5E5B", cursor="hand2", relief="flat", bd=0)
+        kofi_btn.pack(side=tk.RIGHT, padx=(8, 0))
+        kofi_label = tk.Label(
+            kofi_btn,
+            text="☕ Support on Ko-fi",
+            bg="#FF5E5B",
+            fg="white",
             cursor="hand2",
-            anchor="e"
+            padx=12,
+            pady=6,
+            font=("TkDefaultFont", 9, "bold")
         )
-        discord_label.pack(side=tk.RIGHT, padx=(0, 8))
+        kofi_label.pack()
+        kofi_btn.bind("<Button-1>", lambda e: webbrowser.open("https://ko-fi.com/jalco"))
+        kofi_label.bind("<Button-1>", lambda e: webbrowser.open("https://ko-fi.com/jalco"))
+        # Hover effect for Ko-fi
+        def kofi_enter(e):
+            kofi_btn.config(bg="#E04E4C")
+            kofi_label.config(bg="#E04E4C")
+        def kofi_leave(e):
+            kofi_btn.config(bg="#FF5E5B")
+            kofi_label.config(bg="#FF5E5B")
+        kofi_btn.bind("<Enter>", kofi_enter)
+        kofi_btn.bind("<Leave>", kofi_leave)
+        kofi_label.bind("<Enter>", kofi_enter)
+        kofi_label.bind("<Leave>", kofi_leave)
+
+        # Discord button
+        discord_btn = tk.Frame(buttons_frame, bg="#5865F2", cursor="hand2", relief="flat", bd=0)
+        discord_btn.pack(side=tk.RIGHT, padx=(0, 8))
+        discord_label = tk.Label(
+            discord_btn,
+            text="💬 Join Discord",
+            bg="#5865F2",
+            fg="white",
+            cursor="hand2",
+            padx=12,
+            pady=6,
+            font=("TkDefaultFont", 9, "bold")
+        )
+        discord_label.pack()
+        discord_btn.bind("<Button-1>", lambda e: webbrowser.open("https://discord.gg/AspRvTTAch"))
         discord_label.bind("<Button-1>", lambda e: webbrowser.open("https://discord.gg/AspRvTTAch"))
-        # Add underline on hover
-        discord_label.bind("<Enter>", lambda e: discord_label.config(font=("TkDefaultFont", 9, "underline")))
-        discord_label.bind("<Leave>", lambda e: discord_label.config(font=("TkDefaultFont", 9)))
+        # Hover effect for Discord
+        def discord_enter(e):
+            discord_btn.config(bg="#4752C4")
+            discord_label.config(bg="#4752C4")
+        def discord_leave(e):
+            discord_btn.config(bg="#5865F2")
+            discord_label.config(bg="#5865F2")
+        discord_btn.bind("<Enter>", discord_enter)
+        discord_btn.bind("<Leave>", discord_leave)
+        discord_label.bind("<Enter>", discord_enter)
+        discord_label.bind("<Leave>", discord_leave)
 
     # ---- menu/button actions ----
     def on_open_logs_folder(self):
