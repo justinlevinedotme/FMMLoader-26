@@ -32,7 +32,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 
 
 # -----------------------
@@ -287,7 +287,6 @@ def is_fm_running():
         "fm.app",
         "fm26",
         "fm26.app",
-        "fm",
         "Football Manager 26.app",
     ]
     for proc in psutil.process_iter(["name", "exe", "cmdline"]):

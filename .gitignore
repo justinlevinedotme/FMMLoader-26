@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 *.pyo
+/build/FMMLoader26
+/dist
+FMMLoader26.spec
