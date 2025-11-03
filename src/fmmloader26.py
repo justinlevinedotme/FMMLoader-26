@@ -1349,9 +1349,17 @@ class App(BaseTk):
         ttk.Label(flt, text="Filter mod type:").pack(side=tk.RIGHT)
         self.type_combo.bind("<<ComboboxSelected>>", lambda e: self.refresh_mod_list())
 
+        # Create tabbed interface
+        notebook = ttk.Notebook(self)
+        notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+
+        # --- Mods Tab ---
+        mods_tab = ttk.Frame(notebook)
+        notebook.add(mods_tab, text="Mods")
+
         # Main list + right panel
-        mid = ttk.Frame(self)
-        mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        mid = ttk.Frame(mods_tab)
+        mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
         cols = ("name", "version", "type", "author", "order", "enabled")
         self.tree = ttk.Treeview(mid, columns=cols, show="headings", height=12)
         for c in cols:
@@ -1407,17 +1415,24 @@ class App(BaseTk):
         ).pack(fill=tk.X, pady=2)
 
         # Details pane
-        det = ttk.LabelFrame(self, text="Details")
-        det.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(0, 8))
+        det = ttk.LabelFrame(mods_tab, text="Details")
+        det.pack(side=tk.TOP, fill=tk.X, padx=0, pady=(8, 0))
         self.details_text = tk.Text(det, height=6)
         self.details_text.pack(fill=tk.BOTH, expand=True)
         self.tree.bind("<<TreeviewSelect>>", self.on_select_row)
 
+        # --- Logs Tab ---
+        logs_tab = ttk.Frame(notebook)
+        notebook.add(logs_tab, text="Logs")
+
         # Log pane
-        log_frame = ttk.LabelFrame(self, text="Log")
-        log_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=False, padx=8, pady=(0, 8))
-        self.log_text = tk.Text(log_frame, height=10)
-        self.log_text.pack(fill=tk.BOTH, expand=True)
+        log_frame = ttk.Frame(logs_tab)
+        log_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
+        self.log_text = tk.Text(log_frame, wrap="word")
+        self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        log_scrollbar = ttk.Scrollbar(log_frame, orient="vertical", command=self.log_text.yview)
+        log_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.log_text.configure(yscrollcommand=log_scrollbar.set)
 
         # Footer
         footer = ttk.Frame(self)
