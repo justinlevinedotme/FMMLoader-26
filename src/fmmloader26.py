@@ -15,6 +15,8 @@ from pathlib import Path
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+import urllib.request
+import urllib.error
 
 # Optional deps
 try:
@@ -32,7 +34,57 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
+GITHUB_REPO = "justinlevinedotme/FMMLoader-26"
+
+
+# -----------------------
+# Update checker
+# -----------------------
+def check_for_updates():
+    """
+    Check GitHub releases for a newer version.
+    Returns (has_update, latest_version, download_url) or (False, None, None) on error.
+    """
+    try:
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+        req = urllib.request.Request(url)
+        req.add_header("Accept", "application/vnd.github.v3+json")
+
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            latest_version = data.get("tag_name", "").lstrip("v")
+            download_url = data.get("html_url", "")
+
+            # Simple version comparison (assumes semantic versioning)
+            current = VERSION.split(".")
+            latest = latest_version.split(".")
+
+            # Pad to same length
+            while len(current) < len(latest):
+                current.append("0")
+            while len(latest) < len(current):
+                latest.append("0")
+
+            # Compare each part
+            for c, l in zip(current, latest):
+                try:
+                    if int(l) > int(c):
+                        return True, latest_version, download_url
+                    elif int(l) < int(c):
+                        return False, None, None
+                except ValueError:
+                    # If version parts aren't numbers, do string comparison
+                    if l > c:
+                        return True, latest_version, download_url
+                    elif l < c:
+                        return False, None, None
+
+            # Versions are equal
+            return False, None, None
+    except Exception:
+        # Silently fail if we can't check for updates
+        return False, None, None
 
 
 # -----------------------
@@ -93,6 +145,40 @@ def safe_open_path(path: Path):
         messagebox.showerror("Open Error", f"Could not open:\n{path}\n\n{e}")
 
 
+def cleanup_old_backups(keep=10):
+    """Keep only the most recent N backups, delete older ones."""
+    try:
+        backups = sorted(
+            [p for p in BACKUP_DIR.glob("*") if p.is_file()],
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for old_backup in backups[keep:]:
+            try:
+                old_backup.unlink()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+def cleanup_old_restore_points(keep=10):
+    """Keep only the most recent N restore points, delete older ones."""
+    try:
+        restore_points = sorted(
+            [p for p in RESTORE_POINTS_DIR.iterdir() if p.is_dir()],
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for old_rp in restore_points[keep:]:
+            try:
+                shutil.rmtree(old_rp)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
 def _init_storage():
     for p in (BACKUP_DIR, MODS_DIR, LOGS_DIR, RESTORE_POINTS_DIR):
         p.mkdir(parents=True, exist_ok=True)
@@ -109,6 +195,10 @@ def _init_storage():
             LAST_LINK.write_text(str(RUN_LOG), encoding="utf-8")
     except Exception:
         pass
+
+    # Clean up old backups and restore points on startup
+    cleanup_old_backups(keep=10)
+    cleanup_old_restore_points(keep=10)
 
 
 def migrate_legacy_storage_copy_only():
@@ -894,6 +984,10 @@ def create_restore_point(base: Path, log):
                 # Count files in the directory
                 backed_up += sum(1 for _ in dst.rglob("*") if _.is_file())
     log(f"Restore point created: {rp.name} (backed up {backed_up} file(s))")
+
+    # Clean up old restore points, keeping only the 10 most recent
+    cleanup_old_restore_points(keep=10)
+
     return rp.name
 
 
@@ -1044,7 +1138,7 @@ class ModMetadataDialog(tk.Toplevel):
             textvariable=self.type_var,
             width=38,
             state="readonly",
-            values=["ui", "bundle", "tactics", "graphics", "skins", "database", "ruleset", "audio", "editor-data", "misc"]
+            values=["ui", "bundle", "tactics", "graphics", "misc"]
         )
         type_combo.grid(row=1, column=1, pady=5, sticky=tk.EW)
 
@@ -1119,8 +1213,8 @@ class App(BaseTk):
     def __init__(self):
         super().__init__()
         self.title(f"FMMLoader26 v{VERSION} — Presented by the JALCO / Justin Levine")
-        self.geometry("1120x820")
-        self.minsize(1000, 700)
+        self.geometry("1200x900")
+        self.minsize(1100, 750)
         if DND_AVAILABLE:
             self.drop_target_register(DND_FILES)
             self.dnd_bind("<<Drop>>", self.on_drop)
@@ -1129,6 +1223,8 @@ class App(BaseTk):
         self.refresh_user_dir_display()
         self.refresh_mod_list()
         self._log("Ready.")
+        # Check for updates after a short delay (non-blocking)
+        self.after(1000, self._check_for_updates_async)
 
     # ---- logging ----
     def _log(self, msg: str):
@@ -1142,6 +1238,23 @@ class App(BaseTk):
                 f.write(msg + "\n")
         except Exception:
             pass
+
+    # ---- update checker ----
+    def _check_for_updates_async(self):
+        """Check for updates in the background and notify user if available."""
+        has_update, latest_version, download_url = check_for_updates()
+        if has_update:
+            self._log(f"Update available: v{latest_version}")
+            response = messagebox.askyesno(
+                "Update Available",
+                f"A new version of {APP_NAME} is available!\n\n"
+                f"Current version: v{VERSION}\n"
+                f"Latest version: v{latest_version}\n\n"
+                f"Would you like to visit the download page?",
+                icon='info'
+            )
+            if response and download_url:
+                webbrowser.open(download_url)
 
     # ---- UI layout ----
     def create_widgets(self):
@@ -1165,7 +1278,7 @@ class App(BaseTk):
         menubar.add_cascade(label="File", menu=file_menu)
 
         actions_menu = tk.Menu(menubar, tearoff=0)
-        actions_menu.add_command(label="Apply Order\tF5", command=self.on_apply_order)
+        actions_menu.add_command(label="Apply\tF5", command=self.on_apply_order)
         actions_menu.add_command(label="Conflicts…", command=self.on_conflicts)
         actions_menu.add_command(label="Rollback…", command=self.on_rollback)
         menubar.add_cascade(label="Actions", menu=actions_menu)
@@ -1236,9 +1349,17 @@ class App(BaseTk):
         ttk.Label(flt, text="Filter mod type:").pack(side=tk.RIGHT)
         self.type_combo.bind("<<ComboboxSelected>>", lambda e: self.refresh_mod_list())
 
+        # Create tabbed interface
+        notebook = ttk.Notebook(self)
+        notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+
+        # --- Mods Tab ---
+        mods_tab = ttk.Frame(notebook)
+        notebook.add(mods_tab, text="Mods")
+
         # Main list + right panel
-        mid = ttk.Frame(self)
-        mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        mid = ttk.Frame(mods_tab)
+        mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
         cols = ("name", "version", "type", "author", "order", "enabled")
         self.tree = ttk.Treeview(mid, columns=cols, show="headings", height=12)
         for c in cols:
@@ -1277,7 +1398,7 @@ class App(BaseTk):
         ttk.Button(right, text="Down (Order)", command=self.on_move_down).pack(
             fill=tk.X, pady=2
         )
-        ttk.Button(right, text="Apply Order", command=self.on_apply_order).pack(
+        ttk.Button(right, text="Apply", command=self.on_apply_order).pack(
             fill=tk.X, pady=(12, 2)
         )
         ttk.Button(right, text="Conflicts…", command=self.on_conflicts).pack(
@@ -1292,39 +1413,53 @@ class App(BaseTk):
         ttk.Button(
             right, text="Open Logs Folder", command=self.on_open_logs_folder
         ).pack(fill=tk.X, pady=2)
-        ttk.Button(right, text="Copy Log Path", command=self.on_copy_log_path).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(
-            right, text="Help (Manifest)", command=self.on_show_manifest_help
-        ).pack(fill=tk.X, pady=(12, 2))
 
         # Details pane
-        det = ttk.LabelFrame(self, text="Details")
-        det.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(0, 8))
+        det = ttk.LabelFrame(mods_tab, text="Details")
+        det.pack(side=tk.TOP, fill=tk.X, padx=0, pady=(8, 0))
         self.details_text = tk.Text(det, height=6)
         self.details_text.pack(fill=tk.BOTH, expand=True)
         self.tree.bind("<<TreeviewSelect>>", self.on_select_row)
 
+        # --- Logs Tab ---
+        logs_tab = ttk.Frame(notebook)
+        notebook.add(logs_tab, text="Logs")
+
         # Log pane
-        log_frame = ttk.LabelFrame(self, text="Log")
-        log_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=False, padx=8, pady=(0, 8))
-        self.log_text = tk.Text(log_frame, height=10)
-        self.log_text.pack(fill=tk.BOTH, expand=True)
+        log_frame = ttk.Frame(logs_tab)
+        log_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
+        self.log_text = tk.Text(log_frame, wrap="word")
+        self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        log_scrollbar = ttk.Scrollbar(log_frame, orient="vertical", command=self.log_text.yview)
+        log_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.log_text.configure(yscrollcommand=log_scrollbar.set)
 
         # Footer
         footer = ttk.Frame(self)
         footer.pack(side=tk.BOTTOM, fill=tk.X, padx=8, pady=8)
+
+        # Left side: Credits
         ttk.Label(
-            footer, text="Presented by JALCO / Justin Levine", anchor="center"
-        ).pack()
+            footer, text="Presented by JALCO / Justin Levine", anchor="w"
+        ).pack(side=tk.LEFT)
+
+        # Right side: Social buttons
+        buttons_frame = ttk.Frame(footer)
+        buttons_frame.pack(side=tk.RIGHT)
+
+        ttk.Button(
+            buttons_frame,
+            text="Support on Ko-fi",
+            command=lambda: webbrowser.open("https://ko-fi.com/jalco")
+        ).pack(side=tk.RIGHT, padx=(8, 0))
+
+        ttk.Button(
+            buttons_frame,
+            text="Join Discord",
+            command=lambda: webbrowser.open("https://discord.gg/AspRvTTAch")
+        ).pack(side=tk.RIGHT)
 
     # ---- menu/button actions ----
-    def on_copy_log_path(self):
-        self.clipboard_clear()
-        self.clipboard_append(str(RUN_LOG))
-        self._log(f"Copied log path: {RUN_LOG}")
-
     def on_open_logs_folder(self):
         safe_open_path(LOGS_DIR)
 
@@ -1868,31 +2003,6 @@ class App(BaseTk):
 
     def on_open_logs_folder(self):
         safe_open_path(LOGS_DIR)
-
-    def on_show_manifest_help(self):
-        txt = (
-            "Each mod must include a manifest.json at its root:\n\n"
-            "{\n"
-            '  "name": "FM26 UI Pack",\n'
-            '  "version": "1.0.0",\n'
-            '  "type": "ui",\n'
-            '  "author": "You",\n'
-            '  "install_path": "/path/to/custom/install/location",  // optional\n'
-            '  "homepage": "https://example.com",\n'
-            '  "description": "Replaces panel IDs bundle",\n'
-            '  "files": [\n'
-            '    { "source": "ui-panelids_assets_all Mac.bundle", "target_subpath": "ui-panelids_assets_all.bundle", "platform": "mac" },\n'
-            '    { "source": "ui-panelids_assets_all Windows.bundle", "target_subpath": "ui-panelids_assets_all.bundle", "platform": "windows" }\n'
-            "  ]\n"
-            "}\n\n"
-            "• target_subpath is relative to the Standalone… folder (for bundle/ui types).\n"
-            "• Other types install under your FM user folder (tactics/skins/graphics/etc.).\n"
-            "• install_path (optional) overrides the default install location.\n"
-            "• Last-write-wins according to the load order.\n"
-            f"• Mods live in: {MODS_DIR}\n"
-            f"• Logs live in: {LOGS_DIR}\n"
-        )
-        messagebox.showinfo("Manifest format", txt)
 
     def on_select_row(self, _event):
         sel = self.tree.selection()
