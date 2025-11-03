@@ -8,6 +8,7 @@
 <a href="https://discord.gg/AWmnsDUqYQ"><img alt= "Discord Link" src="https://img.shields.io/badge/Discord-7289da?style=flat-round&logo=discord&logoColor=white"></a>
 <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/justinlevinedotme/FMMLoader-26">
 <img alt="GitHub Release" src="https://img.shields.io/github/v/release/justinlevinedotme/FMMLoader-26">
+<img alt="GitHub Downloads (all assets, latest release)" src="https://img.shields.io/github/downloads/justinlevinedotme/fmmloader26/latest/total">
 
 </div>
 
