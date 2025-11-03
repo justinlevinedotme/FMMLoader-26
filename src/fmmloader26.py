@@ -491,8 +491,13 @@ def enable_mod(mod_name: str, log):
     mf = read_manifest(mod_dir)
     mod_type = (mf.get("type") or "misc").strip().lower()
 
-    # Pass mod name so graphics/* routing (kits/faces/logos) can work
-    base = get_target_for_type(mod_type, mf.get("name", mod_name))
+    # Check if manifest specifies a custom install_path
+    if mf.get("install_path"):
+        base = Path(mf.get("install_path")).expanduser()
+        log(f"  [custom path] Using custom install path: {base}")
+    else:
+        # Pass mod name so graphics/* routing (kits/faces/logos) can work
+        base = get_target_for_type(mod_type, mf.get("name", mod_name))
 
     if not base:
         raise RuntimeError("No valid FM26 target set. Use Detect or Set Target.")
@@ -563,7 +568,14 @@ def disable_mod(mod_name: str, log):
     mod_dir = MODS_DIR / mod_name
     mf = read_manifest(mod_dir)
     mod_type = (mf.get("type") or "misc").strip().lower()
-    base = get_target_for_type(mod_type)
+
+    # Check if manifest specifies a custom install_path
+    if mf.get("install_path"):
+        base = Path(mf.get("install_path")).expanduser()
+        log(f"  [custom path] Using custom install path: {base}")
+    else:
+        base = get_target_for_type(mod_type)
+
     if not base or not base.exists():
         raise RuntimeError("No valid FM26 target set. Use Detect or Set Target.")
     files = mf.get("files", [])
@@ -664,7 +676,8 @@ def _auto_detect_mod_type(path: Path) -> str:
 def _generate_manifest(mod_root: Path, mod_metadata: dict) -> dict:
     """
     Generate a manifest.json for a mod without one.
-    mod_metadata should contain: name, type, version (optional), author (optional), description (optional)
+    mod_metadata should contain: name, type, version (optional), author (optional),
+    description (optional), install_path (optional)
     """
     manifest = {
         "name": mod_metadata.get("name", mod_root.name),
@@ -680,6 +693,10 @@ def _generate_manifest(mod_root: Path, mod_metadata: dict) -> dict:
         "load_after": [],
         "license": ""
     }
+
+    # Add custom install_path if provided
+    if mod_metadata.get("install_path"):
+        manifest["install_path"] = mod_metadata.get("install_path")
 
     mod_type = manifest["type"]
 
@@ -981,7 +998,7 @@ class ModMetadataDialog(tk.Toplevel):
     def __init__(self, parent, mod_path: Path, auto_detected_type: str):
         super().__init__(parent)
         self.title("Mod Metadata - No manifest.json found")
-        self.geometry("500x400")
+        self.geometry("500x520")
         self.resizable(False, False)
 
         self.mod_path = mod_path
@@ -1041,10 +1058,20 @@ class ModMetadataDialog(tk.Toplevel):
         self.author_var = tk.StringVar()
         ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
 
+        # Install Path
+        ttk.Label(form, text="Install Path (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
+        self.install_path_var = tk.StringVar()
+        install_path_entry = ttk.Entry(form, textvariable=self.install_path_var, width=40)
+        install_path_entry.grid(row=4, column=1, pady=5, sticky=tk.EW)
+
+        # Add help text for install path
+        help_label = ttk.Label(form, text="Leave empty to use default path based on type", foreground="gray", font=("TkDefaultFont", 8))
+        help_label.grid(row=5, column=1, sticky=tk.W, pady=(0, 5))
+
         # Description
-        ttk.Label(form, text="Description (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Description (optional):").grid(row=6, column=0, sticky=tk.W, pady=5)
         self.description_text = tk.Text(form, width=40, height=4)
-        self.description_text.grid(row=4, column=1, pady=5, sticky=tk.EW)
+        self.description_text.grid(row=6, column=1, pady=5, sticky=tk.EW)
 
         form.columnconfigure(1, weight=1)
 
@@ -1070,6 +1097,7 @@ class ModMetadataDialog(tk.Toplevel):
             "type": mod_type,
             "version": self.version_var.get().strip() or "1.0.0",
             "author": self.author_var.get().strip(),
+            "install_path": self.install_path_var.get().strip(),
             "description": self.description_text.get("1.0", tk.END).strip()
         }
         self.destroy()
@@ -1849,6 +1877,7 @@ class App(BaseTk):
             '  "version": "1.0.0",\n'
             '  "type": "ui",\n'
             '  "author": "You",\n'
+            '  "install_path": "/path/to/custom/install/location",  // optional\n'
             '  "homepage": "https://example.com",\n'
             '  "description": "Replaces panel IDs bundle",\n'
             '  "files": [\n'
@@ -1858,6 +1887,7 @@ class App(BaseTk):
             "}\n\n"
             "• target_subpath is relative to the Standalone… folder (for bundle/ui types).\n"
             "• Other types install under your FM user folder (tactics/skins/graphics/etc.).\n"
+            "• install_path (optional) overrides the default install location.\n"
             "• Last-write-wins according to the load order.\n"
             f"• Mods live in: {MODS_DIR}\n"
             f"• Logs live in: {LOGS_DIR}\n"
