@@ -8,10 +8,22 @@ on:
 
 jobs:
   pyinstaller-build:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.name }})
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            name: Windows
+            artifact_name: FMMLoader26-Windows
+          - os: macos-latest
+            name: macOS (Apple Silicon)
+            artifact_name: FMMLoader26-macOS-AppleSilicon
+          - os: macos-13
+            name: macOS (Intel)
+            artifact_name: FMMLoader26-macOS-Intel
+          - os: ubuntu-latest
+            name: Linux
+            artifact_name: FMMLoader26-Linux
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -66,12 +78,12 @@ jobs:
             src/fmmloader26.py
 
       - name: Package artifact (macOS)
-        if: matrix.os == 'macos-latest'
+        if: startsWith(matrix.os, 'macos')
         shell: bash
         run: |
           mkdir -p upload
           cd dist
-          zip -r "../upload/FMMLoader26-macOS.zip" "FMMLoader26.app"
+          zip -r "../upload/${{ matrix.artifact_name }}.zip" "FMMLoader26.app"
           cd ..
 
       # ---------- Linux ----------
@@ -100,7 +112,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os == 'windows-latest' && 'FMMLoader26-Windows' || (matrix.os == 'macos-latest' && 'FMMLoader26-macOS' || 'FMMLoader26-Linux') }}
+          name: ${{ matrix.artifact_name }}
           path: upload/*
 
   release:
@@ -122,11 +134,18 @@ jobs:
           path: artifacts/windows
         continue-on-error: true
 
-      - name: Download macOS artifact
+      - name: Download macOS (Apple Silicon) artifact
         uses: actions/download-artifact@v4
         with:
-          name: FMMLoader26-macOS
-          path: artifacts/macos
+          name: FMMLoader26-macOS-AppleSilicon
+          path: artifacts/macos-arm
+        continue-on-error: true
+
+      - name: Download macOS (Intel) artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FMMLoader26-macOS-Intel
+          path: artifacts/macos-intel
         continue-on-error: true
 
       - name: Download Linux artifact
@@ -139,15 +158,17 @@ jobs:
       - name: List downloaded files
         run: |
           echo "Windows artifacts:"; ls -lah artifacts/windows || true
-          echo "macOS artifacts:";   ls -lah artifacts/macos || true
-          echo "Linux artifacts:";   ls -lah artifacts/linux || true
+          echo "macOS (Apple Silicon) artifacts:"; ls -lah artifacts/macos-arm || true
+          echo "macOS (Intel) artifacts:"; ls -lah artifacts/macos-intel || true
+          echo "Linux artifacts:"; ls -lah artifacts/linux || true
 
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             artifacts/windows/FMMLoader26.exe
-            artifacts/macos/FMMLoader26-macOS.zip
+            artifacts/macos-arm/FMMLoader26-macOS-AppleSilicon.zip
+            artifacts/macos-intel/FMMLoader26-macOS-Intel.zip
             artifacts/linux/FMMLoader26-Linux.tar.gz
           draft: false
           prerelease: false

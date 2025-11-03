@@ -32,7 +32,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 
 
 # -----------------------
@@ -169,6 +169,19 @@ def get_load_order():
 def set_load_order(order):
     cfg = load_config()
     cfg["load_order"] = order
+    save_config(cfg)
+
+
+def get_user_dir() -> Path | None:
+    """Get custom FM user directory path if set."""
+    p = load_config().get("user_dir_path")
+    return Path(p) if p else None
+
+
+def set_user_dir(path: Path):
+    """Set custom FM user directory path."""
+    cfg = load_config()
+    cfg["user_dir_path"] = str(path)
     save_config(cfg)
 
 
@@ -327,6 +340,12 @@ def _copy_any(src: Path, dst: Path):
 
 def fm_user_dir():
     """Return FM user folder (for tactics, skins, graphics, etc.)."""
+    # Check if user has set a custom path
+    custom_path = get_user_dir()
+    if custom_path and custom_path.exists():
+        return custom_path
+
+    # Default paths
     if sys.platform.startswith("win"):
         return Path.home() / "Documents" / "Sports Interactive" / "Football Manager 26"
     else:
@@ -963,6 +982,7 @@ class App(BaseTk):
             self.dnd_bind("<<Drop>>", self.on_drop)
         self.create_widgets()
         self.refresh_target_display()
+        self.refresh_user_dir_display()
         self.refresh_mod_list()
         self._log("Ready.")
 
@@ -987,7 +1007,11 @@ class App(BaseTk):
         file_menu.add_command(label="Detect Target\tCtrl+D", command=self.on_detect)
         file_menu.add_command(label="Set Target…\tCtrl+O", command=self.on_set_target)
         file_menu.add_separator()
+        file_menu.add_command(label="Set User Directory…", command=self.on_set_user_dir)
+        file_menu.add_command(label="Reset User Directory to Default", command=self.on_reset_user_dir)
+        file_menu.add_separator()
         file_menu.add_command(label="Open Target", command=self.on_open_target)
+        file_menu.add_command(label="Open User Directory", command=self.on_open_user_dir)
         file_menu.add_command(label="Open Mods Folder", command=self.on_open_mods)
         file_menu.add_command(
             label="Open Logs Folder", command=self.on_open_logs_folder
@@ -1013,22 +1037,35 @@ class App(BaseTk):
 
         # Target row
         top = ttk.Frame(self)
-        top.pack(side=tk.TOP, fill=tk.X, padx=8, pady=8)
+        top.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(8, 4))
         self.target_var = tk.StringVar()
-        ttk.Label(top, text="Target:").pack(side=tk.LEFT)
-        self.target_entry = ttk.Entry(top, textvariable=self.target_var, width=120)
+        ttk.Label(top, text="Game Target:").pack(side=tk.LEFT)
+        self.target_entry = ttk.Entry(top, textvariable=self.target_var, width=100)
         self.target_entry.pack(side=tk.LEFT, padx=(4, 6))
+
+        # User directory row
+        user_dir_frame = ttk.Frame(self)
+        user_dir_frame.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(4, 8))
+        self.user_dir_var = tk.StringVar()
+        ttk.Label(user_dir_frame, text="User Directory:").pack(side=tk.LEFT)
+        self.user_dir_entry = ttk.Entry(user_dir_frame, textvariable=self.user_dir_var, width=100)
+        self.user_dir_entry.pack(side=tk.LEFT, padx=(4, 6))
+        ttk.Label(user_dir_frame, text="(for tactics/graphics/skins)", foreground="gray").pack(side=tk.LEFT)
 
         # Controls row
         flt = ttk.Frame(self)
         flt.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(0, 6))
-        ttk.Button(flt, text="Detect", command=self.on_detect).pack(
+        ttk.Button(flt, text="Detect Target", command=self.on_detect).pack(
             side=tk.LEFT, padx=2
         )
         ttk.Button(flt, text="Set Target…", command=self.on_set_target).pack(
             side=tk.LEFT, padx=2
         )
-        ttk.Button(flt, text="Open Target", command=self.on_open_target).pack(
+        ttk.Label(flt, text=" | ", foreground="gray").pack(side=tk.LEFT, padx=4)
+        ttk.Button(flt, text="Set User Dir…", command=self.on_set_user_dir).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(flt, text="Reset User Dir", command=self.on_reset_user_dir).pack(
             side=tk.LEFT, padx=2
         )
 
@@ -1148,6 +1185,15 @@ class App(BaseTk):
         t = get_target()
         self.target_var.set(str(t) if t else "")
 
+    def refresh_user_dir_display(self):
+        """Update the user directory display field."""
+        custom = get_user_dir()
+        if custom:
+            self.user_dir_var.set(f"{custom} (custom)")
+        else:
+            default = fm_user_dir()
+            self.user_dir_var.set(f"{default} (default)")
+
     def refresh_mod_list(self):
         """Refresh table, accurately reflecting which mods are enabled."""
         for i in self.tree.get_children():
@@ -1217,6 +1263,58 @@ class App(BaseTk):
         self.refresh_mod_list()
         self._log(f"Set target to: {p}")
         self.refresh_target_display()
+
+    def on_set_user_dir(self):
+        """Allow user to set custom FM user directory for tactics/graphics/skins."""
+        chosen = filedialog.askdirectory(
+            title="Select FM26 User Directory (contains tactics/graphics/skins folders)"
+        )
+        if not chosen:
+            return
+        p = Path(chosen).expanduser()
+        if not p.exists():
+            messagebox.showerror("Set User Directory", "Selected path does not exist.")
+            return
+
+        # Verify it looks like an FM user directory
+        if "Football Manager" not in str(p):
+            if not messagebox.askyesno(
+                "Confirm",
+                f"Selected folder does not contain 'Football Manager' in its path.\nUse anyway?\n\n{p}",
+            ):
+                return
+
+        set_user_dir(p)
+        self._log(f"Set user directory to: {p}")
+        self.refresh_user_dir_display()
+        messagebox.showinfo(
+            "User Directory Set",
+            f"User directory set to:\n{p}\n\nTactics, graphics, and other user mods will be installed here."
+        )
+
+    def on_reset_user_dir(self):
+        """Reset user directory to default platform-specific path."""
+        cfg = load_config()
+        if "user_dir_path" in cfg:
+            del cfg["user_dir_path"]
+            save_config(cfg)
+        self._log("Reset user directory to default")
+        self.refresh_user_dir_display()
+        messagebox.showinfo(
+            "User Directory Reset",
+            f"User directory reset to default:\n{fm_user_dir()}"
+        )
+
+    def on_open_user_dir(self):
+        """Open the FM user directory."""
+        user_dir = fm_user_dir()
+        if not user_dir.exists():
+            messagebox.showwarning(
+                "Directory Not Found",
+                f"User directory does not exist:\n{user_dir}\n\nPlease set a custom path if your Documents folder has been moved."
+            )
+            return
+        safe_open_path(user_dir)
 
     def _choose_import_source(self) -> Path | None:
         """Choose import from ZIP, Folder, or single file, then show proper dialog."""
