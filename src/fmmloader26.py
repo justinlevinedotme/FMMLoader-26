@@ -153,7 +153,14 @@ def set_target(path: Path):
 
 
 def get_enabled_mods():
-    return load_config().get("enabled_mods", [])
+    """Get list of enabled mods, filtering out any that don't exist on disk."""
+    enabled = load_config().get("enabled_mods", [])
+    # Filter out mods that don't exist
+    valid_mods = [m for m in enabled if (MODS_DIR / m).exists()]
+    # Auto-clean config if we found invalid mods
+    if len(valid_mods) != len(enabled):
+        set_enabled_mods(valid_mods)
+    return valid_mods
 
 
 def set_enabled_mods(mods):
@@ -163,7 +170,14 @@ def set_enabled_mods(mods):
 
 
 def get_load_order():
-    return load_config().get("load_order", [])
+    """Get load order, filtering out any mods that don't exist on disk."""
+    order = load_config().get("load_order", [])
+    # Filter out mods that don't exist
+    valid_order = [m for m in order if (MODS_DIR / m).exists()]
+    # Auto-clean config if we found invalid mods
+    if len(valid_order) != len(order):
+        set_load_order(valid_order)
+    return valid_order
 
 
 def set_load_order(order):
@@ -807,18 +821,26 @@ def build_mod_index(names=None):
     plat = _platform_tag()
 
     for m in names:
-        mf = read_manifest(MODS_DIR / m)
-        manifests[m] = mf
-        for f in mf.get("files", []):
-            # 1) Skip other platforms
-            ep = f.get("platform")
-            if ep and ep != plat:
-                continue
-            # 2) Guard + dedupe
-            tgt = f.get("target_subpath")
-            if not tgt:
-                continue
-            idx.setdefault(tgt, set()).add(m)
+        mod_dir = MODS_DIR / m
+        # Skip mods that don't exist or don't have manifests
+        if not mod_dir.exists():
+            continue
+        try:
+            mf = read_manifest(mod_dir)
+            manifests[m] = mf
+            for f in mf.get("files", []):
+                # 1) Skip other platforms
+                ep = f.get("platform")
+                if ep and ep != plat:
+                    continue
+                # 2) Guard + dedupe
+                tgt = f.get("target_subpath")
+                if not tgt:
+                    continue
+                idx.setdefault(tgt, set()).add(m)
+        except FileNotFoundError:
+            # Skip mods without manifests
+            continue
 
     # Convert sets to lists for stable downstream use
     idx = {t: sorted(list(ms)) for t, ms in idx.items()}
