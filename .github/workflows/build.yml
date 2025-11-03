@@ -11,7 +11,7 @@ jobs:
     name: Build (${{ matrix.os }})
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -74,11 +74,33 @@ jobs:
           zip -r "../upload/FMMLoader26-macOS.zip" "FMMLoader26.app"
           cd ..
 
+      # ---------- Linux ----------
+      - name: Build with PyInstaller (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          pyinstaller \
+            --clean \
+            --noconfirm \
+            --windowed \
+            --onefile \
+            --name "FMMLoader26" \
+            src/fmmloader26.py
+
+      - name: Package artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          mkdir -p upload
+          cd dist
+          tar -czf "../upload/FMMLoader26-Linux.tar.gz" "FMMLoader26"
+          cd ..
+
       # ---------- Upload ----------
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os == 'windows-latest' && 'FMMLoader26-Windows' || 'FMMLoader26-macOS' }}
+          name: ${{ matrix.os == 'windows-latest' && 'FMMLoader26-Windows' || (matrix.os == 'macos-latest' && 'FMMLoader26-macOS' || 'FMMLoader26-Linux') }}
           path: upload/*
 
   release:
@@ -107,10 +129,18 @@ jobs:
           path: artifacts/macos
         continue-on-error: true
 
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FMMLoader26-Linux
+          path: artifacts/linux
+        continue-on-error: true
+
       - name: List downloaded files
         run: |
           echo "Windows artifacts:"; ls -lah artifacts/windows || true
           echo "macOS artifacts:";   ls -lah artifacts/macos || true
+          echo "Linux artifacts:";   ls -lah artifacts/linux || true
 
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
@@ -118,6 +148,7 @@ jobs:
           files: |
             artifacts/windows/FMMLoader26.exe
             artifacts/macos/FMMLoader26-macOS.zip
+            artifacts/linux/FMMLoader26-Linux.tar.gz
           draft: false
           prerelease: false
         env:
