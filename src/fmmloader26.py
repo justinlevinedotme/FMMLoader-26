@@ -589,6 +589,35 @@ def disable_mod(mod_name: str, log):
     )
 
 
+def remove_mod(mod_name: str, log):
+    """
+    Permanently delete a mod from the mod manager.
+    Removes it from enabled_mods, load_order, and deletes the mod directory.
+    """
+    mod_dir = MODS_DIR / mod_name
+    if not mod_dir.exists():
+        raise FileNotFoundError(f"Mod not found: {mod_name}")
+
+    # Remove from enabled mods
+    enabled = get_enabled_mods()
+    if mod_name in enabled:
+        enabled.remove(mod_name)
+        set_enabled_mods(enabled)
+
+    # Remove from load order
+    order = get_load_order()
+    if mod_name in order:
+        order.remove(mod_name)
+        set_load_order(order)
+
+    # Delete the mod directory
+    try:
+        shutil.rmtree(mod_dir)
+        log(f"[remove] Permanently deleted mod '{mod_name}' from {mod_dir}")
+    except Exception as ex:
+        raise RuntimeError(f"Failed to delete mod directory: {ex}")
+
+
 def _auto_detect_mod_type(path: Path) -> str:
     """Auto-detect mod type based on file extensions and names."""
     if path.is_file():
@@ -1189,6 +1218,9 @@ class App(BaseTk):
         ttk.Button(
             right, text="Disable (unmark)", command=self.on_disable_selected
         ).pack(fill=tk.X, pady=2)
+        ttk.Button(right, text="Remove Mod", command=self.on_remove_selected).pack(
+            fill=tk.X, pady=2
+        )
         ttk.Button(right, text="Up (Order)", command=self.on_move_up).pack(
             fill=tk.X, pady=(12, 2)
         )
@@ -1583,6 +1615,31 @@ class App(BaseTk):
             f"Disabled (unmarked) '{name}'. Apply Order to rewrite files without it."
         )
         self.refresh_mod_list()
+
+    def on_remove_selected(self):
+        name = self.selected_mod_name()
+        if not name:
+            messagebox.showinfo("Remove Mod", "Select a mod first.")
+            return
+
+        # Confirm deletion
+        result = messagebox.askyesno(
+            "Remove Mod",
+            f"Are you sure you want to permanently delete '{name}'?\n\n"
+            "This will remove the mod from your mods folder.\n"
+            "This action cannot be undone.",
+            icon='warning'
+        )
+
+        if not result:
+            return
+
+        try:
+            remove_mod(name, self._log)
+            self.refresh_mod_list()
+            messagebox.showinfo("Remove Mod", f"Successfully removed '{name}'.")
+        except Exception as e:
+            messagebox.showerror("Remove Mod Error", f"Failed to remove mod:\n{e}")
 
     def on_move_up(self):
         name = self.selected_mod_name()
