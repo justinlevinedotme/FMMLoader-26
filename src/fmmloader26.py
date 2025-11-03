@@ -1213,8 +1213,8 @@ class App(BaseTk):
     def __init__(self):
         super().__init__()
         self.title(f"FMMLoader26 v{VERSION} — Presented by the JALCO / Justin Levine")
-        self.geometry("1120x820")
-        self.minsize(1000, 700)
+        self.geometry("1200x900")
+        self.minsize(1100, 750)
         if DND_AVAILABLE:
             self.drop_target_register(DND_FILES)
             self.dnd_bind("<<Drop>>", self.on_drop)
@@ -1437,9 +1437,25 @@ class App(BaseTk):
         # Footer
         footer = ttk.Frame(self)
         footer.pack(side=tk.BOTTOM, fill=tk.X, padx=8, pady=8)
+
+        # Left side: Credits
         ttk.Label(
-            footer, text="Presented by JALCO / Justin Levine", anchor="center"
-        ).pack()
+            footer, text="Presented by JALCO / Justin Levine", anchor="w"
+        ).pack(side=tk.LEFT)
+
+        # Right side: Discord link
+        discord_label = tk.Label(
+            footer,
+            text="Join our Discord",
+            foreground="blue",
+            cursor="hand2",
+            anchor="e"
+        )
+        discord_label.pack(side=tk.RIGHT, padx=(0, 8))
+        discord_label.bind("<Button-1>", lambda e: webbrowser.open("https://discord.gg/AspRvTTAch"))
+        # Add underline on hover
+        discord_label.bind("<Enter>", lambda e: discord_label.config(font=("TkDefaultFont", 9, "underline")))
+        discord_label.bind("<Leave>", lambda e: discord_label.config(font=("TkDefaultFont", 9)))
 
     # ---- menu/button actions ----
     def on_open_logs_folder(self):
