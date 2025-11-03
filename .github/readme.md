@@ -32,7 +32,7 @@ ___
 
 ### Installation on a Mac
 
-1. Download **`FMMLoader26.zip`** from [Releases](../../releases).
+1. Download **`FMMLoader26.zip`** from [Releases](https://github.com/justinlevinedotme/FMMLoader-26/releases).
 2. Unzip the compressed file, then drag to your `Applications` folder
 
 <p align="center">
@@ -54,7 +54,7 @@ After clicking "Open Anyway" you will likely recieve a popup. You can press "Ope
 
 ### Installation on Windows
 
-1. Download **`FMMLoader26.exe`** from [Releases](../../releases).
+1. Download **`FMMLoader26.exe`** from [Releases](https://github.com/justinlevinedotme/FMMLoader-26/releases).
 2. Run it directly as Administrator — no installation required. You may get a popup for Windows Defender, click "More Info" and "Run Anyway" **IMAGES NEEDED, WINDOWS USERS**
 
 </details>
