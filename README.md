@@ -5,28 +5,20 @@
 <div align="center">
 
 # FMMLoader26
-
 ### 🎮 Cross-Platform Mod Manager for Football Manager 2026
 
-[![CC BY-NC-SA 4.0 License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-fdfdfd?style=for-the-badge&labelColor=black&logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Server-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/AspRvTTAch)
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-ff5f5f?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jalco)
+[![CC BY-NC-SA 4.0 License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-fdfdfd?style=flat-square&labelColor=black&logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-7289da?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/AspRvTTAch)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-ff5f5f?style=flat-square&logo=ko-fi&logoColor=white)](https://ko-fi.com/jalco)
 
 [![GitHub Release](https://img.shields.io/github/v/release/justinlevinedotme/FMMLoader-26?style=flat-square&logo=github&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/releases/latest)
-[![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/justinlevinedotme/FMMLoader-26/latest/total?style=flat-square&logo=github&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/releases/latest)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/justinlevinedotme/fmmloader26/total?style=flat-square)
 [![GitHub Contributors](https://img.shields.io/github/contributors/justinlevinedotme/FMMLoader-26?style=flat-square&logo=github&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/graphs/contributors)
 [![GitHub Stars](https://img.shields.io/github/stars/justinlevinedotme/FMMLoader-26?style=flat-square&logo=github&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/justinlevinedotme/FMMLoader-26?style=flat-square&logo=github&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/justinlevinedotme/FMMLoader-26?style=flat-square&logo=github&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/pulls)
 
-[![Platform - Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/releases/latest)
-[![Platform - macOS](https://img.shields.io/badge/Platform-macOS-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/justinlevinedotme/FMMLoader-26/releases/latest)
-[![Platform - Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/justinlevinedotme/FMMLoader-26/releases/latest)
-[![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![Code Style - Black](https://img.shields.io/badge/Code%20Style-Black-000000?style=flat-square)](https://github.com/psf/black)
-
 <p align="center">
-  <a href="https://github.com/justinlevinedotme/FMMLoader-26/wiki">📖 Wiki</a> •
   <a href="https://github.com/justinlevinedotme/FMMLoader-26/releases/latest">⬇️ Download</a> •
   <a href="#-installation">🚀 Installation</a> •
   <a href="#-features">✨ Features</a> •
@@ -852,6 +844,7 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial-
 - **psutil** - Process detection
 - **PyInstaller** - Executable creation
 - **shields.io** - Beautiful badges
+- **claude** - doing a bunch of stuff I don't have time for.
 
 ---
 
@@ -867,6 +860,7 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial-
 <div align="center">
 
 ### Made with ❤️ by [Justin Levine](https://justinlevine.me)
+[![Claude](https://img.shields.io/badge/Made%20with%20a%20lil%20Claude-da7756?style=flat-square&labelColor=da7756&logo=claude&logoColor=white)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 **If FMMLoader26 helps you enjoy FM26 more, consider leaving a ⭐!**
 
