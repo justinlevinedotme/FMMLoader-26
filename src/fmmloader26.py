@@ -15,6 +15,7 @@ from pathlib import Path
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+import customtkinter as ctk
 import urllib.request
 import urllib.error
 
@@ -1086,13 +1087,13 @@ def apply_enabled_mods_in_order(log):
 # ==========
 #   GUI
 # ==========
-class ModMetadataDialog(tk.Toplevel):
+class ModMetadataDialog(ctk.CTkToplevel):
     """Dialog for collecting mod metadata when manifest.json is missing."""
 
     def __init__(self, parent, mod_path: Path, auto_detected_type: str):
         super().__init__(parent)
         self.title("Mod Metadata - No manifest.json found")
-        self.geometry("500x520")
+        self.geometry("520x540")
         self.resizable(False, False)
 
         self.mod_path = mod_path
@@ -1111,69 +1112,65 @@ class ModMetadataDialog(tk.Toplevel):
         self.geometry(f"+{x}+{y}")
 
     def _create_widgets(self, auto_detected_type: str):
-        # Info label
-        info_frame = ttk.Frame(self, padding=10)
-        info_frame.pack(fill=tk.X)
-        ttk.Label(
-            info_frame,
-            text="No manifest.json found. Please provide mod information:",
-            wraplength=460,
-            justify=tk.LEFT
-        ).pack(anchor=tk.W)
+        content = ctk.CTkFrame(self, corner_radius=16)
+        content.pack(fill=tk.BOTH, expand=True, padx=16, pady=16)
+        content.grid_columnconfigure(0, weight=1)
 
-        # Form frame
-        form = ttk.Frame(self, padding=10)
-        form.pack(fill=tk.BOTH, expand=True)
+        ctk.CTkLabel(
+            content,
+            text="No manifest.json found. Please provide mod information.",
+            wraplength=440,
+            justify="left",
+            font=("Segoe UI", 12)
+        ).grid(row=0, column=0, columnspan=2, sticky="w", pady=(4, 18))
 
-        # Mod name
-        ttk.Label(form, text="Mod Name:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        form = ctk.CTkFrame(content, fg_color="transparent")
+        form.grid(row=1, column=0, columnspan=2, sticky="nsew")
+        form.grid_columnconfigure(1, weight=1)
+
+        label_font = ("Segoe UI", 11)
+
+        ctk.CTkLabel(form, text="Mod Name", font=label_font).grid(row=0, column=0, sticky="w", pady=6, padx=(0, 12))
         self.name_var = tk.StringVar(value=self.mod_path.stem if self.mod_path.is_file() else self.mod_path.name)
-        ttk.Entry(form, textvariable=self.name_var, width=40).grid(row=0, column=1, pady=5, sticky=tk.EW)
+        ctk.CTkEntry(form, textvariable=self.name_var).grid(row=0, column=1, sticky="ew", pady=6)
 
-        # Mod type
-        ttk.Label(form, text="Mod Type:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        ctk.CTkLabel(form, text="Mod Type", font=label_font).grid(row=1, column=0, sticky="w", pady=6, padx=(0, 12))
         self.type_var = tk.StringVar(value=auto_detected_type)
-        type_combo = ttk.Combobox(
+        type_combo = ctk.CTkComboBox(
             form,
-            textvariable=self.type_var,
-            width=38,
+            values=["ui", "bundle", "tactics", "graphics", "misc"],
             state="readonly",
-            values=["ui", "bundle", "tactics", "graphics", "misc"]
+            command=lambda choice: self.type_var.set(choice)
         )
-        type_combo.grid(row=1, column=1, pady=5, sticky=tk.EW)
+        type_combo.set(self.type_var.get())
+        type_combo.grid(row=1, column=1, sticky="ew", pady=6)
 
-        # Version
-        ttk.Label(form, text="Version (optional):").grid(row=2, column=0, sticky=tk.W, pady=5)
+        ctk.CTkLabel(form, text="Version (optional)", font=label_font).grid(row=2, column=0, sticky="w", pady=6, padx=(0, 12))
         self.version_var = tk.StringVar(value="1.0.0")
-        ttk.Entry(form, textvariable=self.version_var, width=40).grid(row=2, column=1, pady=5, sticky=tk.EW)
+        ctk.CTkEntry(form, textvariable=self.version_var).grid(row=2, column=1, sticky="ew", pady=6)
 
-        # Author
-        ttk.Label(form, text="Author (optional):").grid(row=3, column=0, sticky=tk.W, pady=5)
+        ctk.CTkLabel(form, text="Author (optional)", font=label_font).grid(row=3, column=0, sticky="w", pady=6, padx=(0, 12))
         self.author_var = tk.StringVar()
-        ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
+        ctk.CTkEntry(form, textvariable=self.author_var).grid(row=3, column=1, sticky="ew", pady=6)
 
-        # Install Path
-        ttk.Label(form, text="Install Path (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
+        ctk.CTkLabel(form, text="Install Path (optional)", font=label_font).grid(row=4, column=0, sticky="w", pady=6, padx=(0, 12))
         self.install_path_var = tk.StringVar()
-        install_path_entry = ttk.Entry(form, textvariable=self.install_path_var, width=40)
-        install_path_entry.grid(row=4, column=1, pady=5, sticky=tk.EW)
+        ctk.CTkEntry(form, textvariable=self.install_path_var).grid(row=4, column=1, sticky="ew", pady=6)
+        ctk.CTkLabel(
+            form,
+            text="Leave empty to use the default location based on type.",
+            text_color=("#4a4a4a", "#b5b5b5"),
+            font=("Segoe UI", 10)
+        ).grid(row=5, column=1, sticky="w", pady=(0, 10))
 
-        # Add help text for install path
-        help_label = ttk.Label(form, text="Leave empty to use default path based on type", foreground="gray", font=("TkDefaultFont", 8))
-        help_label.grid(row=5, column=1, sticky=tk.W, pady=(0, 5))
+        ctk.CTkLabel(form, text="Description (optional)", font=label_font).grid(row=6, column=0, sticky="nw", pady=6, padx=(0, 12))
+        self.description_text = ctk.CTkTextbox(form, height=100)
+        self.description_text.grid(row=6, column=1, sticky="ew", pady=6)
 
-        # Description
-        ttk.Label(form, text="Description (optional):").grid(row=6, column=0, sticky=tk.W, pady=5)
-        self.description_text = tk.Text(form, width=40, height=4)
-        self.description_text.grid(row=6, column=1, pady=5, sticky=tk.EW)
-
-        form.columnconfigure(1, weight=1)
-
-        # Buttons
-        button_frame = ttk.Frame(self, padding=10)
-        button_frame.pack(fill=tk.X)
-        ttk.Button(button_frame, text="Import", command=self._on_import).pack(side=tk.RIGHT, padx=5)
-        ttk.Button(button_frame, text="Cancel", command=self._on_cancel).pack(side=tk.RIGHT)
+        button_frame = ctk.CTkFrame(content, fg_color="transparent")
+        button_frame.grid(row=2, column=0, columnspan=2, sticky="e", pady=(18, 0))
+        ctk.CTkButton(button_frame, text="Cancel", width=120, command=self._on_cancel).pack(side=tk.RIGHT, padx=(8, 0))
+        ctk.CTkButton(button_frame, text="Import", width=140, command=self._on_import).pack(side=tk.RIGHT)
 
     def _on_import(self):
         name = self.name_var.get().strip()
@@ -1206,7 +1203,22 @@ class ModMetadataDialog(tk.Toplevel):
         return self.result
 
 
-BaseTk = TkinterDnD.Tk if DND_AVAILABLE else tk.Tk
+ctk.set_appearance_mode("system")
+ctk.set_default_color_theme("blue")
+
+
+if DND_AVAILABLE:
+
+    class BaseTk(ctk.CTk, TkinterDnD.DnDWrapper):
+        def __init__(self, *args, **kwargs):
+            ctk.CTk.__init__(self, *args, **kwargs)
+            TkinterDnD.DnDWrapper.__init__(self)
+
+
+else:
+
+    class BaseTk(ctk.CTk):
+        pass
 
 
 class App(BaseTk):
@@ -1292,174 +1304,305 @@ class App(BaseTk):
             self.bind_all("<Command-d>", lambda e: self.on_detect())
             self.bind_all("<Command-o>", lambda e: self.on_set_target())
 
+        wrapper = ctk.CTkFrame(self, fg_color="transparent")
+        wrapper.pack(fill=tk.BOTH, expand=True, padx=16, pady=(12, 8))
+
         # Target row
-        top = ttk.Frame(self)
-        top.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(8, 4))
         self.target_var = tk.StringVar()
-        ttk.Label(top, text="Game Target:").pack(side=tk.LEFT)
-        self.target_entry = ttk.Entry(top, textvariable=self.target_var, width=100)
-        self.target_entry.pack(side=tk.LEFT, padx=(4, 6))
+        target_row = ctk.CTkFrame(wrapper, fg_color="transparent")
+        target_row.pack(fill=tk.X, pady=(0, 10))
+        target_row.grid_columnconfigure(1, weight=1)
+        ctk.CTkLabel(
+            target_row,
+            text="Game Target",
+            font=("Segoe UI Semibold", 12)
+        ).grid(row=0, column=0, sticky="w")
+        self.target_entry = ctk.CTkEntry(
+            target_row,
+            textvariable=self.target_var,
+            placeholder_text="Detect or set your Football Manager 26 folder",
+            height=36
+        )
+        self.target_entry.grid(row=0, column=1, sticky="ew", padx=(12, 0))
+        target_actions = ctk.CTkFrame(target_row, fg_color="transparent")
+        target_actions.grid(row=0, column=2, sticky="e", padx=(12, 0))
+        ctk.CTkButton(
+            target_actions,
+            text="Detect",
+            width=110,
+            command=self.on_detect
+        ).pack(side=tk.LEFT, padx=(0, 8))
+        ctk.CTkButton(
+            target_actions,
+            text="Browse…",
+            width=110,
+            command=self.on_set_target
+        ).pack(side=tk.LEFT)
 
         # User directory row
-        user_dir_frame = ttk.Frame(self)
-        user_dir_frame.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(4, 8))
         self.user_dir_var = tk.StringVar()
-        ttk.Label(user_dir_frame, text="User Directory:").pack(side=tk.LEFT)
-        self.user_dir_entry = ttk.Entry(user_dir_frame, textvariable=self.user_dir_var, width=100)
-        self.user_dir_entry.pack(side=tk.LEFT, padx=(4, 6))
-        ttk.Label(user_dir_frame, text="(for tactics/graphics/skins)", foreground="gray").pack(side=tk.LEFT)
+        user_row = ctk.CTkFrame(wrapper, fg_color="transparent")
+        user_row.pack(fill=tk.X, pady=(0, 12))
+        user_row.grid_columnconfigure(1, weight=1)
+        ctk.CTkLabel(
+            user_row,
+            text="User Directory",
+            font=("Segoe UI Semibold", 12)
+        ).grid(row=0, column=0, sticky="w")
+        self.user_dir_entry = ctk.CTkEntry(
+            user_row,
+            textvariable=self.user_dir_var,
+            placeholder_text="Defaults to your Football Manager documents folder",
+            height=36
+        )
+        self.user_dir_entry.grid(row=0, column=1, sticky="ew", padx=(12, 0))
+        user_actions = ctk.CTkFrame(user_row, fg_color="transparent")
+        user_actions.grid(row=0, column=2, sticky="e", padx=(12, 0))
+        ctk.CTkButton(
+            user_actions,
+            text="Choose…",
+            width=110,
+            command=self.on_set_user_dir
+        ).pack(side=tk.LEFT, padx=(0, 8))
+        ctk.CTkButton(
+            user_actions,
+            text="Reset",
+            width=110,
+            command=self.on_reset_user_dir
+        ).pack(side=tk.LEFT)
+        ctk.CTkLabel(
+            user_row,
+            text="Used for tactics, graphics, skins and other user files",
+            anchor="w",
+            text_color=("#4a4a4a", "#b5b5b5"),
+            font=("Segoe UI", 10)
+        ).grid(row=1, column=1, sticky="w", pady=(6, 0))
 
-        # Controls row
-        flt = ttk.Frame(self)
-        flt.pack(side=tk.TOP, fill=tk.X, padx=8, pady=(0, 6))
-        ttk.Button(flt, text="Detect Target", command=self.on_detect).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(flt, text="Set Target…", command=self.on_set_target).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Label(flt, text=" | ", foreground="gray").pack(side=tk.LEFT, padx=4)
-        ttk.Button(flt, text="Set User Dir…", command=self.on_set_user_dir).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(flt, text="Reset User Dir", command=self.on_reset_user_dir).pack(
-            side=tk.LEFT, padx=2
-        )
-
+        # Filter row
+        toolbar = ctk.CTkFrame(wrapper, fg_color="transparent")
+        toolbar.pack(fill=tk.X, pady=(0, 4))
+        toolbar.pack_propagate(False)
+        filter_frame = ctk.CTkFrame(toolbar, fg_color="transparent")
+        filter_frame.pack(side=tk.RIGHT)
+        ctk.CTkLabel(
+            filter_frame,
+            text="Filter by type",
+            font=("Segoe UI", 11)
+        ).pack(side=tk.LEFT, padx=(0, 8))
+        filter_values = [
+            "(all)",
+            "ui",
+            "skins",
+            "database",
+            "ruleset",
+            "graphics",
+            "audio",
+            "tactics",
+            "editor-data",
+            "misc",
+        ]
         self.type_filter = tk.StringVar(value="(all)")
-        self.type_combo = ttk.Combobox(
-            flt,
-            textvariable=self.type_filter,
-            width=18,
-            state="readonly",
-            values=[
-                "(all)",
-                "ui",
-                "skins",
-                "database",
-                "ruleset",
-                "graphics",
-                "audio",
-                "tactics",
-                "editor-data",
-                "misc",
-            ],
+
+        def on_filter_change(choice):
+            self.type_filter.set(choice)
+            self.refresh_mod_list()
+
+        self.type_combo = ctk.CTkComboBox(
+            filter_frame,
+            values=filter_values,
+            command=on_filter_change,
+            width=150,
+            state="readonly"
         )
-        self.type_combo.pack(side=tk.RIGHT, padx=6)
-        ttk.Label(flt, text="Filter mod type:").pack(side=tk.RIGHT)
-        self.type_combo.bind("<<ComboboxSelected>>", lambda e: self.refresh_mod_list())
+        self.type_combo.set(self.type_filter.get())
+        self.type_combo.pack(side=tk.LEFT)
 
-        # Create tabbed interface
-        notebook = ttk.Notebook(self)
-        notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        # Tabbed interface
+        notebook = ctk.CTkTabview(wrapper)
+        notebook.pack(fill=tk.BOTH, expand=True, pady=(12, 0))
 
-        # --- Mods Tab ---
-        mods_tab = ttk.Frame(notebook)
-        notebook.add(mods_tab, text="Mods")
+        mods_tab = notebook.add("Mods")
+        logs_tab = notebook.add("Logs")
+        mods_tab.grid_rowconfigure(0, weight=1)
+        mods_tab.grid_columnconfigure(0, weight=1)
+        mods_tab.grid_rowconfigure(1, weight=0)
 
-        # Main list + right panel
-        mid = ttk.Frame(mods_tab)
-        mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
+        # Configure treeview styling to better align with the theme
+        self._configure_treeview_style()
+
+        mid = ctk.CTkFrame(mods_tab, fg_color="transparent")
+        mid.grid(row=0, column=0, sticky="nsew")
+        mid.grid_rowconfigure(0, weight=1)
+        mid.grid_columnconfigure(0, weight=1)
+
+        tree_container = ctk.CTkFrame(mid, fg_color="transparent")
+        tree_container.grid(row=0, column=0, sticky="nsew")
+        tree_container.grid_rowconfigure(0, weight=1)
+        tree_container.grid_columnconfigure(0, weight=1)
+
         cols = ("name", "version", "type", "author", "order", "enabled")
-        self.tree = ttk.Treeview(mid, columns=cols, show="headings", height=12)
+        self.tree = ttk.Treeview(
+            tree_container,
+            columns=cols,
+            show="headings",
+            style="CTk.Treeview"
+        )
         for c in cols:
             self.tree.heading(c, text=c.capitalize())
-        self.tree.column("name", width=300, anchor="w")
+        self.tree.column("name", width=320, anchor="w")
         self.tree.column("version", width=90, anchor="w")
-        self.tree.column("type", width=110, anchor="w")
-        self.tree.column("author", width=160, anchor="w")
-        self.tree.column("order", width=60, anchor="center")
-        self.tree.column("enabled", width=80, anchor="center")
-        self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        sb = ttk.Scrollbar(mid, orient="vertical", command=self.tree.yview)
-        sb.pack(side=tk.LEFT, fill=tk.Y)
+        self.tree.column("type", width=120, anchor="w")
+        self.tree.column("author", width=190, anchor="w")
+        self.tree.column("order", width=70, anchor="center")
+        self.tree.column("enabled", width=90, anchor="center")
+        self.tree.grid(row=0, column=0, sticky="nsew")
+
+        sb = ctk.CTkScrollbar(tree_container, command=self.tree.yview)
+        sb.grid(row=0, column=1, sticky="ns")
         self.tree.configure(yscrollcommand=sb.set)
 
-        right = ttk.Frame(mid)
-        right.pack(side=tk.LEFT, fill=tk.Y, padx=8)
-        ttk.Button(right, text="Refresh", command=self.refresh_mod_list).pack(
-            fill=tk.X, pady=2
+        right = ctk.CTkFrame(
+            mid,
+            fg_color=("#f0f4fa", "#111820"),
+            corner_radius=14,
+            border_width=1,
+            border_color=("#d3d9e3", "#28303a")
         )
-        ttk.Button(right, text="Import Mod…", command=self.on_import_mod).pack(
-            fill=tk.X, pady=2
-        )
-        ttk.Button(right, text="Enable (mark)", command=self.on_enable_selected).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(
-            right, text="Disable (unmark)", command=self.on_disable_selected
-        ).pack(fill=tk.X, pady=2)
-        ttk.Button(right, text="Remove Mod", command=self.on_remove_selected).pack(
-            fill=tk.X, pady=2
-        )
-        ttk.Button(right, text="Up (Order)", command=self.on_move_up).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(right, text="Down (Order)", command=self.on_move_down).pack(
-            fill=tk.X, pady=2
-        )
-        ttk.Button(right, text="Apply", command=self.on_apply_order).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(right, text="Conflicts…", command=self.on_conflicts).pack(
-            fill=tk.X, pady=2
-        )
-        ttk.Button(right, text="Rollback…", command=self.on_rollback).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(right, text="Open Mods Folder", command=self.on_open_mods).pack(
-            fill=tk.X, pady=2
-        )
-        ttk.Button(
-            right, text="Open Logs Folder", command=self.on_open_logs_folder
-        ).pack(fill=tk.X, pady=2)
+        right.grid(row=0, column=1, sticky="ns", padx=(16, 0))
+        for child in (
+            ("Refresh", self.refresh_mod_list),
+            ("Import Mod…", self.on_import_mod),
+            ("Enable (mark)", self.on_enable_selected),
+            ("Disable (unmark)", self.on_disable_selected),
+            ("Remove Mod", self.on_remove_selected),
+            ("Up (Order)", self.on_move_up),
+            ("Down (Order)", self.on_move_down),
+            ("Apply", self.on_apply_order),
+            ("Conflicts…", self.on_conflicts),
+            ("Rollback…", self.on_rollback),
+            ("Open Mods Folder", self.on_open_mods),
+            ("Open Logs Folder", self.on_open_logs_folder),
+        ):
+            pad = (18, 6) if child[0] in {"Enable (mark)", "Up (Order)", "Apply", "Rollback…"} else (6, 6)
+            ctk.CTkButton(
+                right,
+                text=child[0],
+                command=child[1],
+                width=180
+            ).pack(fill=tk.X, padx=18, pady=pad)
 
-        # Details pane
-        det = ttk.LabelFrame(mods_tab, text="Details")
-        det.pack(side=tk.TOP, fill=tk.X, padx=0, pady=(8, 0))
-        self.details_text = tk.Text(det, height=6)
-        self.details_text.pack(fill=tk.BOTH, expand=True)
+        details_frame = ctk.CTkFrame(
+            mods_tab,
+            fg_color=("#f7f9fc", "#111820"),
+            corner_radius=14,
+            border_width=1,
+            border_color=("#d3d9e3", "#28303a")
+        )
+        details_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", pady=(16, 0))
+        details_frame.grid_rowconfigure(1, weight=1)
+        details_frame.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(
+            details_frame,
+            text="Mod details",
+            font=("Segoe UI Semibold", 13)
+        ).grid(row=0, column=0, sticky="w", padx=16, pady=(12, 0))
+        self.details_text = ctk.CTkTextbox(details_frame, height=160)
+        self.details_text.grid(row=1, column=0, sticky="nsew", padx=16, pady=(8, 16))
         self.tree.bind("<<TreeviewSelect>>", self.on_select_row)
 
-        # --- Logs Tab ---
-        logs_tab = ttk.Frame(notebook)
-        notebook.add(logs_tab, text="Logs")
-
-        # Log pane
-        log_frame = ttk.Frame(logs_tab)
-        log_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
-        self.log_text = tk.Text(log_frame, wrap="word")
-        self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        log_scrollbar = ttk.Scrollbar(log_frame, orient="vertical", command=self.log_text.yview)
-        log_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        logs_tab.grid_rowconfigure(0, weight=1)
+        logs_tab.grid_columnconfigure(0, weight=1)
+        log_frame = ctk.CTkFrame(logs_tab, fg_color="transparent")
+        log_frame.grid(row=0, column=0, sticky="nsew")
+        log_frame.grid_rowconfigure(0, weight=1)
+        log_frame.grid_columnconfigure(0, weight=1)
+        self.log_text = ctk.CTkTextbox(log_frame, wrap="word")
+        self.log_text.grid(row=0, column=0, sticky="nsew")
+        log_scrollbar = ctk.CTkScrollbar(log_frame, command=self.log_text.yview)
+        log_scrollbar.grid(row=0, column=1, sticky="ns")
         self.log_text.configure(yscrollcommand=log_scrollbar.set)
 
         # Footer
-        footer = ttk.Frame(self)
-        footer.pack(side=tk.BOTTOM, fill=tk.X, padx=8, pady=8)
+        footer = ctk.CTkFrame(self, corner_radius=0, fg_color=("#f4f6fb", "#0e141b"))
+        footer.pack(fill=tk.X, padx=0, pady=(0, 0))
+        footer.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(
+            footer,
+            text="Presented by JALCO / Justin Levine",
+            anchor="w",
+            font=("Segoe UI", 11)
+        ).grid(row=0, column=0, sticky="w", padx=20, pady=12)
 
-        # Left side: Credits
-        ttk.Label(
-            footer, text="Presented by JALCO / Justin Levine", anchor="w"
-        ).pack(side=tk.LEFT)
-
-        # Right side: Social buttons
-        buttons_frame = ttk.Frame(footer)
-        buttons_frame.pack(side=tk.RIGHT)
-
-        ttk.Button(
-            buttons_frame,
-            text="Support on Ko-fi",
-            command=lambda: webbrowser.open("https://ko-fi.com/jalco")
-        ).pack(side=tk.RIGHT, padx=(8, 0))
-
-        ttk.Button(
-            buttons_frame,
+        social_frame = ctk.CTkFrame(footer, fg_color="transparent")
+        social_frame.grid(row=0, column=1, sticky="e", padx=20)
+        ctk.CTkButton(
+            social_frame,
             text="Join Discord",
+            width=140,
             command=lambda: webbrowser.open("https://discord.gg/AspRvTTAch")
+        ).pack(side=tk.RIGHT, padx=(12, 0))
+        ctk.CTkButton(
+            social_frame,
+            text="Support on Ko-fi",
+            width=160,
+            command=lambda: webbrowser.open("https://ko-fi.com/jalco")
         ).pack(side=tk.RIGHT)
 
     # ---- menu/button actions ----
+    def _configure_treeview_style(self):
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except tk.TclError:
+            pass
+
+        mode = (ctk.get_appearance_mode() or "Light").lower()
+        if mode == "dark":
+            bg = "#0f1115"
+            fg = "#f4f6fb"
+            border = "#1f2833"
+            header_bg = "#1b2430"
+            header_fg = "#f4f6fb"
+            select_bg = "#1f6aa5"
+            select_fg = "#ffffff"
+        else:
+            bg = "#ffffff"
+            fg = "#1c1c1f"
+            border = "#d5d9e2"
+            header_bg = "#eef1f6"
+            header_fg = "#1c1c1f"
+            select_bg = "#1f6aa5"
+            select_fg = "#ffffff"
+
+        style.layout("CTk.Treeview", style.layout("Treeview"))
+        style.configure(
+            "CTk.Treeview",
+            background=bg,
+            fieldbackground=bg,
+            foreground=fg,
+            bordercolor=border,
+            rowheight=36,
+            font=("Segoe UI", 11),
+        )
+        style.configure(
+            "CTk.Treeview.Heading",
+            background=header_bg,
+            foreground=header_fg,
+            borderwidth=0,
+            relief="flat",
+            font=("Segoe UI Semibold", 11),
+        )
+        style.map(
+            "CTk.Treeview",
+            background=[("selected", select_bg)],
+            foreground=[("selected", select_fg)],
+        )
+        style.map(
+            "CTk.Treeview.Heading",
+            background=[("active", header_bg)],
+            relief=[("pressed", "flat")],
+        )
+
     def on_open_logs_folder(self):
         safe_open_path(LOGS_DIR)
 
@@ -1886,17 +2029,27 @@ class App(BaseTk):
             return
 
         order = get_load_order()
-        win = tk.Toplevel(self)
+        win = ctk.CTkToplevel(self)
         win.title("Conflict Manager — FM26 Mod Manager")
-        win.geometry("760x560")
+        win.geometry("780x580")
+        win.transient(self)
 
-        frame = ttk.Frame(win)
-        frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        frame = ctk.CTkFrame(win, corner_radius=16)
+        frame.pack(fill=tk.BOTH, expand=True, padx=16, pady=16)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_rowconfigure(1, weight=1)
 
-        text = tk.Text(frame, wrap="word", height=18)
-        text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        sb = ttk.Scrollbar(frame, command=text.yview)
-        sb.pack(side=tk.RIGHT, fill=tk.Y)
+        header = ctk.CTkLabel(
+            frame,
+            text="Detected conflicts where multiple mods write the same files.",
+            font=("Segoe UI", 12)
+        )
+        header.grid(row=0, column=0, sticky="w", pady=(0, 12))
+
+        text = ctk.CTkTextbox(frame, wrap="word", height=220)
+        text.grid(row=1, column=0, sticky="nsew")
+        sb = ctk.CTkScrollbar(frame, command=text.yview)
+        sb.grid(row=1, column=1, sticky="ns", padx=(8, 0))
         text.configure(yscrollcommand=sb.set)
 
         text.insert(
@@ -1918,19 +2071,21 @@ class App(BaseTk):
             )
         text.config(state="disabled")
 
-        ttk.Label(win, text="Select mods to disable:").pack(
-            anchor="w", padx=8, pady=(8, 0)
-        )
+        ctk.CTkLabel(
+            frame,
+            text="Select mods to disable:",
+            font=("Segoe UI Semibold", 12)
+        ).grid(row=2, column=0, sticky="w", pady=(16, 6))
 
         # Checkbox area
         mods_to_disable = {}
-        box_frame = ttk.Frame(win)
-        box_frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
+        box_frame = ctk.CTkScrollableFrame(frame, height=140, corner_radius=12)
+        box_frame.grid(row=3, column=0, columnspan=2, sticky="nsew")
         unique_mods = sorted(set([mm for ms in conflicts.values() for mm in ms]))
         for m in unique_mods:
             var = tk.BooleanVar()
             mods_to_disable[m] = var
-            ttk.Checkbutton(box_frame, text=m, variable=var).pack(anchor="w")
+            ctk.CTkCheckBox(box_frame, text=m, variable=var).pack(anchor="w", pady=2)
 
         def apply_disables():
             changed = []
@@ -1946,12 +2101,20 @@ class App(BaseTk):
                 self.refresh_mod_list()
             win.destroy()
 
-        bframe = ttk.Frame(win)
-        bframe.pack(pady=(8, 8))
-        ttk.Button(bframe, text="Disable Selected Mods", command=apply_disables).pack(
-            side=tk.LEFT, padx=6
-        )
-        ttk.Button(bframe, text="Close", command=win.destroy).pack(side=tk.LEFT, padx=6)
+        bframe = ctk.CTkFrame(frame, fg_color="transparent")
+        bframe.grid(row=4, column=0, sticky="e", pady=(16, 0))
+        ctk.CTkButton(
+            bframe,
+            text="Close",
+            width=140,
+            command=win.destroy
+        ).pack(side=tk.RIGHT, padx=(12, 0))
+        ctk.CTkButton(
+            bframe,
+            text="Disable Selected Mods",
+            width=200,
+            command=apply_disables
+        ).pack(side=tk.RIGHT)
 
         self._log(
             f"Opened conflict manager with {len(conflicts)} overlapping file path(s)."
@@ -1965,13 +2128,33 @@ class App(BaseTk):
             messagebox.showinfo("Rollback", "No restore points found.")
             return
 
-        win = tk.Toplevel(self)
+        win = ctk.CTkToplevel(self)
         win.title("Choose Restore Point")
-        win.geometry("420x420")
-        lb = tk.Listbox(win, height=min(16, len(rps)))
+        win.geometry("440x440")
+        win.transient(self)
+
+        container = ctk.CTkFrame(win, corner_radius=16)
+        container.pack(fill=tk.BOTH, expand=True, padx=16, pady=16)
+        container.grid_columnconfigure(0, weight=1)
+
+        ctk.CTkLabel(
+            container,
+            text="Select a restore point to roll back to.",
+            font=("Segoe UI", 12)
+        ).grid(row=0, column=0, sticky="w", pady=(0, 12))
+
+        list_frame = ctk.CTkFrame(container, fg_color="transparent")
+        list_frame.grid(row=1, column=0, sticky="nsew")
+        list_frame.grid_columnconfigure(0, weight=1)
+        list_frame.grid_rowconfigure(0, weight=1)
+        lb = tk.Listbox(list_frame, height=min(16, len(rps)))
         for rp in rps:
             lb.insert(tk.END, rp)
-        lb.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        lb.grid(row=0, column=0, sticky="nsew")
+        lb.config(borderwidth=0, highlightthickness=0)
+        lb_scroll = ctk.CTkScrollbar(list_frame, command=lb.yview)
+        lb_scroll.grid(row=0, column=1, sticky="ns", padx=(8, 0))
+        lb.configure(yscrollcommand=lb_scroll.set)
 
         def do_rb():
             sel = lb.curselection()
@@ -1989,7 +2172,10 @@ class App(BaseTk):
             except Exception as e:
                 messagebox.showerror("Rollback Error", str(e))
 
-        ttk.Button(win, text="Rollback to selected", command=do_rb).pack(pady=(0, 8))
+        btn_frame = ctk.CTkFrame(container, fg_color="transparent")
+        btn_frame.grid(row=2, column=0, sticky="e", pady=(16, 0))
+        ctk.CTkButton(btn_frame, text="Cancel", width=120, command=win.destroy).pack(side=tk.RIGHT, padx=(12, 0))
+        ctk.CTkButton(btn_frame, text="Rollback to selected", width=200, command=do_rb).pack(side=tk.RIGHT)
 
     def on_open_target(self):
         t = get_target()
