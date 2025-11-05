@@ -313,7 +313,19 @@ def default_candidates():
                 p = base / sub
                 if p.exists():
                     out.append(p)
-    else:
+
+        # Xbox Game Pass - check C:, D:, E: drives
+        for drive in ("C:", "D:", "E:"):
+            gamepass_base = Path(f"{drive}/XboxGames/Football Manager 26/Content")
+            if gamepass_base.exists():
+                for sub in (
+                    "fm_Data/StreamingAssets/aa/StandaloneWindows64",
+                    "data/StreamingAssets/aa/StandaloneWindows64",
+                ):
+                    p = gamepass_base / sub
+                    if p.exists():
+                        out.append(p)
+    elif sys.platform.startswith("darwin"):
         # macOS
         for p in (
             home
@@ -323,6 +335,15 @@ def default_candidates():
             home
             / "Library/Application Support/Epic/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneOSXUniversal",
         ):
+            if p.exists():
+                out.append(p)
+    else:
+        # Linux/Steam Deck
+        linux_paths = [
+            home / ".local/share/Steam/steamapps/common/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneLinux64",
+            Path("/run/media/mmcblk0p1/steamapps/common/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneLinux64"),
+        ]
+        for p in linux_paths:
             if p.exists():
                 out.append(p)
     return out
@@ -457,11 +478,17 @@ def fm_user_dir():
     # Default paths
     if sys.platform.startswith("win"):
         return Path.home() / "Documents" / "Sports Interactive" / "Football Manager 26"
-    else:
+    elif sys.platform.startswith("darwin"):
         # macOS
         return (
             Path.home()
             / "Library/Application Support/Sports Interactive/Football Manager 26"
+        )
+    else:
+        # Linux/Steam Deck
+        return (
+            Path.home()
+            / ".local/share/Sports Interactive/Football Manager 26"
         )
 
 
