@@ -228,6 +228,7 @@ Categories=Game;Utility;
       <ul>
         <li><b>UI/Bundle mods</b> → Game data folder</li>
         <li><b>Tactics</b> → User tactics folder</li>
+        <li><b>Editor Data</b> → User editor data folder</li>
         <li><b>Graphics</b> → User graphics folder (kits/faces/logos)</li>
         <li><b>Skins</b> → User skins folder</li>
       </ul>
@@ -503,6 +504,7 @@ FMMLoader26 supports all major Football Manager mod types:
 | **UI** | User interface modifications | Game data folder | UI enhancements, stadium graphics, match engine tweaks |
 | **Bundle** | Game data bundles | Game data folder | Core game file modifications |
 | **Tactics** | Pre-made tactical setups | User tactics folder | 4-4-2 formations, gegenpressing tactics |
+| **Editor Data** | Editor data files | User editor data folder | Custom editor data mods (.fmf files) |
 | **Graphics** | Visual enhancements | User graphics folder | Logo packs, kits, player faces |
 | **Misc** | Other modifications | User folder | Various other mods |
 

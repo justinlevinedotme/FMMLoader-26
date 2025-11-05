@@ -542,6 +542,12 @@ def get_target_for_type(mod_type: str, mod_name: str = "") -> Path:
         path.mkdir(parents=True, exist_ok=True)
         return path
 
+    # Editor data mods go to the user's editor data folder
+    if mod_type == "editor-data":
+        path = base / "editor data"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
     # Graphics and its subtypes
     if mod_type == "graphics":
         graphics_base.mkdir(parents=True, exist_ok=True)
@@ -752,7 +758,12 @@ def _auto_detect_mod_type(path: Path) -> str:
         has_bundle = any(f.suffix.lower() == '.bundle' for f in path.rglob('*.bundle'))
         has_graphics = any(d.name.lower() in ('kits', 'faces', 'logos', 'graphics')
                           for d in path.rglob('*') if d.is_dir())
+        has_editor_data = any(d.name.lower().replace(' ', '').replace('_', '') in ('editordata', 'editor')
+                             for d in path.rglob('*') if d.is_dir())
 
+        # Check for editor data first (FMF files in editor data folder)
+        if has_fmf and has_editor_data:
+            return 'editor-data'
         if has_fmf:
             return 'tactics'
         if has_bundle:
@@ -809,6 +820,15 @@ def _generate_manifest(mod_root: Path, mod_metadata: dict) -> dict:
             files.append({
                 "source": str(rel_path),
                 "target_subpath": fmf_file.name  # Tactics go flat to tactics folder
+            })
+
+    elif mod_type == "editor-data":
+        # For editor data, include all .fmf files preserving directory structure
+        for fmf_file in sorted(mod_root.rglob("*.fmf")):
+            rel_path = fmf_file.relative_to(mod_root)
+            files.append({
+                "source": str(rel_path),
+                "target_subpath": str(rel_path)  # Editor data preserves structure
             })
 
     elif mod_type in ("ui", "bundle"):

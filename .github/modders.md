@@ -7,13 +7,14 @@ This section explains how to structure and package your mods so they’re compat
 
 ### ⚙️ Supported Mod Types
 
-| Type         | Description                                                          | Typical Files                          | Destination                                          |
-| ------------ | -------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------- |
-| **ui**       | UI bundles that replace interface panels, menus, or in-game overlays | `.bundle`                              | Game directory → `StreamingAssets/aa/Standalone...`  |
-| **bundle**   | Core game assets (graphics, shaders, lighting, etc.)                 | `.bundle`                              | Game directory → `StreamingAssets/aa/Standalone...`  |
-| **tactics**  | Custom tactics that appear under “Load Tactic”                       | `.fmf`                                 | User folder → `Football Manager 26/tactics/`         |
-| **graphics** | Logo, kit, and face packs                                            | `logos/`, `kits/`, or `faces/` folders | User folder → `Football Manager 26/graphics/<type>/` |
-| **misc**     | Configs, XMLs, or scripts that don’t fit other categories            | `.xml`, `.txt`, etc.                   | User folder → `Football Manager 26/`                 |
+| Type            | Description                                                          | Typical Files                          | Destination                                          |
+| --------------- | -------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| **ui**          | UI bundles that replace interface panels, menus, or in-game overlays | `.bundle`                              | Game directory → `StreamingAssets/aa/Standalone...`  |
+| **bundle**      | Core game assets (graphics, shaders, lighting, etc.)                 | `.bundle`                              | Game directory → `StreamingAssets/aa/Standalone...`  |
+| **tactics**     | Custom tactics that appear under "Load Tactic"                       | `.fmf`                                 | User folder → `Football Manager 26/tactics/`         |
+| **editor-data** | Editor data files for custom editor content                          | `.fmf`                                 | User folder → `Football Manager 26/editor data/`     |
+| **graphics**    | Logo, kit, and face packs                                            | `logos/`, `kits/`, or `faces/` folders | User folder → `Football Manager 26/graphics/<type>/` |
+| **misc**        | Configs, XMLs, or scripts that don't fit other categories            | `.xml`, `.txt`, etc.                   | User folder → `Football Manager 26/`                 |
 
 FMMLoader automatically detects where each mod type belongs and installs it in the correct directory for both Windows and macOS.
 
@@ -72,16 +73,16 @@ Each mod needs a `manifest.json` file that tells FMMLoader what it is and where 
 
 ### 🔧 Manifest Field Reference
 
-| Field           | Required   | Description                                            |
-| --------------- | ---------- | ------------------------------------------------------ |
-| **name**        | ✅          | Display name of the mod                                |
-| **version**     | ✅          | Version number (e.g., `"1.0.0"`)                       |
-| **type**        | ✅          | One of: `ui`, `bundle`, `tactics`, `graphics`, `misc`  |
-| **author**      | ✅          | Mod creator name                                       |
-| **homepage**    | ⛔ Optional | URL or Discord link for your mod                       |
-| **description** | ⛔ Optional | Short summary shown in the app                         |
-| **files**       | ✅          | List of `{ source, target_subpath, platform }` objects |
-| **platform**    | ⛔ Optional | `"windows"`, `"mac"`, or omitted for both              |
+| Field           | Required   | Description                                                        |
+| --------------- | ---------- | ------------------------------------------------------------------ |
+| **name**        | ✅          | Display name of the mod                                            |
+| **version**     | ✅          | Version number (e.g., `"1.0.0"`)                                   |
+| **type**        | ✅          | One of: `ui`, `bundle`, `tactics`, `editor-data`, `graphics`, `misc` |
+| **author**      | ✅          | Mod creator name                                                   |
+| **homepage**    | ⛔ Optional | URL or Discord link for your mod                                   |
+| **description** | ⛔ Optional | Short summary shown in the app                                     |
+| **files**       | ✅          | List of `{ source, target_subpath, platform }` objects             |
+| **platform**    | ⛔ Optional | `"windows"`, `"mac"`, or omitted for both                          |
 
 ---
 
