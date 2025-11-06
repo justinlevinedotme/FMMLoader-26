@@ -39,11 +39,11 @@
 
 ### 🎯 Why FMMLoader26?
 
-- **⚡ Zero Installation** - Standalone executables for Windows and macOS
+- **⚡ Zero Installation** - Standalone executables for Windows and macOS, runs from source on Linux
 - **🎨 Beautiful GUI** - Clean, intuitive interface built with Tkinter
 - **🔄 Drag & Drop** - Import mods effortlessly with drag-and-drop support
 - **🛡️ Safe & Reversible** - Automatic backups and restore points before every change
-- **🔍 Smart Detection** - Automatically finds your FM26 installation (Steam & Epic)
+- **🔍 Smart Detection** - Automatically finds your FM26 installation (Steam, Epic, Game Pass, Steam Deck)
 - **⚙️ Type-Aware** - Intelligently installs different mod types to the correct locations
 - **🚨 Conflict Resolution** - Detects and helps resolve file conflicts between mods
 - **📊 Detailed Logging** - Comprehensive logs for troubleshooting
@@ -78,7 +78,7 @@
 | **OS** | Windows 10/11, macOS 10.14+, Linux (Ubuntu 20.04+) |
 | **RAM** | 512 MB |
 | **Disk Space** | 100 MB (plus space for mods) |
-| **FM26** | Football Manager 2026 installed (Steam or Epic) |
+| **FM26** | Football Manager 2026 installed (Steam, Epic, Game Pass, or Steam Deck) |
 
 ### Optional Dependencies
 
@@ -220,7 +220,7 @@ Categories=Game;Utility;
   <tr>
     <td>
       <h4>🔍 Automatic Detection</h4>
-      Automatically detects your FM26 installation from Steam or Epic Games on Windows and macOS.
+      Automatically detects your FM26 installation from Steam, Epic Games, Xbox Game Pass (Windows), and Steam Deck (Linux).
     </td>
     <td>
       <h4>⚙️ Type-Aware Installation</h4>
@@ -228,6 +228,7 @@ Categories=Game;Utility;
       <ul>
         <li><b>UI/Bundle mods</b> → Game data folder</li>
         <li><b>Tactics</b> → User tactics folder</li>
+        <li><b>Editor Data</b> → User editor data folder</li>
         <li><b>Graphics</b> → User graphics folder (kits/faces/logos)</li>
         <li><b>Skins</b> → User skins folder</li>
       </ul>
@@ -314,8 +315,10 @@ If auto-detection fails (or you have a custom installation):
 |----------|----------|
 | **Windows (Steam)** | `C:\Program Files (x86)\Steam\steamapps\common\Football Manager 26\fm_Data\StreamingAssets\aa\StandaloneWindows64` |
 | **Windows (Epic)** | `C:\Program Files\Epic Games\Football Manager 26\data\StreamingAssets\aa\StandaloneWindows64` |
+| **Windows (Game Pass)** | `C:\XboxGames\Football Manager 26\Content\fm_Data\StreamingAssets\aa\StandaloneWindows64` (or D:, E: drives) |
 | **macOS (Steam)** | `~/Library/Application Support/Steam/steamapps/common/Football Manager 26/fm.app/Contents/Resources/Data/StreamingAssets/aa/StandaloneOSX` |
 | **macOS (Epic)** | `~/Library/Application Support/Epic/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneOSXUniversal` |
+| **Linux/Steam Deck** | `~/.local/share/Steam/steamapps/common/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneLinux64` |
 
 3. Click **"Select Folder"**
 
@@ -503,6 +506,7 @@ FMMLoader26 supports all major Football Manager mod types:
 | **UI** | User interface modifications | Game data folder | UI enhancements, stadium graphics, match engine tweaks |
 | **Bundle** | Game data bundles | Game data folder | Core game file modifications |
 | **Tactics** | Pre-made tactical setups | User tactics folder | 4-4-2 formations, gegenpressing tactics |
+| **Editor Data** | Editor data files | User editor data folder | Custom editor data mods (.fmf files) |
 | **Graphics** | Visual enhancements | User graphics folder | Logo packs, kits, player faces |
 | **Misc** | Other modifications | User folder | Various other mods |
 

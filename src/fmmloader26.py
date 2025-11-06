@@ -313,7 +313,19 @@ def default_candidates():
                 p = base / sub
                 if p.exists():
                     out.append(p)
-    else:
+
+        # Xbox Game Pass - check C:, D:, E: drives
+        for drive in ("C:", "D:", "E:"):
+            gamepass_base = Path(f"{drive}/XboxGames/Football Manager 26/Content")
+            if gamepass_base.exists():
+                for sub in (
+                    "fm_Data/StreamingAssets/aa/StandaloneWindows64",
+                    "data/StreamingAssets/aa/StandaloneWindows64",
+                ):
+                    p = gamepass_base / sub
+                    if p.exists():
+                        out.append(p)
+    elif sys.platform.startswith("darwin"):
         # macOS
         for p in (
             home
@@ -323,6 +335,15 @@ def default_candidates():
             home
             / "Library/Application Support/Epic/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneOSXUniversal",
         ):
+            if p.exists():
+                out.append(p)
+    else:
+        # Linux/Steam Deck
+        linux_paths = [
+            home / ".local/share/Steam/steamapps/common/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneLinux64",
+            Path("/run/media/mmcblk0p1/steamapps/common/Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneLinux64"),
+        ]
+        for p in linux_paths:
             if p.exists():
                 out.append(p)
     return out
@@ -457,11 +478,17 @@ def fm_user_dir():
     # Default paths
     if sys.platform.startswith("win"):
         return Path.home() / "Documents" / "Sports Interactive" / "Football Manager 26"
-    else:
+    elif sys.platform.startswith("darwin"):
         # macOS
         return (
             Path.home()
             / "Library/Application Support/Sports Interactive/Football Manager 26"
+        )
+    else:
+        # Linux/Steam Deck
+        return (
+            Path.home()
+            / ".local/share/Sports Interactive/Football Manager 26"
         )
 
 
@@ -539,6 +566,12 @@ def get_target_for_type(mod_type: str, mod_name: str = "") -> Path:
     # Tactics mods go to the user's tactics folder
     if mod_type == "tactics":
         path = base / "tactics"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    # Editor data mods go to the user's editor data folder
+    if mod_type == "editor-data":
+        path = base / "editor data"
         path.mkdir(parents=True, exist_ok=True)
         return path
 
@@ -752,7 +785,12 @@ def _auto_detect_mod_type(path: Path) -> str:
         has_bundle = any(f.suffix.lower() == '.bundle' for f in path.rglob('*.bundle'))
         has_graphics = any(d.name.lower() in ('kits', 'faces', 'logos', 'graphics')
                           for d in path.rglob('*') if d.is_dir())
+        has_editor_data = any(d.name.lower().replace(' ', '').replace('_', '') in ('editordata', 'editor')
+                             for d in path.rglob('*') if d.is_dir())
 
+        # Check for editor data first (FMF files in editor data folder)
+        if has_fmf and has_editor_data:
+            return 'editor-data'
         if has_fmf:
             return 'tactics'
         if has_bundle:
@@ -809,6 +847,15 @@ def _generate_manifest(mod_root: Path, mod_metadata: dict) -> dict:
             files.append({
                 "source": str(rel_path),
                 "target_subpath": fmf_file.name  # Tactics go flat to tactics folder
+            })
+
+    elif mod_type == "editor-data":
+        # For editor data, include all .fmf files preserving directory structure
+        for fmf_file in sorted(mod_root.rglob("*.fmf")):
+            rel_path = fmf_file.relative_to(mod_root)
+            files.append({
+                "source": str(rel_path),
+                "target_subpath": str(rel_path)  # Editor data preserves structure
             })
 
     elif mod_type in ("ui", "bundle"):
@@ -1087,12 +1134,11 @@ def apply_enabled_mods_in_order(log):
 #   GUI
 # ==========
 class ModMetadataDialog(tk.Toplevel):
-    """Dialog for collecting mod metadata when manifest.json is missing."""
-
+    """Dialog to collect mod metadata when no manifest.json is found."""
     def __init__(self, parent, mod_path: Path, auto_detected_type: str):
         super().__init__(parent)
-        self.title("Mod Metadata - No manifest.json found")
-        self.geometry("500x520")
+        self.title("Mod Importer")
+        self.geometry("500x400")
         self.resizable(False, False)
 
         self.mod_path = mod_path
@@ -1116,9 +1162,9 @@ class ModMetadataDialog(tk.Toplevel):
         info_frame.pack(fill=tk.X)
         ttk.Label(
             info_frame,
-            text="No manifest.json found. Please provide mod information:",
+            text="Please provide information for the mod you are importing:",
             wraplength=460,
-            justify=tk.LEFT
+            justify=tk.CENTER
         ).pack(anchor=tk.W)
 
         # Form frame
@@ -1138,34 +1184,36 @@ class ModMetadataDialog(tk.Toplevel):
             textvariable=self.type_var,
             width=38,
             state="readonly",
-            values=["ui", "bundle", "tactics", "graphics", "misc"]
+            values=["ui", "bundle", "tactics", "graphics", "editor-data","misc"]
         )
         type_combo.grid(row=1, column=1, pady=5, sticky=tk.EW)
+        help_label = ttk.Label(form, text="Double check the correct type is selected or the install will be incorrect.", foreground="gray", font=("TkDefaultFont", 8))
+        help_label.grid(row=2, column=1, sticky=tk.W, pady=(0, 5))
 
         # Version
-        ttk.Label(form, text="Version (optional):").grid(row=2, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Version (optional):").grid(row=3, column=0, sticky=tk.W, pady=5)
         self.version_var = tk.StringVar(value="1.0.0")
-        ttk.Entry(form, textvariable=self.version_var, width=40).grid(row=2, column=1, pady=5, sticky=tk.EW)
+        ttk.Entry(form, textvariable=self.version_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
 
         # Author
-        ttk.Label(form, text="Author (optional):").grid(row=3, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Author (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
         self.author_var = tk.StringVar()
-        ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
+        ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=4, column=1, pady=5, sticky=tk.EW)
 
         # Install Path
-        ttk.Label(form, text="Install Path (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Install Path (optional):").grid(row=5, column=0, sticky=tk.W, pady=5)
         self.install_path_var = tk.StringVar()
         install_path_entry = ttk.Entry(form, textvariable=self.install_path_var, width=40)
-        install_path_entry.grid(row=4, column=1, pady=5, sticky=tk.EW)
+        install_path_entry.grid(row=5, column=1, pady=5, sticky=tk.EW)
 
         # Add help text for install path
         help_label = ttk.Label(form, text="Leave empty to use default path based on type", foreground="gray", font=("TkDefaultFont", 8))
-        help_label.grid(row=5, column=1, sticky=tk.W, pady=(0, 5))
+        help_label.grid(row=6, column=1, sticky=tk.W, pady=(0, 5))
 
         # Description
-        ttk.Label(form, text="Description (optional):").grid(row=6, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Description (optional):").grid(row=7, column=0, sticky=tk.W, pady=5)
         self.description_text = tk.Text(form, width=40, height=4)
-        self.description_text.grid(row=6, column=1, pady=5, sticky=tk.EW)
+        self.description_text.grid(row=7, column=1, pady=5, sticky=tk.EW)
 
         form.columnconfigure(1, weight=1)
 
@@ -1339,7 +1387,6 @@ class App(BaseTk):
                 "database",
                 "ruleset",
                 "graphics",
-                "audio",
                 "tactics",
                 "editor-data",
                 "misc",
@@ -1360,15 +1407,15 @@ class App(BaseTk):
         # Main list + right panel
         mid = ttk.Frame(mods_tab)
         mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
-        cols = ("name", "version", "type", "author", "order", "enabled")
+        cols = ("name", "version", "type", "author", "order","enabled")
         self.tree = ttk.Treeview(mid, columns=cols, show="headings", height=12)
         for c in cols:
             self.tree.heading(c, text=c.capitalize())
         self.tree.column("name", width=300, anchor="w")
         self.tree.column("version", width=90, anchor="w")
-        self.tree.column("type", width=110, anchor="w")
+        self.tree.column("type", width=110, anchor="center")
         self.tree.column("author", width=160, anchor="w")
-        self.tree.column("order", width=60, anchor="center")
+        self.tree.column("order", width=80, anchor="w")
         self.tree.column("enabled", width=80, anchor="center")
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb = ttk.Scrollbar(mid, orient="vertical", command=self.tree.yview)
@@ -1773,7 +1820,6 @@ class App(BaseTk):
         finally:
             if temp_dir:
                 shutil.rmtree(temp_dir, ignore_errors=True)
-
 
     def on_enable_selected(self):
         name = self.selected_mod_name()
