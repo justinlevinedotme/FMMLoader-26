@@ -1134,12 +1134,11 @@ def apply_enabled_mods_in_order(log):
 #   GUI
 # ==========
 class ModMetadataDialog(tk.Toplevel):
-    """Dialog for collecting mod metadata when manifest.json is missing."""
-
+    """Dialog to collect mod metadata when no manifest.json is found."""
     def __init__(self, parent, mod_path: Path, auto_detected_type: str):
         super().__init__(parent)
-        self.title("Mod Metadata - No manifest.json found")
-        self.geometry("500x520")
+        self.title("Mod Importer")
+        self.geometry("500x400")
         self.resizable(False, False)
 
         self.mod_path = mod_path
@@ -1163,9 +1162,9 @@ class ModMetadataDialog(tk.Toplevel):
         info_frame.pack(fill=tk.X)
         ttk.Label(
             info_frame,
-            text="No manifest.json found. Please provide mod information:",
+            text="Please provide information for the mod you are importing:",
             wraplength=460,
-            justify=tk.LEFT
+            justify=tk.CENTER
         ).pack(anchor=tk.W)
 
         # Form frame
@@ -1185,34 +1184,36 @@ class ModMetadataDialog(tk.Toplevel):
             textvariable=self.type_var,
             width=38,
             state="readonly",
-            values=["ui", "bundle", "tactics", "graphics", "misc"]
+            values=["ui", "bundle", "tactics", "graphics", "editor-data","misc"]
         )
         type_combo.grid(row=1, column=1, pady=5, sticky=tk.EW)
+        help_label = ttk.Label(form, text="Double check the correct type is selected or the install will be incorrect.", foreground="gray", font=("TkDefaultFont", 8))
+        help_label.grid(row=2, column=1, sticky=tk.W, pady=(0, 5))
 
         # Version
-        ttk.Label(form, text="Version (optional):").grid(row=2, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Version (optional):").grid(row=3, column=0, sticky=tk.W, pady=5)
         self.version_var = tk.StringVar(value="1.0.0")
-        ttk.Entry(form, textvariable=self.version_var, width=40).grid(row=2, column=1, pady=5, sticky=tk.EW)
+        ttk.Entry(form, textvariable=self.version_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
 
         # Author
-        ttk.Label(form, text="Author (optional):").grid(row=3, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Author (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
         self.author_var = tk.StringVar()
-        ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=3, column=1, pady=5, sticky=tk.EW)
+        ttk.Entry(form, textvariable=self.author_var, width=40).grid(row=4, column=1, pady=5, sticky=tk.EW)
 
         # Install Path
-        ttk.Label(form, text="Install Path (optional):").grid(row=4, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Install Path (optional):").grid(row=5, column=0, sticky=tk.W, pady=5)
         self.install_path_var = tk.StringVar()
         install_path_entry = ttk.Entry(form, textvariable=self.install_path_var, width=40)
-        install_path_entry.grid(row=4, column=1, pady=5, sticky=tk.EW)
+        install_path_entry.grid(row=5, column=1, pady=5, sticky=tk.EW)
 
         # Add help text for install path
         help_label = ttk.Label(form, text="Leave empty to use default path based on type", foreground="gray", font=("TkDefaultFont", 8))
-        help_label.grid(row=5, column=1, sticky=tk.W, pady=(0, 5))
+        help_label.grid(row=6, column=1, sticky=tk.W, pady=(0, 5))
 
         # Description
-        ttk.Label(form, text="Description (optional):").grid(row=6, column=0, sticky=tk.W, pady=5)
+        ttk.Label(form, text="Description (optional):").grid(row=7, column=0, sticky=tk.W, pady=5)
         self.description_text = tk.Text(form, width=40, height=4)
-        self.description_text.grid(row=6, column=1, pady=5, sticky=tk.EW)
+        self.description_text.grid(row=7, column=1, pady=5, sticky=tk.EW)
 
         form.columnconfigure(1, weight=1)
 
@@ -1386,7 +1387,6 @@ class App(BaseTk):
                 "database",
                 "ruleset",
                 "graphics",
-                "audio",
                 "tactics",
                 "editor-data",
                 "misc",
@@ -1407,15 +1407,15 @@ class App(BaseTk):
         # Main list + right panel
         mid = ttk.Frame(mods_tab)
         mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
-        cols = ("name", "version", "type", "author", "order", "enabled")
+        cols = ("name", "version", "type", "author", "order","enabled")
         self.tree = ttk.Treeview(mid, columns=cols, show="headings", height=12)
         for c in cols:
             self.tree.heading(c, text=c.capitalize())
         self.tree.column("name", width=300, anchor="w")
         self.tree.column("version", width=90, anchor="w")
-        self.tree.column("type", width=110, anchor="w")
+        self.tree.column("type", width=110, anchor="center")
         self.tree.column("author", width=160, anchor="w")
-        self.tree.column("order", width=60, anchor="center")
+        self.tree.column("order", width=80, anchor="w")
         self.tree.column("enabled", width=80, anchor="center")
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb = ttk.Scrollbar(mid, orient="vertical", command=self.tree.yview)
@@ -1820,7 +1820,6 @@ class App(BaseTk):
         finally:
             if temp_dir:
                 shutil.rmtree(temp_dir, ignore_errors=True)
-
 
     def on_enable_selected(self):
         name = self.selected_mod_name()
