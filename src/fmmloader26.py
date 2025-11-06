@@ -34,7 +34,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "FMMLoader26"
-VERSION = "0.0.8"
+VERSION = "0.0.9"
 GITHUB_REPO = "justinlevinedotme/FMMLoader-26"
 
 
