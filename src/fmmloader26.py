@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # FM26 Mod Manager (FMMLoader26)
 # Cross-platform (macOS/Windows) GUI with:
-# - Enable/disable mods, load order, filter by type
+# - Enable/disable mods, filter by type
 # - Import from .zip or folder (+ drag & drop if tkinterdnd2 is available)
 # - Conflict manager (detects overlapping target files; disable selected)
 # - Restore points & rollback
@@ -259,21 +259,6 @@ def set_enabled_mods(mods):
     save_config(cfg)
 
 
-def get_load_order():
-    """Get load order, filtering out any mods that don't exist on disk."""
-    order = load_config().get("load_order", [])
-    # Filter out mods that don't exist
-    valid_order = [m for m in order if (MODS_DIR / m).exists()]
-    # Auto-clean config if we found invalid mods
-    if len(valid_order) != len(order):
-        set_load_order(valid_order)
-    return valid_order
-
-
-def set_load_order(order):
-    cfg = load_config()
-    cfg["load_order"] = order
-    save_config(cfg)
 
 
 def get_user_dir() -> Path | None:
@@ -741,7 +726,7 @@ def disable_mod(mod_name: str, log):
 def remove_mod(mod_name: str, log):
     """
     Permanently delete a mod from the mod manager.
-    Removes it from enabled_mods, load_order, and deletes the mod directory.
+    Removes it from enabled_mods and deletes the mod directory.
     """
     mod_dir = MODS_DIR / mod_name
     if not mod_dir.exists():
@@ -752,12 +737,6 @@ def remove_mod(mod_name: str, log):
     if mod_name in enabled:
         enabled.remove(mod_name)
         set_enabled_mods(enabled)
-
-    # Remove from load order
-    order = get_load_order()
-    if mod_name in order:
-        order.remove(mod_name)
-        set_load_order(order)
 
     # Delete the mod directory
     try:
@@ -1103,30 +1082,26 @@ def rollback_to_restore_point(name: str, base: Path, log):
 
 
 # --------------
-# Apply order
+# Apply mods
 # --------------
-def apply_enabled_mods_in_order(log):
+def apply_enabled_mods(log):
     # IMPORTANT: For mixed types, we still create a restore point for the Standalone base.
     # For user-dir types, restore points won't snapshot (only intended for game-file overwrites).
     base = get_target()
     if not base or not base.exists():
         raise RuntimeError("No valid FM26 target set. Use Detect or Set Target.")
     enabled = get_enabled_mods()
-    order = get_load_order()
-    ordered = [m for m in order if m in enabled] + [
-        m for m in enabled if m not in order
-    ]
-    if not ordered:
+    if not enabled:
         log("No enabled mods to apply.")
         return
     rp = create_restore_point(base, log)
-    for name in ordered:
+    for name in enabled:
         try:
             enable_mod(name, log)
         except Exception as ex:
             log(f"[WARN] Failed enabling {name}: {ex}")
     log(
-        f"Applied {len(ordered)} mod(s) in order (last-write-wins). Restore point: {rp}"
+        f"Applied {len(enabled)} mod(s). Restore point: {rp}"
     )
 
 
@@ -1407,7 +1382,7 @@ class App(BaseTk):
         # Main list + right panel
         mid = ttk.Frame(mods_tab)
         mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=0, pady=0)
-        cols = ("name", "version", "type", "author", "order","enabled")
+        cols = ("name", "version", "type", "author", "enabled")
         self.tree = ttk.Treeview(mid, columns=cols, show="headings", height=12)
         for c in cols:
             self.tree.heading(c, text=c.capitalize())
@@ -1415,7 +1390,6 @@ class App(BaseTk):
         self.tree.column("version", width=90, anchor="w")
         self.tree.column("type", width=110, anchor="center")
         self.tree.column("author", width=160, anchor="w")
-        self.tree.column("order", width=80, anchor="w")
         self.tree.column("enabled", width=80, anchor="center")
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb = ttk.Scrollbar(mid, orient="vertical", command=self.tree.yview)
@@ -1437,12 +1411,6 @@ class App(BaseTk):
             right, text="Disable (unmark)", command=self.on_disable_selected
         ).pack(fill=tk.X, pady=2)
         ttk.Button(right, text="Remove Mod", command=self.on_remove_selected).pack(
-            fill=tk.X, pady=2
-        )
-        ttk.Button(right, text="Up (Order)", command=self.on_move_up).pack(
-            fill=tk.X, pady=(12, 2)
-        )
-        ttk.Button(right, text="Down (Order)", command=self.on_move_down).pack(
             fill=tk.X, pady=2
         )
         ttk.Button(right, text="Apply", command=self.on_apply_order).pack(
@@ -1529,7 +1497,6 @@ class App(BaseTk):
             self.tree.delete(i)
 
         wanted = self.type_filter.get()
-        order = get_load_order()
         enabled = set(get_enabled_mods())
         rows = []
 
@@ -1541,13 +1508,11 @@ class App(BaseTk):
                 mtype = mf.get("type", "misc")
                 if wanted != "(all)" and mtype != wanted:
                     continue
-                ord_idx = order.index(p.name) if p.name in order else -1
-                ord_disp = (ord_idx + 1) if ord_idx >= 0 else ""
                 ena = "yes" if p.name in enabled else ""  # dynamically check enabled set
                 rows.append(((p.name, mf.get("version", ""), mtype,
-                            mf.get("author", ""), ord_disp, ena), mf))
+                            mf.get("author", ""), ena), mf))
             except Exception:
-                rows.append(((p.name, "?", "?", "?", "", ""), None))
+                rows.append(((p.name, "?", "?", "?", ""), None))
 
         for row, _ in rows:
             self.tree.insert("", tk.END, values=row)
@@ -1751,10 +1716,6 @@ class App(BaseTk):
                 self._log(f"Generated manifest for mod '{metadata['name']}' (type: {metadata['type']})")
 
             newname = install_mod_from_folder(mod_root, None, log=self._log, generated_manifest=generated_manifest)
-            order = get_load_order()
-            if newname not in order:
-                order.append(newname)
-                set_load_order(order)
             self.refresh_mod_list()
             messagebox.showinfo("Import", f"Imported '{newname}'.")
         except Exception as e:
@@ -1809,10 +1770,6 @@ class App(BaseTk):
                 self._log(f"Generated manifest for mod '{metadata['name']}' (type: {metadata['type']})")
 
             newname = install_mod_from_folder(mod_root, None, log=self._log, generated_manifest=generated_manifest)
-            order = get_load_order()
-            if newname not in order:
-                order.append(newname)
-                set_load_order(order)
             self.refresh_mod_list()
             messagebox.showinfo("Import", f"Imported '{newname}' via drag-and-drop.")
         except Exception as e:
@@ -1830,7 +1787,7 @@ class App(BaseTk):
         if name not in enabled:
             enabled.append(name)
             set_enabled_mods(enabled)
-            self._log(f"Enabled (marked) '{name}'. Use Apply Order to write files.")
+            self._log(f"Enabled (marked) '{name}'. Use Apply to write files.")
             self.refresh_mod_list()
         else:
             messagebox.showinfo("Mods", f"'{name}' already enabled (marked).")
@@ -1843,7 +1800,7 @@ class App(BaseTk):
         enabled = [m for m in get_enabled_mods() if m != name]
         set_enabled_mods(enabled)
         self._log(
-            f"Disabled (unmarked) '{name}'. Apply Order to rewrite files without it."
+            f"Disabled (unmarked) '{name}'. Apply to rewrite files without it."
         )
         self.refresh_mod_list()
 
@@ -1872,33 +1829,6 @@ class App(BaseTk):
         except Exception as e:
             messagebox.showerror("Remove Mod Error", f"Failed to remove mod:\n{e}")
 
-    def on_move_up(self):
-        name = self.selected_mod_name()
-        if not name:
-            return
-        order = get_load_order()
-        if name not in order:
-            order.append(name)
-        i = order.index(name)
-        if i > 0:
-            order[i - 1], order[i] = order[i], order[i - 1]
-            set_load_order(order)
-            self._log(f"Moved up: {name}")
-            self.refresh_mod_list()
-
-    def on_move_down(self):
-        name = self.selected_mod_name()
-        if not name:
-            return
-        order = get_load_order()
-        if name not in order:
-            order.append(name)
-        i = order.index(name)
-        if i < len(order) - 1:
-            order[i + 1], order[i] = order[i], order[i + 1]
-            set_load_order(order)
-            self._log(f"Moved down: {name}")
-            self.refresh_mod_list()
 
     def on_apply_order(self):
         # Only show conflicts window when the user tries to apply *and* conflicts exist
@@ -1916,13 +1846,13 @@ class App(BaseTk):
         except Exception:
             pass
         try:
-            apply_enabled_mods_in_order(self._log)
+            apply_enabled_mods(self._log)
             messagebox.showinfo(
-                "Apply Order",
-                "All enabled mods applied in load order.\n(Last-write-wins).",
+                "Apply Mods",
+                "All enabled mods applied successfully.",
             )
         except Exception as e:
-            messagebox.showerror("Apply Order Error", str(e))
+            messagebox.showerror("Apply Mods Error", str(e))
 
     def on_conflicts(self):
         enabled = get_enabled_mods()
@@ -1931,7 +1861,6 @@ class App(BaseTk):
             messagebox.showinfo("Conflicts", "No file overlaps among enabled mods.")
             return
 
-        order = get_load_order()
         win = tk.Toplevel(self)
         win.title("Conflict Manager — FM26 Mod Manager")
         win.geometry("760x560")
@@ -1949,9 +1878,6 @@ class App(BaseTk):
             tk.END, "Detected conflicts where multiple mods write the same file(s):\n\n"
         )
         for rel, mods in conflicts.items():
-            ranks = [(order.index(m) if m in order else -1, m) for m in mods]
-            ranks.sort()
-            winner = ranks[-1][1] if ranks else mods[-1]
             details = []
             for m in mods:
                 mf = manifests[m]
@@ -1960,7 +1886,7 @@ class App(BaseTk):
                 )
             text.insert(
                 tk.END,
-                f"{rel}\n  Mods: {', '.join(details)}\n  Winner by load order (last wins): {winner}\n\n",
+                f"{rel}\n  Mods: {', '.join(details)}\n\n",
             )
         text.config(state="disabled")
 
