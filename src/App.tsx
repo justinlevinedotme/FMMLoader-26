@@ -1,7 +1,8 @@
-import { useEffect, useState, version } from "react";
+import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { open as openUrl } from "@tauri-apps/plugin-shell";
 import { listen } from "@tauri-apps/api/event";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -52,6 +53,13 @@ import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
 import { UpdateBanner } from "@/components/UpdateBanner";
 import { TitleBar } from "@/components/TitleBar";
+import { Toaster } from "@/components/ui/sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ModWithInfo extends ModManifest {
   id: string;
@@ -245,17 +253,21 @@ function App() {
   const applyMods = async () => {
     if (!config?.target_path) {
       addLog("Please set game target first");
+      toast.warning("Please set game target first");
       return;
     }
 
     try {
       setLoading(true);
       addLog("Applying mods...");
+      toast.loading("Applying mods...", { id: "apply-mods" });
       const result = await tauriCommands.applyMods();
       addLog(result);
       addLog("Mods applied successfully");
+      toast.success("Mods applied successfully!", { id: "apply-mods" });
     } catch (error) {
       addLog(`Error applying mods: ${error}`);
+      toast.error(`Failed to apply mods: ${error}`, { id: "apply-mods" });
     } finally {
       setLoading(false);
     }
@@ -269,6 +281,7 @@ function App() {
     try {
       await tauriCommands.removeMod(modId);
       addLog(`Removed ${modId}`);
+      toast.success(`Successfully removed ${modId}`);
 
       // Clear selection if we removed the selected mod
       if (selectedMod?.id === modId) {
@@ -279,6 +292,7 @@ function App() {
       await loadMods();
     } catch (error) {
       addLog(`Error removing mod: ${error}`);
+      toast.error(`Failed to remove mod: ${error}`);
     }
   };
 
@@ -308,6 +322,7 @@ function App() {
       addLog(`Importing from: ${sourcePath}`);
       const result = await tauriCommands.importMod(sourcePath);
       addLog(`Successfully imported: ${result}`);
+      toast.success(`Successfully imported: ${result}`);
       await loadMods();
     } catch (error) {
       const errorStr = String(error);
@@ -316,8 +331,10 @@ function App() {
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
+        toast.info("Please provide mod metadata");
       } else {
         addLog(`Import failed: ${error}`);
+        toast.error(`Import failed: ${error}`);
       }
     }
   };
@@ -441,7 +458,8 @@ function App() {
   }, [config]);
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <TooltipProvider>
+      <div className="h-screen flex flex-col bg-background">
       {/* Custom TitleBar */}
       <TitleBar />
 
@@ -477,33 +495,54 @@ function App() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleImportClick}
-              disabled={loading}
-            >
-              <Upload className="mr-2 h-4 w-4" />
-              Import
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setConflictsDialogOpen(true)}
-              disabled={loading || !config?.target_path}
-            >
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              Conflicts
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setRestoreDialogOpen(true)}
-              disabled={loading}
-            >
-              <History className="mr-2 h-4 w-4" />
-              Restore
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleImportClick}
+                  disabled={loading}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Import mod from ZIP, folder, or file</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConflictsDialogOpen(true)}
+                  disabled={loading || !config?.target_path}
+                >
+                  <AlertTriangle className="mr-2 h-4 w-4" />
+                  Conflicts
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Check for file conflicts between mods</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setRestoreDialogOpen(true)}
+                  disabled={loading}
+                >
+                  <History className="mr-2 h-4 w-4" />
+                  Restore
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Rollback to a previous backup</p>
+              </TooltipContent>
+            </Tooltip>
             <Button
               variant="outline"
               size="sm"
@@ -620,13 +659,20 @@ function App() {
                         {mods.length} mods installed
                       </CardDescription>
                     </div>
-                    <Button
-                      onClick={applyMods}
-                      disabled={loading || !config?.target_path}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Apply Mods
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={applyMods}
+                          disabled={loading || !config?.target_path}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Apply Mods
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Apply enabled mods to game (creates backup)</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto">
@@ -902,7 +948,9 @@ function App() {
           </div>
         </SheetContent>
       </Sheet>
-    </div>
+      <Toaster />
+      </div>
+    </TooltipProvider>
   );
 }
 
