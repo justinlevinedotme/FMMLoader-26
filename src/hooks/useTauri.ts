@@ -1,5 +1,17 @@
 import { invoke } from "@tauri-apps/api/core";
 
+// Wait for Tauri to be ready
+const waitForTauri = async (timeout = 5000): Promise<boolean> => {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeout) {
+    if (typeof window !== 'undefined' && '__TAURI__' in window) {
+      return true;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  return false;
+};
+
 // Check if we're running in a Tauri context
 const isTauri = () => {
   return typeof window !== 'undefined' && '__TAURI__' in window;
@@ -8,7 +20,11 @@ const isTauri = () => {
 // Wrapper to ensure we're in Tauri context
 const safeInvoke = async <T>(cmd: string, args?: any): Promise<T> => {
   if (!isTauri()) {
-    throw new Error('Not running in Tauri context. Please run with "npm run tauri dev"');
+    // Try waiting for Tauri to load
+    const ready = await waitForTauri();
+    if (!ready) {
+      throw new Error('Not running in Tauri context. Please run with "npm run tauri dev"');
+    }
   }
   return invoke<T>(cmd, args);
 };
