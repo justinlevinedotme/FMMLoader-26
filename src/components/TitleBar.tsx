@@ -1,5 +1,6 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useState } from "react";
+import { GripVertical } from "lucide-react";
 
 export function TitleBar() {
   const [isHovered, setIsHovered] = useState(false);
@@ -15,15 +16,6 @@ export function TitleBar() {
 
   const handleMaximize = () => {
     appWindow.toggleMaximize();
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Only start drag if it's a left click, not on a button, and not during file drag
-    if (e.button === 0 && e.target === e.currentTarget) {
-      // Prevent window dragging during file drops
-      e.preventDefault();
-      appWindow.startDragging();
-    }
   };
 
   return (
@@ -87,18 +79,23 @@ export function TitleBar() {
         </button>
       </div>
 
-      {/* Title area with drag handle */}
-      <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none">
-        <div
-          onMouseDown={handleMouseDown}
-          className="text-sm font-medium text-foreground/70 cursor-move px-4 py-1 rounded hover:bg-muted/50 transition-colors pointer-events-auto"
-        >
+      {/* Title with small drag handle */}
+      <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center gap-2">
+        <div className="text-sm font-medium text-foreground/70">
           FMMLoader26
+        </div>
+        {/* Small drag handle - only this area triggers window drag */}
+        <div
+          data-tauri-drag-region
+          className="cursor-move p-1 rounded hover:bg-muted/50 transition-colors pointer-events-auto"
+          title="Drag to move window"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
         </div>
       </div>
 
       {/* Spacer for balance */}
-      <div className="w-20"></div>
+      <div className="w-20 pointer-events-auto"></div>
     </div>
   );
 }
