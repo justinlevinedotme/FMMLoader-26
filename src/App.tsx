@@ -375,6 +375,10 @@ function App() {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
+    console.log("isDragging changed:", isDragging);
+  }, [isDragging]);
+
+  useEffect(() => {
     const init = async () => {
       try {
         await tauriCommands.initApp();
@@ -393,13 +397,18 @@ function App() {
           setIsDragging(false);
         });
 
-        const unlistenDragOver = await listen("tauri://drag-over", () => {
-          console.log("Drag over event");
+        const unlistenDragOver = await listen("tauri://drag-over", (event: any) => {
+          console.log("Drag over event", event);
           setIsDragging(true);
         });
 
-        const unlistenDragLeave = await listen("tauri://drag-leave", () => {
-          console.log("Drag leave event");
+        const unlistenDragDrop = await listen("tauri://drag-drop", (event: any) => {
+          console.log("Drag drop event (cancelled)", event);
+          setIsDragging(false);
+        });
+
+        const unlistenDragLeave = await listen("tauri://drag-leave", (event: any) => {
+          console.log("Drag leave event", event);
           setIsDragging(false);
         });
 
@@ -418,6 +427,7 @@ function App() {
         return () => {
           unlistenDrop();
           unlistenDragOver();
+          unlistenDragDrop();
           unlistenDragLeave();
         };
       } catch (error) {
@@ -441,7 +451,7 @@ function App() {
 
       {/* Drag overlay */}
       {isDragging && (
-        <div className="fixed inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center pointer-events-none">
+        <div className="fixed inset-0 bg-primary/10 border-4 border-dashed border-primary z-40 flex items-center justify-center pointer-events-none">
           <div className="bg-background/95 p-8 rounded-lg shadow-lg">
             <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
             <p className="text-xl font-semibold">Drop mod file to import</p>
