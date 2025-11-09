@@ -146,12 +146,32 @@ fn import_mod(
         return Err("Source path does not exist".to_string());
     }
 
-    // Handle ZIP files
-    let mod_root = if source.is_file() && source.extension().and_then(|s| s.to_str()) == Some("zip") {
-        let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
-        extract_zip(&source, &temp_dir)?;
-        find_mod_root(&temp_dir)?
+    // Handle different source types
+    let mod_root = if source.is_file() {
+        let ext = source.extension().and_then(|s| s.to_str());
+
+        if ext == Some("zip") {
+            // Extract ZIP to temp directory
+            let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+            extract_zip(&source, &temp_dir)?;
+            find_mod_root(&temp_dir)?
+        } else {
+            // Single file (.bundle, .fmf, etc) - create temp dir with just this file
+            let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+            fs::create_dir_all(&temp_dir)
+                .map_err(|e| format!("Failed to create temp directory: {}", e))?;
+
+            let file_name = source.file_name()
+                .ok_or("Invalid file name")?;
+            let dest_file = temp_dir.join(file_name);
+
+            fs::copy(&source, &dest_file)
+                .map_err(|e| format!("Failed to copy file: {}", e))?;
+
+            temp_dir
+        }
     } else {
+        // It's a directory
         find_mod_root(&source)?
     };
 
