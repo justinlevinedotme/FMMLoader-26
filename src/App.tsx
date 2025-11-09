@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { listen } from '@tauri-apps/api/event';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { tauriCommands, type Config, type ModManifest, type ModMetadata, type UpdateInfo } from "@/hooks/useTauri";
-import { Folder, FolderOpen, RefreshCw, Download, Trash2, Power, PowerOff, Upload, AlertTriangle, History } from "lucide-react";
+import { Folder, FolderOpen, RefreshCw, Download, Trash2, Upload, AlertTriangle, History, Moon, Sun, Settings, DollarSign, MessageCircle } from "lucide-react";
 import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
@@ -27,11 +30,14 @@ function App() {
   // Editable path states
   const [gameTargetInput, setGameTargetInput] = useState("");
   const [userDirInput, setUserDirInput] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
 
   // Dialog states
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const [conflictsDialogOpen, setConflictsDialogOpen] = useState(false);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [modDetailsOpen, setModDetailsOpen] = useState(false);
   const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
 
   const addLog = (message: string) => {
@@ -222,6 +228,13 @@ function App() {
     try {
       await tauriCommands.removeMod(modId);
       addLog(`Removed ${modId}`);
+
+      // Clear selection if we removed the selected mod
+      if (selectedMod?.id === modId) {
+        setSelectedMod(null);
+        setModDetailsOpen(false);
+      }
+
       await loadMods();
     } catch (error) {
       addLog(`Error removing mod: ${error}`);
@@ -295,6 +308,33 @@ function App() {
     await toggleMod(modName, false);
   };
 
+  const detectUserDirectory = async () => {
+    try {
+      setLoading(true);
+      addLog("Detecting user directory...");
+      // The backend should auto-detect this, but we can trigger a refresh
+      await loadConfig();
+      if (config?.user_dir_path) {
+        addLog(`User directory detected: ${config.user_dir_path}`);
+      } else {
+        addLog("Could not auto-detect user directory");
+      }
+    } catch (error) {
+      addLog(`Error detecting user directory: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    if (!darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
   // Drag and drop handlers for the entire window
   const [isDragging, setIsDragging] = useState(false);
 
@@ -334,6 +374,14 @@ function App() {
         await loadMods();
         addLog("FMMLoader26 initialized");
 
+        // Set up file drop listener
+        const unlisten = await listen('tauri://file-drop', (event: any) => {
+          const files = event.payload as string[];
+          if (files && files.length > 0) {
+            handleImport(files[0]);
+          }
+        });
+
         // Check for updates
         try {
           const updates = await tauriCommands.checkUpdates();
@@ -345,6 +393,10 @@ function App() {
           // Silently fail update check - not critical
           console.error("Failed to check for updates:", error);
         }
+
+        return () => {
+          unlisten();
+        };
       } catch (error) {
         addLog(`Initialization error: ${error}`);
       }
