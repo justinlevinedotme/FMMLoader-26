@@ -29,6 +29,24 @@ export interface FileEntry {
   platform?: string;
 }
 
+export interface ConflictInfo {
+  file_path: string;
+  conflicting_mods: string[];
+}
+
+export interface RestorePoint {
+  timestamp: string;
+  path: string;
+}
+
+export interface ModMetadata {
+  name?: string;
+  version?: string;
+  mod_type?: string;
+  author?: string;
+  description?: string;
+}
+
 export const tauriCommands = {
   initApp: () => invoke<void>("init_app"),
 
@@ -52,4 +70,29 @@ export const tauriCommands = {
   applyMods: () => invoke<string>("apply_mods"),
 
   removeMod: (modName: string) => invoke<void>("remove_mod", { modName }),
+
+  importMod: (
+    sourcePath: string,
+    metadata?: ModMetadata
+  ) =>
+    invoke<string>("import_mod", {
+      sourcePath,
+      modName: metadata?.name,
+      version: metadata?.version,
+      modType: metadata?.mod_type,
+      author: metadata?.author,
+      description: metadata?.description,
+    }),
+
+  detectModType: (path: string) => invoke<string>("detect_mod_type", { path }),
+
+  checkConflicts: () => invoke<ConflictInfo[]>("check_conflicts"),
+
+  getRestorePoints: () => invoke<RestorePoint[]>("get_restore_points"),
+
+  restoreFromPoint: (pointPath: string) =>
+    invoke<string>("restore_from_point", { pointPath }),
+
+  createBackupPoint: (name: string) =>
+    invoke<string>("create_backup_point", { name }),
 };

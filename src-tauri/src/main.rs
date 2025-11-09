@@ -2,14 +2,21 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod config;
+mod conflicts;
 mod game_detection;
+mod import;
 mod mod_manager;
+mod restore;
 mod types;
 
 use config::{get_mods_dir, init_storage, load_config, save_config};
-use game_detection::{get_default_candidates, get_fm_user_dir};
+use conflicts::find_conflicts;
+use game_detection::get_default_candidates;
+use import::{auto_detect_mod_type, extract_zip, find_mod_root, generate_manifest, has_manifest};
 use mod_manager::{cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods, uninstall_mod};
-use types::{Config, ModManifest};
+use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
+use types::{Config, ConflictInfo, ModManifest, RestorePoint};
+use std::path::PathBuf;
 
 #[tauri::command]
 fn init_app() -> Result<(), String> {
@@ -119,6 +126,154 @@ fn remove_mod(mod_name: String) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn import_mod(
+    source_path: String,
+    mod_name: Option<String>,
+    version: Option<String>,
+    mod_type: Option<String>,
+    author: Option<String>,
+    description: Option<String>,
+) -> Result<String, String> {
+    use std::fs;
+
+    let source = PathBuf::from(&source_path);
+    let mods_dir = get_mods_dir();
+
+    if !source.exists() {
+        return Err("Source path does not exist".to_string());
+    }
+
+    // Handle ZIP files
+    let mod_root = if source.is_file() && source.extension().and_then(|s| s.to_str()) == Some("zip") {
+        let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+        extract_zip(&source, &temp_dir)?;
+        find_mod_root(&temp_dir)?
+    } else {
+        find_mod_root(&source)?
+    };
+
+    // Check if manifest exists
+    let needs_manifest = !has_manifest(&mod_root);
+
+    // If no manifest and no metadata provided, return error asking for metadata
+    if needs_manifest {
+        if mod_name.is_none() || version.is_none() || mod_type.is_none() {
+            // Return special error code indicating we need metadata
+            return Err("NEEDS_METADATA".to_string());
+        }
+
+        // Generate manifest with provided metadata
+        generate_manifest(
+            &mod_root,
+            mod_name.clone().unwrap(),
+            version.unwrap(),
+            mod_type.unwrap(),
+            author.unwrap_or_default(),
+            description.unwrap_or_default(),
+        )?;
+    }
+
+    // Read the manifest to get the mod name
+    let manifest = mod_manager::read_manifest(&mod_root)?;
+    let final_mod_name = mod_name.unwrap_or(manifest.name.clone());
+
+    // Copy to mods directory
+    let dest_dir = mods_dir.join(&final_mod_name);
+
+    if dest_dir.exists() {
+        return Err(format!("Mod '{}' already exists", final_mod_name));
+    }
+
+    // Copy the mod files
+    copy_dir_recursive(&mod_root, &dest_dir)?;
+
+    Ok(final_mod_name)
+}
+
+#[tauri::command]
+fn detect_mod_type(path: String) -> Result<String, String> {
+    let mod_path = PathBuf::from(path);
+
+    if !mod_path.exists() {
+        return Err("Path does not exist".to_string());
+    }
+
+    Ok(auto_detect_mod_type(&mod_path))
+}
+
+#[tauri::command]
+fn check_conflicts() -> Result<Vec<ConflictInfo>, String> {
+    let config = load_config()?;
+
+    let target_path = config
+        .target_path
+        .as_ref()
+        .ok_or("Game target not set")?;
+
+    let target = PathBuf::from(target_path);
+
+    find_conflicts(&config.enabled_mods, &target, config.user_dir_path.as_deref())
+}
+
+#[tauri::command]
+fn get_restore_points() -> Result<Vec<RestorePoint>, String> {
+    list_restore_points()
+}
+
+#[tauri::command]
+fn restore_from_point(point_path: String) -> Result<String, String> {
+    let path = PathBuf::from(point_path);
+    rollback_to_restore_point(&path)
+}
+
+#[tauri::command]
+fn create_backup_point(name: String) -> Result<String, String> {
+    let config = load_config()?;
+
+    let target_path = config
+        .target_path
+        .as_ref()
+        .ok_or("Game target not set")?;
+
+    let target = PathBuf::from(target_path);
+    let point_dir = create_restore_point(&name, &[target])?;
+
+    Ok(point_dir.to_string_lossy().to_string())
+}
+
+// Helper function for recursive directory copy
+fn copy_dir_recursive(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
+    use std::fs;
+    use walkdir::WalkDir;
+
+    fs::create_dir_all(dst)
+        .map_err(|e| format!("Failed to create destination directory: {}", e))?;
+
+    for entry in WalkDir::new(src) {
+        let entry = entry.map_err(|e| format!("Failed to walk directory: {}", e))?;
+        let path = entry.path();
+
+        if let Ok(rel_path) = path.strip_prefix(src) {
+            let target_path = dst.join(rel_path);
+
+            if path.is_dir() {
+                fs::create_dir_all(&target_path)
+                    .map_err(|e| format!("Failed to create directory: {}", e))?;
+            } else {
+                if let Some(parent) = target_path.parent() {
+                    fs::create_dir_all(parent)
+                        .map_err(|e| format!("Failed to create parent directory: {}", e))?;
+                }
+                fs::copy(path, &target_path)
+                    .map_err(|e| format!("Failed to copy file: {}", e))?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -138,6 +293,12 @@ fn main() {
             disable_mod,
             apply_mods,
             remove_mod,
+            import_mod,
+            detect_mod_type,
+            check_conflicts,
+            get_restore_points,
+            restore_from_point,
+            create_backup_point,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
