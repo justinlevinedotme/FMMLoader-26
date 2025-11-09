@@ -41,7 +41,6 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "titleBarStyle": "Transparent",
         "label": "main",
         "title": "FMMLoader26",
         "width": 1200,
