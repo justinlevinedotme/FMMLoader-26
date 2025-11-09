@@ -403,7 +403,13 @@ function App() {
         });
 
         const unlistenDragDrop = await listen("tauri://drag-drop", (event: any) => {
-          console.log("Drag drop event (cancelled)", event);
+          console.log("Drag drop event", event);
+          // In Tauri v2, drag-drop contains the file paths
+          const paths = event.payload?.paths as string[];
+          if (paths && paths.length > 0) {
+            console.log("Importing file from drag-drop:", paths[0]);
+            handleImport(paths[0]);
+          }
           setIsDragging(false);
         });
 

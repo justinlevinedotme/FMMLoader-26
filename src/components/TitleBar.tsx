@@ -1,6 +1,5 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useState } from "react";
-import { GripVertical } from "lucide-react";
 
 export function TitleBar() {
   const [isHovered, setIsHovered] = useState(false);
@@ -79,23 +78,18 @@ export function TitleBar() {
         </button>
       </div>
 
-      {/* Title with small drag handle */}
-      <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center gap-2">
+      {/* Title - draggable */}
+      <div
+        data-tauri-drag-region
+        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center pointer-events-auto"
+      >
         <div className="text-sm font-medium text-foreground/70">
           FMMLoader26
-        </div>
-        {/* Small drag handle - only this area triggers window drag */}
-        <div
-          data-tauri-drag-region
-          className="cursor-move p-1 rounded hover:bg-muted/50 transition-colors pointer-events-auto"
-          title="Drag to move window"
-        >
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
         </div>
       </div>
 
       {/* Spacer for balance */}
-      <div className="w-20 pointer-events-auto"></div>
+      <div className="w-20"></div>
     </div>
   );
 }
