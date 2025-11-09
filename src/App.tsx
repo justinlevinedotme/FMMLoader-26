@@ -25,6 +25,10 @@ function App() {
   const [logs, setLogs] = useState<string[]>([]);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
+  // Editable path states
+  const [gameTargetInput, setGameTargetInput] = useState("");
+  const [userDirInput, setUserDirInput] = useState("");
+
   // Dialog states
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const [conflictsDialogOpen, setConflictsDialogOpen] = useState(false);
@@ -40,6 +44,8 @@ function App() {
     try {
       const cfg = await tauriCommands.getConfig();
       setConfig(cfg);
+      setGameTargetInput(cfg.target_path || "");
+      setUserDirInput(cfg.user_dir_path || "");
       addLog("Configuration loaded");
     } catch (error) {
       addLog(`Error loading config: ${error}`);
@@ -121,7 +127,6 @@ function App() {
       });
 
       if (selected) {
-        // We'll need to add a set_user_directory command to the backend
         const updatedConfig = {
           ...config!,
           user_dir_path: selected as string
@@ -132,6 +137,46 @@ function App() {
       }
     } catch (error) {
       addLog(`Error selecting user directory: ${error}`);
+    }
+  };
+
+  const handleGameTargetChange = (value: string) => {
+    setGameTargetInput(value);
+  };
+
+  const handleUserDirChange = (value: string) => {
+    setUserDirInput(value);
+  };
+
+  const saveGameTarget = async () => {
+    if (gameTargetInput !== config?.target_path) {
+      try {
+        await tauriCommands.setGameTarget(gameTargetInput);
+        await loadConfig();
+        addLog(`Game target updated to: ${gameTargetInput}`);
+      } catch (error) {
+        addLog(`Error updating game target: ${error}`);
+        // Revert on error
+        setGameTargetInput(config?.target_path || "");
+      }
+    }
+  };
+
+  const saveUserDirectory = async () => {
+    if (userDirInput !== config?.user_dir_path) {
+      try {
+        const updatedConfig = {
+          ...config!,
+          user_dir_path: userDirInput
+        };
+        await tauriCommands.updateConfig(updatedConfig);
+        await loadConfig();
+        addLog(`User directory updated to: ${userDirInput}`);
+      } catch (error) {
+        addLog(`Error updating user directory: ${error}`);
+        // Revert on error
+        setUserDirInput(config?.user_dir_path || "");
+      }
     }
   };
 
@@ -358,10 +403,13 @@ function App() {
               <span className="text-sm text-muted-foreground whitespace-nowrap">Game Target:</span>
               <input
                 type="text"
-                value={config?.target_path || ""}
-                readOnly
-                className="flex-1 px-2 py-1 text-sm font-mono bg-muted rounded border border-input"
+                value={gameTargetInput}
+                onChange={(e) => handleGameTargetChange(e.target.value)}
+                onBlur={saveGameTarget}
+                onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
+                className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 placeholder="Not set - click 'Select' or 'Detect Game'"
+                disabled={loading}
               />
             </div>
             <Button
@@ -380,10 +428,13 @@ function App() {
               <span className="text-sm text-muted-foreground whitespace-nowrap">User Directory:</span>
               <input
                 type="text"
-                value={config?.user_dir_path || ""}
-                readOnly
-                className="flex-1 px-2 py-1 text-sm font-mono bg-muted rounded border border-input"
+                value={userDirInput}
+                onChange={(e) => handleUserDirChange(e.target.value)}
+                onBlur={saveUserDirectory}
+                onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
+                className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 placeholder="Auto-detected from system"
+                disabled={loading}
               />
             </div>
             <Button
