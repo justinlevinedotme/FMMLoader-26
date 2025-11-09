@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
+import { open } from "@tauri-apps/plugin-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { tauriCommands, type Config, type ModManifest } from "@/hooks/useTauri";
-import { Folder, FolderOpen, RefreshCw, Download, Trash2, Power, PowerOff } from "lucide-react";
+import { tauriCommands, type Config, type ModManifest, type ModMetadata } from "@/hooks/useTauri";
+import { Folder, FolderOpen, RefreshCw, Download, Trash2, Power, PowerOff, Upload, AlertTriangle, History } from "lucide-react";
+import { ModMetadataDialog } from "@/components/ModMetadataDialog";
+import { ConflictsDialog } from "@/components/ConflictsDialog";
+import { RestorePointsDialog } from "@/components/RestorePointsDialog";
+import { DropZone } from "@/components/DropZone";
 
 interface ModWithInfo extends ModManifest {
   id: string;

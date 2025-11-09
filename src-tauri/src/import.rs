@@ -101,9 +101,9 @@ pub fn auto_detect_mod_type(dir: &Path) -> String {
                 match ext_lower.as_str() {
                     "bundle" => has_bundle = true,
                     "fmf" => has_fmf = true,
+                    "xml" if path.to_string_lossy().contains("panel") => has_panel = true,
                     "xml" => has_xml = true,
                     "inc" if path.to_string_lossy().contains("config") => has_config = true,
-                    "xml" if path.to_string_lossy().contains("panel") => has_panel = true,
                     "edt" => has_edt = true,
                     _ => {}
                 }
