@@ -5,6 +5,7 @@ mod config;
 mod conflicts;
 mod game_detection;
 mod import;
+mod logging;
 mod mod_manager;
 mod restore;
 mod types;
@@ -22,9 +23,11 @@ use std::path::PathBuf;
 
 #[tauri::command]
 fn init_app() -> Result<(), String> {
+    tracing::info!("Initializing application");
     init_storage()?;
     cleanup_old_backups(10)?;
     cleanup_old_restore_points(10)?;
+    tracing::info!("Application initialized successfully");
     Ok(())
 }
 
@@ -146,52 +149,76 @@ fn import_mod(
 ) -> Result<String, String> {
     use std::fs;
 
+    tracing::info!("Starting mod import from: {}", source_path);
+    tracing::debug!("Import params - name: {:?}, version: {:?}, type: {:?}", mod_name, version, mod_type);
+
     let source = PathBuf::from(&source_path);
     let mods_dir = get_mods_dir();
 
     if !source.exists() {
+        tracing::error!("Source path does not exist: {}", source_path);
         return Err("Source path does not exist".to_string());
     }
+
+    tracing::info!("Source exists: {:?}, is_file: {}, is_dir: {}", source, source.is_file(), source.is_dir());
 
     // Handle different source types
     let mod_root = if source.is_file() {
         let ext = source.extension().and_then(|s| s.to_str());
+        tracing::info!("File extension: {:?}", ext);
 
         if ext == Some("zip") {
             // Extract ZIP to temp directory
             let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+            tracing::info!("Extracting ZIP to: {:?}", temp_dir);
             extract_zip(&source, &temp_dir)?;
-            find_mod_root(&temp_dir)?
+            let root = find_mod_root(&temp_dir)?;
+            tracing::info!("Found mod root in ZIP: {:?}", root);
+            root
         } else {
             // Single file (.bundle, .fmf, etc) - create temp dir with just this file
             let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+            tracing::info!("Creating temp directory for single file: {:?}", temp_dir);
             fs::create_dir_all(&temp_dir)
-                .map_err(|e| format!("Failed to create temp directory: {}", e))?;
+                .map_err(|e| {
+                    tracing::error!("Failed to create temp directory: {}", e);
+                    format!("Failed to create temp directory: {}", e)
+                })?;
 
             let file_name = source.file_name()
                 .ok_or("Invalid file name")?;
             let dest_file = temp_dir.join(file_name);
 
+            tracing::info!("Copying file to: {:?}", dest_file);
             fs::copy(&source, &dest_file)
-                .map_err(|e| format!("Failed to copy file: {}", e))?;
+                .map_err(|e| {
+                    tracing::error!("Failed to copy file: {}", e);
+                    format!("Failed to copy file: {}", e)
+                })?;
 
             temp_dir
         }
     } else {
         // It's a directory
-        find_mod_root(&source)?
+        tracing::info!("Source is a directory, finding mod root");
+        let root = find_mod_root(&source)?;
+        tracing::info!("Found mod root: {:?}", root);
+        root
     };
 
     // Check if manifest exists
     let needs_manifest = !has_manifest(&mod_root);
+    tracing::info!("Needs manifest: {}", needs_manifest);
 
     // If no manifest and no metadata provided, return error asking for metadata
     if needs_manifest {
         if mod_name.is_none() || version.is_none() || mod_type.is_none() {
+            tracing::warn!("Manifest needed but metadata not provided");
             // Return special error code indicating we need metadata
             return Err("NEEDS_METADATA".to_string());
         }
 
+        tracing::info!("Generating manifest with provided metadata");
         // Generate manifest with provided metadata
         generate_manifest(
             &mod_root,
@@ -204,18 +231,24 @@ fn import_mod(
     }
 
     // Read the manifest to get the mod name
+    tracing::info!("Reading manifest from mod root");
     let manifest = mod_manager::read_manifest(&mod_root)?;
     let final_mod_name = mod_name.unwrap_or(manifest.name.clone());
+    tracing::info!("Final mod name: {}", final_mod_name);
 
     // Copy to mods directory
     let dest_dir = mods_dir.join(&final_mod_name);
+    tracing::info!("Destination directory: {:?}", dest_dir);
 
     if dest_dir.exists() {
+        tracing::error!("Mod already exists: {}", final_mod_name);
         return Err(format!("Mod '{}' already exists", final_mod_name));
     }
 
     // Copy the mod files
+    tracing::info!("Copying mod files from {:?} to {:?}", mod_root, dest_dir);
     copy_dir_recursive(&mod_root, &dest_dir)?;
+    tracing::info!("Mod import completed successfully: {}", final_mod_name);
 
     Ok(final_mod_name)
 }
@@ -276,6 +309,44 @@ fn check_updates() -> Result<UpdateInfo, String> {
     check_for_updates()
 }
 
+#[tauri::command]
+fn open_logs_folder() -> Result<(), String> {
+    let logs_dir = logging::get_logs_dir();
+    tracing::info!("Opening logs folder: {:?}", logs_dir);
+
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(&logs_dir)
+            .spawn()
+            .map_err(|e| format!("Failed to open logs folder: {}", e))?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&logs_dir)
+            .spawn()
+            .map_err(|e| format!("Failed to open logs folder: {}", e))?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&logs_dir)
+            .spawn()
+            .map_err(|e| format!("Failed to open logs folder: {}", e))?;
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
+fn get_logs_path() -> Result<String, String> {
+    let logs_dir = logging::get_logs_dir();
+    Ok(logs_dir.to_string_lossy().to_string())
+}
+
 // Helper function for recursive directory copy
 fn copy_dir_recursive(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
     use std::fs;
@@ -309,6 +380,13 @@ fn copy_dir_recursive(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
 }
 
 fn main() {
+    // Initialize logging first
+    if let Err(e) = logging::init_logging() {
+        eprintln!("Failed to initialize logging: {}", e);
+    }
+
+    tracing::info!("Starting FMMLoader26");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
@@ -335,6 +413,8 @@ fn main() {
             restore_from_point,
             create_backup_point,
             check_updates,
+            open_logs_folder,
+            get_logs_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

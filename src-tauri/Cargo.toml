@@ -26,6 +26,10 @@ dirs = "5"
 chrono = "0.4"
 uuid = { version = "1", features = ["v4"] }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+hostname = "0.3"
 
 [features]
 default = ["custom-protocol"]

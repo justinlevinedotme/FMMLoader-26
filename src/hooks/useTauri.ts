@@ -135,4 +135,8 @@ export const tauriCommands = {
     safeInvoke<string>("create_backup_point", { name }),
 
   checkUpdates: () => safeInvoke<UpdateInfo>("check_updates"),
+
+  openLogsFolder: () => safeInvoke<void>("open_logs_folder"),
+
+  getLogsPath: () => safeInvoke<string>("get_logs_path"),
 };

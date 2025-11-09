@@ -375,10 +375,6 @@ function App() {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    console.log("isDragging changed:", isDragging);
-  }, [isDragging]);
-
-  useEffect(() => {
     const init = async () => {
       try {
         await tauriCommands.initApp();
@@ -388,33 +384,27 @@ function App() {
 
         // Set up Tauri drag and drop event listeners
         const unlistenDrop = await listen("tauri://file-drop", (event: any) => {
-          console.log("File drop event:", event);
           const files = event.payload as string[];
           if (files && files.length > 0) {
-            console.log("Importing file:", files[0]);
             handleImport(files[0]);
           }
           setIsDragging(false);
         });
 
-        const unlistenDragOver = await listen("tauri://drag-over", (event: any) => {
-          console.log("Drag over event", event);
+        const unlistenDragOver = await listen("tauri://drag-over", () => {
           setIsDragging(true);
         });
 
         const unlistenDragDrop = await listen("tauri://drag-drop", (event: any) => {
-          console.log("Drag drop event", event);
           // In Tauri v2, drag-drop contains the file paths
           const paths = event.payload?.paths as string[];
           if (paths && paths.length > 0) {
-            console.log("Importing file from drag-drop:", paths[0]);
             handleImport(paths[0]);
           }
           setIsDragging(false);
         });
 
-        const unlistenDragLeave = await listen("tauri://drag-leave", (event: any) => {
-          console.log("Drag leave event", event);
+        const unlistenDragLeave = await listen("tauri://drag-leave", () => {
           setIsDragging(false);
         });
 
@@ -875,7 +865,7 @@ function App() {
               Configure FMMLoader26 preferences
             </SheetDescription>
           </SheetHeader>
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <div className="text-sm font-medium">Dark Mode</div>
@@ -884,6 +874,30 @@ function App() {
                 </div>
               </div>
               <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Application Logs</div>
+                <div className="text-sm text-muted-foreground">
+                  View application logs for troubleshooting. Logs from the last 10 sessions are kept.
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full mt-2"
+                  onClick={async () => {
+                    try {
+                      await tauriCommands.openLogsFolder();
+                      addLog("Opened logs folder");
+                    } catch (error) {
+                      addLog(`Failed to open logs folder: ${error}`);
+                    }
+                  }}
+                >
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Open Logs Folder
+                </Button>
+              </div>
             </div>
           </div>
         </SheetContent>
