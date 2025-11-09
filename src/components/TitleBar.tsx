@@ -85,12 +85,12 @@ export function TitleBar() {
         </button>
       </div>
 
-      {/* Draggable title area */}
-      <div
-        onMouseDown={handleMouseDown}
-        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center cursor-move"
-      >
-        <div className="text-sm font-medium text-foreground/70 pointer-events-none">
+      {/* Title area with drag handle */}
+      <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center">
+        <div
+          onMouseDown={handleMouseDown}
+          className="text-sm font-medium text-foreground/70 cursor-move px-4 py-1 rounded hover:bg-muted/50 transition-colors"
+        >
           FMMLoader26
         </div>
       </div>
