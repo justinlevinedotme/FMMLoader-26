@@ -94,6 +94,47 @@ function App() {
     }
   };
 
+  const selectGamePath = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        directory: true,
+        title: "Select FM26 Game Target Folder"
+      });
+
+      if (selected) {
+        await tauriCommands.setGameTarget(selected as string);
+        await loadConfig();
+        addLog(`Game target set to: ${selected}`);
+      }
+    } catch (error) {
+      addLog(`Error selecting game path: ${error}`);
+    }
+  };
+
+  const selectUserDirectory = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        directory: true,
+        title: "Select FM26 User Directory"
+      });
+
+      if (selected) {
+        // We'll need to add a set_user_directory command to the backend
+        const updatedConfig = {
+          ...config!,
+          user_dir_path: selected as string
+        };
+        await tauriCommands.updateConfig(updatedConfig);
+        await loadConfig();
+        addLog(`User directory set to: ${selected}`);
+      }
+    } catch (error) {
+      addLog(`Error selecting user directory: ${error}`);
+    }
+  };
+
   const toggleMod = async (modId: string, enable: boolean) => {
     try {
       if (enable) {
@@ -309,16 +350,52 @@ function App() {
           </div>
         </div>
 
-        {/* Game Target Display */}
-        {config?.target_path && (
-          <div className="px-4 pb-4">
-            <div className="flex items-center gap-2 text-sm">
-              <FolderOpen className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Game Target:</span>
-              <span className="font-mono">{config.target_path}</span>
+        {/* Game Target and User Directory */}
+        <div className="px-4 pb-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1">
+              <FolderOpen className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">Game Target:</span>
+              <input
+                type="text"
+                value={config?.target_path || ""}
+                readOnly
+                className="flex-1 px-2 py-1 text-sm font-mono bg-muted rounded border border-input"
+                placeholder="Not set - click 'Select' or 'Detect Game'"
+              />
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={selectGamePath}
+              disabled={loading}
+            >
+              Select...
+            </Button>
           </div>
-        )}
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1">
+              <Folder className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">User Directory:</span>
+              <input
+                type="text"
+                value={config?.user_dir_path || ""}
+                readOnly
+                className="flex-1 px-2 py-1 text-sm font-mono bg-muted rounded border border-input"
+                placeholder="Auto-detected from system"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={selectUserDirectory}
+              disabled={loading}
+            >
+              Select...
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
