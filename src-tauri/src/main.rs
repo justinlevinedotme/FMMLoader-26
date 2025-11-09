@@ -52,6 +52,13 @@ fn set_game_target(path: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn detect_user_dir() -> Result<String, String> {
+    let config = load_config()?;
+    let user_dir = game_detection::get_fm_user_dir(config.user_dir_path.as_deref());
+    Ok(user_dir.to_string_lossy().to_string())
+}
+
+#[tauri::command]
 fn get_mods_list() -> Result<Vec<String>, String> {
     list_mods()
 }
@@ -314,6 +321,7 @@ fn main() {
             update_config,
             detect_game_path,
             set_game_target,
+            detect_user_dir,
             get_mods_list,
             get_mod_details,
             enable_mod,

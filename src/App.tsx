@@ -303,13 +303,16 @@ function App() {
     try {
       setLoading(true);
       addLog("Detecting user directory...");
-      // The backend should auto-detect this, but we can trigger a refresh
+      const detectedPath = await tauriCommands.detectUserDir();
+
+      // Update the config with the detected path
+      const updatedConfig = {
+        ...config!,
+        user_dir_path: detectedPath
+      };
+      await tauriCommands.updateConfig(updatedConfig);
       await loadConfig();
-      if (config?.user_dir_path) {
-        addLog(`User directory detected: ${config.user_dir_path}`);
-      } else {
-        addLog("Could not auto-detect user directory");
-      }
+      addLog(`User directory detected: ${detectedPath}`);
     } catch (error) {
       addLog(`Error detecting user directory: ${error}`);
     } finally {
@@ -479,31 +482,13 @@ function App() {
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
-            <div className="border-l pl-2 ml-2 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openUrl('https://ko-fi.com/jalco')}
-              >
-                <DollarSign className="mr-2 h-4 w-4" />
-                Support
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                Discord
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSettingsOpen(true)}
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
@@ -677,8 +662,28 @@ function App() {
       </div>
 
       {/* Footer */}
-      <div className="border-t p-2 text-center text-xs text-muted-foreground">
-        FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
+      <div className="border-t p-2 flex items-center justify-between">
+        <div className="text-xs text-muted-foreground">
+          FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => openUrl('https://ko-fi.com/jalco')}
+          >
+            <DollarSign className="mr-2 h-4 w-4" />
+            Support
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Discord
+          </Button>
+        </div>
       </div>
 
       {/* Dialogs */}

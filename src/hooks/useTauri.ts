@@ -94,6 +94,8 @@ export const tauriCommands = {
 
   setGameTarget: (path: string) => safeInvoke<void>("set_game_target", { path }),
 
+  detectUserDir: () => safeInvoke<string>("detect_user_dir"),
+
   getModsList: () => safeInvoke<string[]>("get_mods_list"),
 
   getModDetails: (modName: string) =>
