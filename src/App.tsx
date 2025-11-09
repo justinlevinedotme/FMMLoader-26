@@ -9,7 +9,6 @@ import { Folder, FolderOpen, RefreshCw, Download, Trash2, Power, PowerOff, Uploa
 import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
-import { DropZone } from "@/components/DropZone";
 import { UpdateBanner } from "@/components/UpdateBanner";
 
 interface ModWithInfo extends ModManifest {
@@ -296,6 +295,37 @@ function App() {
     await toggleMod(modName, false);
   };
 
+  // Drag and drop handlers for the entire window
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only set to false if leaving the window entirely
+    if (e.currentTarget === e.target) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      // In Tauri, we get the file path from the path property
+      const path = (file as any).path || file.name;
+      await handleImport(path);
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -330,7 +360,21 @@ function App() {
   }, [config]);
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div
+      className="h-screen flex flex-col bg-background"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Drag overlay */}
+      {isDragging && (
+        <div className="fixed inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-background/95 p-8 rounded-lg shadow-lg">
+            <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
+            <p className="text-xl font-semibold">Drop mod file to import</p>
+          </div>
+        </div>
+      )}
       {/* Update Banner */}
       {updateInfo && updateInfo.has_update && (
         <UpdateBanner
@@ -457,10 +501,7 @@ function App() {
             <TabsTrigger value="logs">Logs</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2 space-y-4">
-            {/* Drop Zone */}
-            <DropZone onDrop={handleFileDrop} />
-
+          <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
             <div className="grid grid-cols-3 gap-4 h-full">
               {/* Mods List */}
               <Card className="col-span-2 flex flex-col">
