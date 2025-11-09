@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { open as openUrl } from "@tauri-apps/plugin-shell";
 import { listen } from '@tauri-apps/api/event';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { tauriCommands, type Config, type ModManifest, type ModMetadata, type UpdateInfo } from "@/hooks/useTauri";
-import { Folder, FolderOpen, RefreshCw, Download, Trash2, Upload, AlertTriangle, History, Moon, Sun, Settings, DollarSign, MessageCircle } from "lucide-react";
+import { Folder, FolderOpen, RefreshCw, Download, Trash2, Upload, AlertTriangle, History, Settings, DollarSign, MessageCircle } from "lucide-react";
 import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
@@ -260,16 +261,6 @@ function App() {
     }
   };
 
-  const handleFileDrop = async (files: FileList) => {
-    if (files.length > 0) {
-      const file = files[0];
-      // On web we get a File object, but Tauri needs a path
-      // In Tauri, drag & drop gives us the file path directly
-      const path = (file as any).path || file.name;
-      await handleImport(path);
-    }
-  };
-
   const handleImport = async (sourcePath: string) => {
     try {
       addLog(`Importing from: ${sourcePath}`);
@@ -488,6 +479,31 @@ function App() {
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
+            <div className="border-l pl-2 ml-2 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openUrl('https://ko-fi.com/jalco')}
+              >
+                <DollarSign className="mr-2 h-4 w-4" />
+                Support
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Discord
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSettingsOpen(true)}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -536,6 +552,14 @@ function App() {
             <Button
               variant="outline"
               size="sm"
+              onClick={detectUserDirectory}
+              disabled={loading}
+            >
+              Detect
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={selectUserDirectory}
               disabled={loading}
             >
@@ -554,9 +578,9 @@ function App() {
           </TabsList>
 
           <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
-            <div className="grid grid-cols-3 gap-4 h-full">
+            <div className="h-full">
               {/* Mods List */}
-              <Card className="col-span-2 flex flex-col">
+              <Card className="flex flex-col h-full">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
@@ -585,24 +609,20 @@ function App() {
                       {mods.map((mod) => (
                         <TableRow
                           key={mod.id}
-                          className={`cursor-pointer ${selectedMod?.id === mod.id ? "bg-muted" : ""}`}
-                          onClick={() => setSelectedMod(mod)}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => {
+                            setSelectedMod(mod);
+                            setModDetailsOpen(true);
+                          }}
                         >
                           <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleMod(mod.id, !mod.enabled);
+                            <Switch
+                              checked={mod.enabled}
+                              onCheckedChange={(checked: boolean) => {
+                                toggleMod(mod.id, checked);
                               }}
-                            >
-                              {mod.enabled ? (
-                                <Power className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <PowerOff className="h-4 w-4 text-muted-foreground" />
-                              )}
-                            </Button>
+                              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                            />
                           </TableCell>
                           <TableCell className="font-medium">{mod.name}</TableCell>
                           <TableCell>
@@ -628,83 +648,6 @@ function App() {
                       ))}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
-
-              {/* Mod Details */}
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>Mod Details</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 overflow-auto">
-                  {selectedMod ? (
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="font-semibold text-lg">{selectedMod.name}</h3>
-                        <p className="text-sm text-muted-foreground">v{selectedMod.version}</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-sm font-medium">Author:</span>
-                          <p className="text-sm text-muted-foreground">{selectedMod.author || "Unknown"}</p>
-                        </div>
-
-                        <div>
-                          <span className="text-sm font-medium">Type:</span>
-                          <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
-                        </div>
-
-                        <div>
-                          <span className="text-sm font-medium">Description:</span>
-                          <p className="text-sm text-muted-foreground">
-                            {selectedMod.description || "No description available"}
-                          </p>
-                        </div>
-
-                        {selectedMod.license && (
-                          <div>
-                            <span className="text-sm font-medium">License:</span>
-                            <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
-                          </div>
-                        )}
-
-                        {selectedMod.files && selectedMod.files.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium">Files:</span>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside">
-                              {selectedMod.files.slice(0, 5).map((file, i) => (
-                                <li key={i} className="truncate">{file.source}</li>
-                              ))}
-                              {selectedMod.files.length > 5 && (
-                                <li>... and {selectedMod.files.length - 5} more</li>
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="pt-4 space-y-2">
-                        <Button
-                          className="w-full"
-                          variant={selectedMod.enabled ? "destructive" : "default"}
-                          onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
-                        >
-                          {selectedMod.enabled ? "Disable Mod" : "Enable Mod"}
-                        </Button>
-                        <Button
-                          className="w-full"
-                          variant="outline"
-                          onClick={() => removeMod(selectedMod.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Remove Mod
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Select a mod to view details</p>
-                  )}
                 </CardContent>
               </Card>
             </div>
@@ -760,6 +703,102 @@ function App() {
           addLog("Restored from backup");
         }}
       />
+
+      {/* Mod Details Sheet */}
+      <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
+        <SheetContent className="w-[400px] sm:w-[540px]">
+          <SheetHeader>
+            <SheetTitle>{selectedMod?.name || "Mod Details"}</SheetTitle>
+            <SheetDescription>
+              {selectedMod ? `Version ${selectedMod.version}` : "Select a mod to view details"}
+            </SheetDescription>
+          </SheetHeader>
+          {selectedMod && (
+            <div className="mt-6 space-y-4">
+              <div className="space-y-2">
+                <div>
+                  <span className="text-sm font-medium">Author:</span>
+                  <p className="text-sm text-muted-foreground">{selectedMod.author || "Unknown"}</p>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium">Type:</span>
+                  <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium">Description:</span>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedMod.description || "No description available"}
+                  </p>
+                </div>
+
+                {selectedMod.license && (
+                  <div>
+                    <span className="text-sm font-medium">License:</span>
+                    <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
+                  </div>
+                )}
+
+                {selectedMod.files && selectedMod.files.length > 0 && (
+                  <div>
+                    <span className="text-sm font-medium">Files ({selectedMod.files.length}):</span>
+                    <ul className="text-sm text-muted-foreground list-disc list-inside max-h-60 overflow-y-auto">
+                      {selectedMod.files.map((file, i) => (
+                        <li key={i} className="truncate">{file.source}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 space-y-2">
+                <Button
+                  className="w-full"
+                  variant={selectedMod.enabled ? "destructive" : "default"}
+                  onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
+                >
+                  {selectedMod.enabled ? "Disable Mod" : "Enable Mod"}
+                </Button>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => removeMod(selectedMod.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Remove Mod
+                </Button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Settings Sheet */}
+      <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Settings</SheetTitle>
+            <SheetDescription>
+              Configure FMMLoader26 preferences
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <div className="text-sm font-medium">Dark Mode</div>
+                <div className="text-sm text-muted-foreground">
+                  Toggle dark mode theme
+                </div>
+              </div>
+              <Switch
+                checked={darkMode}
+                onCheckedChange={toggleDarkMode}
+              />
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -7,14 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { AlertTriangle } from "lucide-react";
 import { tauriCommands, type ConflictInfo } from "@/hooks/useTauri";
 
