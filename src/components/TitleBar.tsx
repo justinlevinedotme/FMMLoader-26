@@ -18,20 +18,22 @@ export function TitleBar() {
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Only start drag if it's a left click and not on a button
+    // Only start drag if it's a left click, not on a button, and not during file drag
     if (e.button === 0 && e.target === e.currentTarget) {
+      // Prevent window dragging during file drops
+      e.preventDefault();
       appWindow.startDragging();
     }
   };
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none"
+      className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none pointer-events-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Stoplight buttons - not draggable */}
-      <div className="flex items-center gap-2 relative z-10">
+      <div className="flex items-center gap-2 relative z-10 pointer-events-auto">
         <button
           onClick={handleClose}
           className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff5f57]/80 flex items-center justify-center group"
@@ -86,10 +88,10 @@ export function TitleBar() {
       </div>
 
       {/* Title area with drag handle */}
-      <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center">
+      <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none">
         <div
           onMouseDown={handleMouseDown}
-          className="text-sm font-medium text-foreground/70 cursor-move px-4 py-1 rounded hover:bg-muted/50 transition-colors"
+          className="text-sm font-medium text-foreground/70 cursor-move px-4 py-1 rounded hover:bg-muted/50 transition-colors pointer-events-auto"
         >
           FMMLoader26
         </div>

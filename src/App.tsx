@@ -449,15 +449,6 @@ function App() {
       {/* Custom TitleBar */}
       <TitleBar />
 
-      {/* Drag overlay */}
-      {isDragging && (
-        <div className="fixed inset-0 bg-primary/10 border-4 border-dashed border-primary z-40 flex items-center justify-center pointer-events-none">
-          <div className="bg-background/95 p-8 rounded-lg shadow-lg">
-            <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
-            <p className="text-xl font-semibold">Drop mod file to import</p>
-          </div>
-        </div>
-      )}
       {/* Update Banner */}
       {updateInfo && updateInfo.has_update && (
         <UpdateBanner
@@ -465,6 +456,20 @@ function App() {
           onDismiss={() => setUpdateInfo(null)}
         />
       )}
+
+      {/* File Drop Zone - covers everything below titlebar */}
+      {/* This invisible overlay catches file drops without blocking interactions */}
+      <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
+        {/* Drag overlay visual feedback */}
+        {isDragging && (
+          <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary flex items-center justify-center z-40 pointer-events-none">
+            <div className="bg-background/95 p-8 rounded-lg shadow-lg">
+              <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
+              <p className="text-xl font-semibold">Drop mod file to import</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Header */}
       <div className="border-b pt-12">
