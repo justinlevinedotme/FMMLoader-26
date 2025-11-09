@@ -8,14 +8,16 @@ mod import;
 mod mod_manager;
 mod restore;
 mod types;
+mod updater;
 
 use config::{get_mods_dir, init_storage, load_config, save_config};
 use conflicts::find_conflicts;
 use game_detection::get_default_candidates;
 use import::{auto_detect_mod_type, extract_zip, find_mod_root, generate_manifest, has_manifest};
-use mod_manager::{cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods, uninstall_mod};
+use mod_manager::{cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods};
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
 use types::{Config, ConflictInfo, ModManifest, RestorePoint};
+use updater::{check_for_updates, UpdateInfo};
 use std::path::PathBuf;
 
 #[tauri::command]
@@ -242,6 +244,11 @@ fn create_backup_point(name: String) -> Result<String, String> {
     Ok(point_dir.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+fn check_updates() -> Result<UpdateInfo, String> {
+    check_for_updates()
+}
+
 // Helper function for recursive directory copy
 fn copy_dir_recursive(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
     use std::fs;
@@ -299,6 +306,7 @@ fn main() {
             get_restore_points,
             restore_from_point,
             create_backup_point,
+            check_updates,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

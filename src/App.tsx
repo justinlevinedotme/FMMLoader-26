@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { tauriCommands, type Config, type ModManifest, type ModMetadata } from "@/hooks/useTauri";
+import { tauriCommands, type Config, type ModManifest, type ModMetadata, type UpdateInfo } from "@/hooks/useTauri";
 import { Folder, FolderOpen, RefreshCw, Download, Trash2, Power, PowerOff, Upload, AlertTriangle, History } from "lucide-react";
 import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
 import { DropZone } from "@/components/DropZone";
+import { UpdateBanner } from "@/components/UpdateBanner";
 
 interface ModWithInfo extends ModManifest {
   id: string;
@@ -22,6 +23,7 @@ function App() {
   const [selectedMod, setSelectedMod] = useState<ModWithInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   // Dialog states
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
@@ -215,6 +217,18 @@ function App() {
         await loadConfig();
         await loadMods();
         addLog("FMMLoader26 initialized");
+
+        // Check for updates
+        try {
+          const updates = await tauriCommands.checkUpdates();
+          setUpdateInfo(updates);
+          if (updates.has_update) {
+            addLog(`Update available: ${updates.latest_version}`);
+          }
+        } catch (error) {
+          // Silently fail update check - not critical
+          console.error("Failed to check for updates:", error);
+        }
       } catch (error) {
         addLog(`Initialization error: ${error}`);
       }
@@ -231,6 +245,14 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-background">
+      {/* Update Banner */}
+      {updateInfo && updateInfo.has_update && (
+        <UpdateBanner
+          updateInfo={updateInfo}
+          onDismiss={() => setUpdateInfo(null)}
+        />
+      )}
+
       {/* Header */}
       <div className="border-b">
         <div className="flex items-center justify-between p-4">

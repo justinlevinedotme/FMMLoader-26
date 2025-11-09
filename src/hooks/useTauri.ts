@@ -47,6 +47,13 @@ export interface ModMetadata {
   description?: string;
 }
 
+export interface UpdateInfo {
+  has_update: boolean;
+  current_version: string;
+  latest_version: string;
+  download_url: string;
+}
+
 export const tauriCommands = {
   initApp: () => invoke<void>("init_app"),
 
@@ -95,4 +102,6 @@ export const tauriCommands = {
 
   createBackupPoint: (name: string) =>
     invoke<string>("create_backup_point", { name }),
+
+  checkUpdates: () => invoke<UpdateInfo>("check_updates"),
 };

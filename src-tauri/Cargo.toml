@@ -25,6 +25,7 @@ regex = "1"
 dirs = "5"
 chrono = "0.4"
 uuid = { version = "1", features = ["v4"] }
+reqwest = { version = "0.11", features = ["blocking", "json"] }
 
 [features]
 default = ["custom-protocol"]
