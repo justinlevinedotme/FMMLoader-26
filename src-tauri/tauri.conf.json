@@ -12,10 +12,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
+    "icon": ["icons/icon.icns", "icons/icon.ico"],
     "resources": [],
     "externalBin": [],
     "copyright": "",
@@ -44,6 +41,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "titleBarStyle": "Transparent",
         "label": "main",
         "title": "FMMLoader26",
         "width": 1200,
