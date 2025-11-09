@@ -19,13 +19,12 @@ export function TitleBar() {
 
   return (
     <div
-      data-tauri-drag-region
       className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Stoplight buttons */}
-      <div className="flex items-center gap-2">
+      {/* Stoplight buttons - not draggable */}
+      <div className="flex items-center gap-2 relative z-10">
         <button
           onClick={handleClose}
           className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff5f57]/80 flex items-center justify-center group"
@@ -79,9 +78,14 @@ export function TitleBar() {
         </button>
       </div>
 
-      {/* Title */}
-      <div className="absolute left-1/2 transform -translate-x-1/2 text-sm font-medium text-foreground/70">
-        FMMLoader26
+      {/* Draggable title area */}
+      <div
+        data-tauri-drag-region
+        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center"
+      >
+        <div className="text-sm font-medium text-foreground/70">
+          FMMLoader26
+        </div>
       </div>
 
       {/* Spacer for balance */}
