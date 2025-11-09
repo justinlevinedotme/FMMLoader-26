@@ -1,24 +1,9 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
-interface TitleBarProps {
-  isDraggingFile?: boolean;
-}
-
-export function TitleBar({ isDraggingFile = false }: TitleBarProps) {
+export function TitleBar() {
   const [isHovered, setIsHovered] = useState(false);
   const appWindow = getCurrentWindow();
-  const dragRegionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (dragRegionRef.current) {
-      if (isDraggingFile) {
-        dragRegionRef.current.removeAttribute("data-tauri-drag-region");
-      } else {
-        dragRegionRef.current.setAttribute("data-tauri-drag-region", "");
-      }
-    }
-  }, [isDraggingFile]);
 
   const handleClose = () => {
     appWindow.close();
@@ -32,11 +17,16 @@ export function TitleBar({ isDraggingFile = false }: TitleBarProps) {
     appWindow.toggleMaximize();
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Only start drag if it's a left click and not on a button
+    if (e.button === 0 && e.target === e.currentTarget) {
+      appWindow.startDragging();
+    }
+  };
+
   return (
     <div
-      className={`fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none ${
-        isDraggingFile ? "pointer-events-none" : ""
-      }`}
+      className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -97,10 +87,10 @@ export function TitleBar({ isDraggingFile = false }: TitleBarProps) {
 
       {/* Draggable title area */}
       <div
-        ref={dragRegionRef}
-        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center"
+        onMouseDown={handleMouseDown}
+        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center cursor-move"
       >
-        <div className="text-sm font-medium text-foreground/70">
+        <div className="text-sm font-medium text-foreground/70 pointer-events-none">
           FMMLoader26
         </div>
       </div>

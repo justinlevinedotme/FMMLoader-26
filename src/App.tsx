@@ -447,7 +447,7 @@ function App() {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Custom TitleBar */}
-      <TitleBar isDraggingFile={isDragging} />
+      <TitleBar />
 
       {/* Drag overlay */}
       {isDragging && (
