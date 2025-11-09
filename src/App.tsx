@@ -1,15 +1,52 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, version } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { open as openUrl } from "@tauri-apps/plugin-shell";
-import { listen } from '@tauri-apps/api/event';
+import { listen } from "@tauri-apps/api/event";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { tauriCommands, type Config, type ModManifest, type ModMetadata, type UpdateInfo } from "@/hooks/useTauri";
-import { Folder, FolderOpen, RefreshCw, Download, Trash2, Upload, AlertTriangle, History, Settings, DollarSign, MessageCircle } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  tauriCommands,
+  type Config,
+  type ModManifest,
+  type ModMetadata,
+  type UpdateInfo,
+} from "@/hooks/useTauri";
+import {
+  Folder,
+  FolderOpen,
+  RefreshCw,
+  Download,
+  Trash2,
+  Upload,
+  AlertTriangle,
+  History,
+  Settings,
+} from "lucide-react";
+import { FaDiscord } from "react-icons/fa6";
+import { SiKofi } from "react-icons/si";
 import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
@@ -39,7 +76,9 @@ function App() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modDetailsOpen, setModDetailsOpen] = useState(false);
-  const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
+  const [pendingImportPath, setPendingImportPath] = useState<string | null>(
+    null
+  );
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -111,7 +150,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 Game Target Folder"
+        title: "Select FM26 Game Target Folder",
       });
 
       if (selected) {
@@ -129,13 +168,13 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 User Directory"
+        title: "Select FM26 User Directory",
       });
 
       if (selected) {
         const updatedConfig = {
           ...config!,
-          user_dir_path: selected as string
+          user_dir_path: selected as string,
         };
         await tauriCommands.updateConfig(updatedConfig);
         await loadConfig();
@@ -173,7 +212,7 @@ function App() {
       try {
         const updatedConfig = {
           ...config!,
-          user_dir_path: userDirInput
+          user_dir_path: userDirInput,
         };
         await tauriCommands.updateConfig(updatedConfig);
         await loadConfig();
@@ -247,10 +286,12 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: false,
-        filters: [{
-          name: 'Mod Files',
-          extensions: ['zip', 'bundle', 'fmf']
-        }]
+        filters: [
+          {
+            name: "Mod Files",
+            extensions: ["zip", "bundle", "fmf"],
+          },
+        ],
       });
 
       if (selected) {
@@ -308,7 +349,7 @@ function App() {
       // Update the config with the detected path
       const updatedConfig = {
         ...config!,
-        user_dir_path: detectedPath
+        user_dir_path: detectedPath,
       };
       await tauriCommands.updateConfig(updatedConfig);
       await loadConfig();
@@ -323,9 +364,9 @@ function App() {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     if (!darkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   };
 
@@ -369,7 +410,7 @@ function App() {
         addLog("FMMLoader26 initialized");
 
         // Set up file drop listener
-        const unlisten = await listen('tauri://file-drop', (event: any) => {
+        const unlisten = await listen("tauri://file-drop", (event: any) => {
           const files = event.payload as string[];
           if (files && files.length > 0) {
             handleImport(files[0]);
@@ -434,7 +475,9 @@ function App() {
         <div className="flex items-center justify-between p-4">
           <div>
             <h1 className="text-2xl font-bold">FMMLoader26</h1>
-            <p className="text-sm text-muted-foreground">Football Manager 2026 Mod Manager</p>
+            <p className="text-sm text-muted-foreground">
+              Football Manager 2026 Mod Manager
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -479,7 +522,9 @@ function App() {
               onClick={loadMods}
               disabled={loading}
             >
-              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
             <Button
@@ -497,13 +542,15 @@ function App() {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 flex-1">
               <FolderOpen className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm text-muted-foreground whitespace-nowrap">Game Target:</span>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                Game Target:
+              </span>
               <input
                 type="text"
                 value={gameTargetInput}
                 onChange={(e) => handleGameTargetChange(e.target.value)}
                 onBlur={saveGameTarget}
-                onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
+                onKeyDown={(e) => e.key === "Enter" && saveGameTarget()}
                 className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 placeholder="Not set - click 'Select' or 'Detect Game'"
                 disabled={loading}
@@ -522,13 +569,15 @@ function App() {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 flex-1">
               <Folder className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm text-muted-foreground whitespace-nowrap">User Directory:</span>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                User Directory:
+              </span>
               <input
                 type="text"
                 value={userDirInput}
                 onChange={(e) => handleUserDirChange(e.target.value)}
                 onBlur={saveUserDirectory}
-                onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
+                onKeyDown={(e) => e.key === "Enter" && saveUserDirectory()}
                 className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 placeholder="Auto-detected from system"
                 disabled={loading}
@@ -570,9 +619,14 @@ function App() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>Installed Mods</CardTitle>
-                      <CardDescription>{mods.length} mods installed</CardDescription>
+                      <CardDescription>
+                        {mods.length} mods installed
+                      </CardDescription>
                     </div>
-                    <Button onClick={applyMods} disabled={loading || !config?.target_path}>
+                    <Button
+                      onClick={applyMods}
+                      disabled={loading || !config?.target_path}
+                    >
                       <Download className="mr-2 h-4 w-4" />
                       Apply Mods
                     </Button>
@@ -606,17 +660,25 @@ function App() {
                               onCheckedChange={(checked: boolean) => {
                                 toggleMod(mod.id, checked);
                               }}
-                              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                              onClick={(e: React.MouseEvent) =>
+                                e.stopPropagation()
+                              }
                             />
                           </TableCell>
-                          <TableCell className="font-medium">{mod.name}</TableCell>
+                          <TableCell className="font-medium">
+                            {mod.name}
+                          </TableCell>
                           <TableCell>
                             <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                               {mod.mod_type}
                             </span>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">{mod.version}</TableCell>
-                          <TableCell className="text-muted-foreground">{mod.author}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {mod.version}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {mod.author}
+                          </TableCell>
                           <TableCell>
                             <Button
                               variant="ghost"
@@ -642,7 +704,9 @@ function App() {
             <Card className="h-full flex flex-col">
               <CardHeader>
                 <CardTitle>Activity Logs</CardTitle>
-                <CardDescription>Recent activity and operations</CardDescription>
+                <CardDescription>
+                  Recent activity and operations
+                </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 overflow-auto">
                 <div className="font-mono text-xs space-y-1">
@@ -662,25 +726,27 @@ function App() {
       </div>
 
       {/* Footer */}
-      <div className="border-t p-2 flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
+      <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
+        <div className="text-xs text-muted-foreground font-medium">
           FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => openUrl('https://ko-fi.com/jalco')}
+            onClick={() => openUrl("https://ko-fi.com/jalco")}
+            className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
           >
-            <DollarSign className="mr-2 h-4 w-4" />
-            Support
+            <SiKofi className="mr-2 h-4 w-4" />
+            Support on Ko-Fi
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
+            onClick={() => openUrl("https://discord.gg/AspRvTTAch")}
+            className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
           >
-            <MessageCircle className="mr-2 h-4 w-4" />
+            <FaDiscord className="mr-2 h-4 w-4" />
             Discord
           </Button>
         </div>
@@ -715,7 +781,9 @@ function App() {
           <SheetHeader>
             <SheetTitle>{selectedMod?.name || "Mod Details"}</SheetTitle>
             <SheetDescription>
-              {selectedMod ? `Version ${selectedMod.version}` : "Select a mod to view details"}
+              {selectedMod
+                ? `Version ${selectedMod.version}`
+                : "Select a mod to view details"}
             </SheetDescription>
           </SheetHeader>
           {selectedMod && (
@@ -723,12 +791,16 @@ function App() {
               <div className="space-y-2">
                 <div>
                   <span className="text-sm font-medium">Author:</span>
-                  <p className="text-sm text-muted-foreground">{selectedMod.author || "Unknown"}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedMod.author || "Unknown"}
+                  </p>
                 </div>
 
                 <div>
                   <span className="text-sm font-medium">Type:</span>
-                  <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedMod.mod_type}
+                  </p>
                 </div>
 
                 <div>
@@ -741,16 +813,22 @@ function App() {
                 {selectedMod.license && (
                   <div>
                     <span className="text-sm font-medium">License:</span>
-                    <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedMod.license}
+                    </p>
                   </div>
                 )}
 
                 {selectedMod.files && selectedMod.files.length > 0 && (
                   <div>
-                    <span className="text-sm font-medium">Files ({selectedMod.files.length}):</span>
+                    <span className="text-sm font-medium">
+                      Files ({selectedMod.files.length}):
+                    </span>
                     <ul className="text-sm text-muted-foreground list-disc list-inside max-h-60 overflow-y-auto">
                       {selectedMod.files.map((file, i) => (
-                        <li key={i} className="truncate">{file.source}</li>
+                        <li key={i} className="truncate">
+                          {file.source}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -761,7 +839,9 @@ function App() {
                 <Button
                   className="w-full"
                   variant={selectedMod.enabled ? "destructive" : "default"}
-                  onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
+                  onClick={() =>
+                    toggleMod(selectedMod.id, !selectedMod.enabled)
+                  }
                 >
                   {selectedMod.enabled ? "Disable Mod" : "Enable Mod"}
                 </Button>
@@ -796,10 +876,7 @@ function App() {
                   Toggle dark mode theme
                 </div>
               </div>
-              <Switch
-                checked={darkMode}
-                onCheckedChange={toggleDarkMode}
-              />
+              <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
             </div>
           </div>
         </SheetContent>
