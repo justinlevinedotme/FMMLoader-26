@@ -370,36 +370,8 @@ function App() {
     }
   };
 
-  // Drag and drop handlers for the entire window
+  // Drag and drop visual feedback
   const [isDragging, setIsDragging] = useState(false);
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // Only set to false if leaving the window entirely
-    if (e.currentTarget === e.target) {
-      setIsDragging(false);
-    }
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      // In Tauri, we get the file path from the path property
-      const path = (file as any).path || file.name;
-      await handleImport(path);
-    }
-  };
 
   useEffect(() => {
     const init = async () => {
@@ -409,12 +381,21 @@ function App() {
         await loadMods();
         addLog("FMMLoader26 initialized");
 
-        // Set up file drop listener
-        const unlisten = await listen("tauri://file-drop", (event: any) => {
+        // Set up Tauri drag and drop event listeners
+        const unlistenDrop = await listen("tauri://file-drop", (event: any) => {
           const files = event.payload as string[];
           if (files && files.length > 0) {
             handleImport(files[0]);
           }
+          setIsDragging(false);
+        });
+
+        const unlistenDragOver = await listen("tauri://drag-over", () => {
+          setIsDragging(true);
+        });
+
+        const unlistenDragLeave = await listen("tauri://drag-leave", () => {
+          setIsDragging(false);
         });
 
         // Check for updates
@@ -430,7 +411,9 @@ function App() {
         }
 
         return () => {
-          unlisten();
+          unlistenDrop();
+          unlistenDragOver();
+          unlistenDragLeave();
         };
       } catch (error) {
         addLog(`Initialization error: ${error}`);
@@ -447,12 +430,7 @@ function App() {
   }, [config]);
 
   return (
-    <div
-      className="h-screen flex flex-col bg-background"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
+    <div className="h-screen flex flex-col bg-background">
       {/* Drag overlay */}
       {isDragging && (
         <div className="fixed inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center pointer-events-none">
