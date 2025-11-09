@@ -23,6 +23,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
 
+  // Dialog states
+  const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
+  const [conflictsDialogOpen, setConflictsDialogOpen] = useState(false);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
+
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs((prev) => [`[${timestamp}] ${message}`, ...prev].slice(0, 100));
@@ -135,6 +141,73 @@ function App() {
     }
   };
 
+  const handleImportClick = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        directory: false,
+        filters: [{
+          name: 'Mod Files',
+          extensions: ['zip', 'bundle', 'fmf']
+        }]
+      });
+
+      if (selected) {
+        await handleImport(selected as string);
+      }
+    } catch (error) {
+      addLog(`Error selecting file: ${error}`);
+    }
+  };
+
+  const handleFileDrop = async (files: FileList) => {
+    if (files.length > 0) {
+      const file = files[0];
+      // On web we get a File object, but Tauri needs a path
+      // In Tauri, drag & drop gives us the file path directly
+      const path = (file as any).path || file.name;
+      await handleImport(path);
+    }
+  };
+
+  const handleImport = async (sourcePath: string) => {
+    try {
+      addLog(`Importing from: ${sourcePath}`);
+      const result = await tauriCommands.importMod(sourcePath);
+      addLog(`Successfully imported: ${result}`);
+      await loadMods();
+    } catch (error) {
+      const errorStr = String(error);
+
+      if (errorStr === "NEEDS_METADATA") {
+        // Mod needs metadata - show dialog
+        setPendingImportPath(sourcePath);
+        setMetadataDialogOpen(true);
+      } else {
+        addLog(`Import failed: ${error}`);
+      }
+    }
+  };
+
+  const handleMetadataSubmit = async (metadata: ModMetadata) => {
+    if (!pendingImportPath) return;
+
+    try {
+      addLog(`Importing with metadata...`);
+      const result = await tauriCommands.importMod(pendingImportPath, metadata);
+      addLog(`Successfully imported: ${result}`);
+      setMetadataDialogOpen(false);
+      setPendingImportPath(null);
+      await loadMods();
+    } catch (error) {
+      addLog(`Import failed: ${error}`);
+    }
+  };
+
+  const handleConflictDisable = async (modName: string) => {
+    await toggleMod(modName, false);
+  };
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -166,6 +239,33 @@ function App() {
             <p className="text-sm text-muted-foreground">Football Manager 2026 Mod Manager</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleImportClick}
+              disabled={loading}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setConflictsDialogOpen(true)}
+              disabled={loading || !config?.target_path}
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              Conflicts
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRestoreDialogOpen(true)}
+              disabled={loading}
+            >
+              <History className="mr-2 h-4 w-4" />
+              Restore
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -207,7 +307,10 @@ function App() {
             <TabsTrigger value="logs">Logs</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
+          <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2 space-y-4">
+            {/* Drop Zone */}
+            <DropZone onDrop={handleFileDrop} />
+
             <div className="grid grid-cols-3 gap-4 h-full">
               {/* Mods List */}
               <Card className="col-span-2 flex flex-col">
@@ -391,6 +494,29 @@ function App() {
       <div className="border-t p-2 text-center text-xs text-muted-foreground">
         FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
       </div>
+
+      {/* Dialogs */}
+      <ModMetadataDialog
+        open={metadataDialogOpen}
+        onOpenChange={setMetadataDialogOpen}
+        sourcePath={pendingImportPath || ""}
+        onSubmit={handleMetadataSubmit}
+      />
+
+      <ConflictsDialog
+        open={conflictsDialogOpen}
+        onOpenChange={setConflictsDialogOpen}
+        onDisableMod={handleConflictDisable}
+      />
+
+      <RestorePointsDialog
+        open={restoreDialogOpen}
+        onOpenChange={setRestoreDialogOpen}
+        onRestore={() => {
+          loadMods();
+          addLog("Restored from backup");
+        }}
+      />
     </div>
   );
 }
