@@ -1,5 +1,5 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface TitleBarProps {
   isDraggingFile?: boolean;
@@ -8,6 +8,17 @@ interface TitleBarProps {
 export function TitleBar({ isDraggingFile = false }: TitleBarProps) {
   const [isHovered, setIsHovered] = useState(false);
   const appWindow = getCurrentWindow();
+  const dragRegionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (dragRegionRef.current) {
+      if (isDraggingFile) {
+        dragRegionRef.current.removeAttribute("data-tauri-drag-region");
+      } else {
+        dragRegionRef.current.setAttribute("data-tauri-drag-region", "");
+      }
+    }
+  }, [isDraggingFile]);
 
   const handleClose = () => {
     appWindow.close();
@@ -84,7 +95,7 @@ export function TitleBar({ isDraggingFile = false }: TitleBarProps) {
 
       {/* Draggable title area */}
       <div
-        {...(!isDraggingFile && { "data-tauri-drag-region": true })}
+        ref={dragRegionRef}
         className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center"
       >
         <div className="text-sm font-medium text-foreground/70">
