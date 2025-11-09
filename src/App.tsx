@@ -51,6 +51,7 @@ import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
 import { UpdateBanner } from "@/components/UpdateBanner";
+import { TitleBar } from "@/components/TitleBar";
 
 interface ModWithInfo extends ModManifest {
   id: string;
@@ -431,6 +432,9 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-background">
+      {/* Custom TitleBar */}
+      <TitleBar />
+
       {/* Drag overlay */}
       {isDragging && (
         <div className="fixed inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center pointer-events-none">
@@ -449,7 +453,7 @@ function App() {
       )}
 
       {/* Header */}
-      <div className="border-b">
+      <div className="border-b pt-12">
         <div className="flex items-center justify-between p-4">
           <div>
             <h1 className="text-2xl font-bold">FMMLoader26</h1>
