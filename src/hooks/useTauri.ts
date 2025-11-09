@@ -1,5 +1,18 @@
 import { invoke } from "@tauri-apps/api/core";
 
+// Check if we're running in a Tauri context
+const isTauri = () => {
+  return typeof window !== 'undefined' && '__TAURI__' in window;
+};
+
+// Wrapper to ensure we're in Tauri context
+const safeInvoke = async <T>(cmd: string, args?: any): Promise<T> => {
+  if (!isTauri()) {
+    throw new Error('Not running in Tauri context. Please run with "npm run tauri dev"');
+  }
+  return invoke<T>(cmd, args);
+};
+
 export interface Config {
   target_path?: string;
   user_dir_path?: string;
@@ -55,34 +68,34 @@ export interface UpdateInfo {
 }
 
 export const tauriCommands = {
-  initApp: () => invoke<void>("init_app"),
+  initApp: () => safeInvoke<void>("init_app"),
 
-  getConfig: () => invoke<Config>("get_config"),
+  getConfig: () => safeInvoke<Config>("get_config"),
 
-  updateConfig: (config: Config) => invoke<void>("update_config", { config }),
+  updateConfig: (config: Config) => safeInvoke<void>("update_config", { config }),
 
-  detectGamePath: () => invoke<string[]>("detect_game_path"),
+  detectGamePath: () => safeInvoke<string[]>("detect_game_path"),
 
-  setGameTarget: (path: string) => invoke<void>("set_game_target", { path }),
+  setGameTarget: (path: string) => safeInvoke<void>("set_game_target", { path }),
 
-  getModsList: () => invoke<string[]>("get_mods_list"),
+  getModsList: () => safeInvoke<string[]>("get_mods_list"),
 
   getModDetails: (modName: string) =>
-    invoke<ModManifest>("get_mod_details", { modName }),
+    safeInvoke<ModManifest>("get_mod_details", { modName }),
 
-  enableMod: (modName: string) => invoke<void>("enable_mod", { modName }),
+  enableMod: (modName: string) => safeInvoke<void>("enable_mod", { modName }),
 
-  disableMod: (modName: string) => invoke<void>("disable_mod", { modName }),
+  disableMod: (modName: string) => safeInvoke<void>("disable_mod", { modName }),
 
-  applyMods: () => invoke<string>("apply_mods"),
+  applyMods: () => safeInvoke<string>("apply_mods"),
 
-  removeMod: (modName: string) => invoke<void>("remove_mod", { modName }),
+  removeMod: (modName: string) => safeInvoke<void>("remove_mod", { modName }),
 
   importMod: (
     sourcePath: string,
     metadata?: ModMetadata
   ) =>
-    invoke<string>("import_mod", {
+    safeInvoke<string>("import_mod", {
       sourcePath,
       modName: metadata?.name,
       version: metadata?.version,
@@ -91,17 +104,17 @@ export const tauriCommands = {
       description: metadata?.description,
     }),
 
-  detectModType: (path: string) => invoke<string>("detect_mod_type", { path }),
+  detectModType: (path: string) => safeInvoke<string>("detect_mod_type", { path }),
 
-  checkConflicts: () => invoke<ConflictInfo[]>("check_conflicts"),
+  checkConflicts: () => safeInvoke<ConflictInfo[]>("check_conflicts"),
 
-  getRestorePoints: () => invoke<RestorePoint[]>("get_restore_points"),
+  getRestorePoints: () => safeInvoke<RestorePoint[]>("get_restore_points"),
 
   restoreFromPoint: (pointPath: string) =>
-    invoke<string>("restore_from_point", { pointPath }),
+    safeInvoke<string>("restore_from_point", { pointPath }),
 
   createBackupPoint: (name: string) =>
-    invoke<string>("create_backup_point", { name }),
+    safeInvoke<string>("create_backup_point", { name }),
 
-  checkUpdates: () => invoke<UpdateInfo>("check_updates"),
+  checkUpdates: () => safeInvoke<UpdateInfo>("check_updates"),
 };
