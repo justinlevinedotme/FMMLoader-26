@@ -34,7 +34,9 @@ export function TitleBar({ isDraggingFile = false }: TitleBarProps) {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none"
+      className={`fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-50 select-none ${
+        isDraggingFile ? "pointer-events-none" : ""
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
