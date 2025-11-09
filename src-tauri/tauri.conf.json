@@ -43,13 +43,15 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "FMMLoader26",
         "width": 1200,
         "height": 800,
         "resizable": true,
         "fullscreen": false,
         "minWidth": 800,
-        "minHeight": 600
+        "minHeight": 600,
+        "fileDropEnabled": true
       }
     ],
     "security": {
