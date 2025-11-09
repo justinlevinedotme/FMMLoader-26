@@ -384,18 +384,22 @@ function App() {
 
         // Set up Tauri drag and drop event listeners
         const unlistenDrop = await listen("tauri://file-drop", (event: any) => {
+          console.log("File drop event:", event);
           const files = event.payload as string[];
           if (files && files.length > 0) {
+            console.log("Importing file:", files[0]);
             handleImport(files[0]);
           }
           setIsDragging(false);
         });
 
         const unlistenDragOver = await listen("tauri://drag-over", () => {
+          console.log("Drag over event");
           setIsDragging(true);
         });
 
         const unlistenDragLeave = await listen("tauri://drag-leave", () => {
+          console.log("Drag leave event");
           setIsDragging(false);
         });
 
