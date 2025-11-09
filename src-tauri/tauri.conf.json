@@ -47,6 +47,7 @@
         "height": 800,
         "resizable": true,
         "fullscreen": false,
+        "dragDropEnabled": false,
         "minWidth": 800,
         "minHeight": 600,
         "titleBarStyle": "Transparent",

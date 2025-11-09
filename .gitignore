@@ -38,3 +38,7 @@ logs/
 
 # Backup
 src-old/
+src-tauri/gen/schemas/acl-manifests.json
+src-tauri/gen/schemas/capabilities.json
+src-tauri/gen/schemas/desktop-schema.json
+src-tauri/gen/schemas/macOS-schema.json
