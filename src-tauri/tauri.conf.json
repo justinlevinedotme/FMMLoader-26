@@ -56,17 +56,5 @@
       "csp": null
     }
   },
-  "plugins": {
-    "dialog": {
-      "all": true,
-      "open": true,
-      "save": true
-    },
-    "fs": {
-      "scope": ["**"]
-    },
-    "shell": {
-      "open": true
-    }
-  }
+  "plugins": {}
 }
