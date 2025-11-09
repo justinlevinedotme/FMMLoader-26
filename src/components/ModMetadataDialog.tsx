@@ -27,7 +27,8 @@ interface ModMetadataDialogProps {
 }
 
 const MOD_TYPES = [
-  { value: "ui", label: "UI / Bundle" },
+  { value: "ui", label: "UI" },
+  { value: "bundle", label: "Bundle" },
   { value: "tactics", label: "Tactics" },
   { value: "graphics", label: "Graphics" },
   { value: "skins", label: "Skins" },

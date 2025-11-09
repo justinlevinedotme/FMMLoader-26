@@ -85,57 +85,91 @@ pub fn find_mod_root(path: &Path) -> Result<PathBuf, String> {
         .to_path_buf())
 }
 
-pub fn auto_detect_mod_type(dir: &Path) -> String {
+pub fn auto_detect_mod_type(path: &Path) -> String {
+    // Handle single files
+    if path.is_file() {
+        if let Some(ext) = path.extension() {
+            let ext_lower = ext.to_string_lossy().to_lowercase();
+            let name_lower = path.file_name()
+                .map(|n| n.to_string_lossy().to_lowercase())
+                .unwrap_or_default();
+
+            match ext_lower.as_str() {
+                "fmf" => return "tactics".to_string(),
+                "bundle" => {
+                    // Check if it's a UI bundle
+                    if name_lower.contains("ui-") || name_lower.contains("panelids") {
+                        return "ui".to_string();
+                    }
+                    return "bundle".to_string();
+                }
+                _ => {}
+            }
+        }
+        return "misc".to_string();
+    }
+
+    // For directories, check contents
     let mut has_bundle = false;
     let mut has_fmf = false;
-    let mut has_xml = false;
-    let mut has_config = false;
-    let mut has_panel = false;
-    let mut has_edt = false;
+    let mut has_graphics = false;
+    let mut has_editor_data = false;
 
-    if let Ok(entries) = walkdir::WalkDir::new(dir).max_depth(2).into_iter().collect::<Result<Vec<_>, _>>() {
+    if let Ok(entries) = walkdir::WalkDir::new(path).into_iter().collect::<Result<Vec<_>, _>>() {
         for entry in entries {
-            let path = entry.path();
-            if let Some(ext) = path.extension() {
-                let ext_lower = ext.to_string_lossy().to_lowercase();
-                match ext_lower.as_str() {
-                    "bundle" => has_bundle = true,
-                    "fmf" => has_fmf = true,
-                    "xml" if path.to_string_lossy().contains("panel") => has_panel = true,
-                    "xml" => has_xml = true,
-                    "inc" if path.to_string_lossy().contains("config") => has_config = true,
-                    "edt" => has_edt = true,
-                    _ => {}
+            let entry_path = entry.path();
+
+            // Check for file extensions
+            if entry_path.is_file() {
+                if let Some(ext) = entry_path.extension() {
+                    let ext_lower = ext.to_string_lossy().to_lowercase();
+                    match ext_lower.as_str() {
+                        "fmf" => has_fmf = true,
+                        "bundle" => has_bundle = true,
+                        _ => {}
+                    }
                 }
             }
 
-            // Check for graphics subdirectories
-            if let Some(name) = path.file_name() {
-                let name_lower = name.to_string_lossy().to_lowercase();
-                if ["faces", "kits", "logos", "badges"].contains(&name_lower.as_str()) {
-                    return "graphics".to_string();
+            // Check for directory names indicating graphics or editor data
+            if entry_path.is_dir() {
+                if let Some(name) = entry_path.file_name() {
+                    let name_lower = name.to_string_lossy().to_lowercase();
+                    let name_normalized = name_lower.replace(' ', "").replace('_', "");
+
+                    // Check for graphics directories
+                    if ["kits", "faces", "logos", "graphics", "badges"].contains(&name_lower.as_str()) {
+                        has_graphics = true;
+                    }
+
+                    // Check for editor data directories
+                    if ["editordata", "editor"].contains(&name_normalized.as_str()) {
+                        has_editor_data = true;
+                    }
                 }
             }
         }
     }
 
-    // Determine type based on files found
-    if has_bundle || has_fmf {
-        "ui".to_string()
-    } else if has_edt {
-        "editor-data".to_string()
-    } else if has_config && has_panel {
-        "skins".to_string()
-    } else if has_xml {
-        // Check if it's in a tactics-like structure
-        if dir.to_string_lossy().to_lowercase().contains("tactics") {
-            "tactics".to_string()
-        } else {
-            "misc".to_string()
-        }
-    } else {
-        "misc".to_string()
+    // Determine type based on what we found
+    // Editor data takes priority if we have FMF files in editor data folder
+    if has_fmf && has_editor_data {
+        return "editor-data".to_string();
     }
+
+    if has_fmf {
+        return "tactics".to_string();
+    }
+
+    if has_bundle {
+        return "ui".to_string();
+    }
+
+    if has_graphics {
+        return "graphics".to_string();
+    }
+
+    "misc".to_string()
 }
 
 pub fn generate_manifest(
