@@ -1,7 +1,40 @@
+# OS
 .DS_Store
+Thumbs.db
+
+# Python (legacy)
 __pycache__/
 *.pyc
 *.pyo
+
+# Node.js / npm
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
 /build/FMMLoader26
-/dist
 FMMLoader26.spec
+
+# Tauri
+src-tauri/target/
+src-tauri/Cargo.lock
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup
+src-old/
