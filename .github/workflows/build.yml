@@ -13,38 +13,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build job for each platform
   build:
-    name: Build (${{ matrix.platform.name }})
+    name: Build (${{ matrix.platform }})
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - name: Windows
-            os: windows-latest
+        include:
+          - platform: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact_name: FMMLoader26-Windows-x64
-            artifact_ext: .exe
-
-          - name: macOS (Apple Silicon)
-            os: macos-latest
+          - platform: macos-latest
             target: aarch64-apple-darwin
-            artifact_name: FMMLoader26-macOS-ARM64
-            artifact_ext: .app
-
-          - name: macOS (Intel)
-            os: macos-13
+          - platform: macos-15-intel
             target: x86_64-apple-darwin
-            artifact_name: FMMLoader26-macOS-x64
-            artifact_ext: .app
-
-          - name: Linux
-            os: ubuntu-22.04
+          - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
-            artifact_name: FMMLoader26-Linux-x64
-            artifact_ext: .AppImage
 
-    runs-on: ${{ matrix.platform.os }}
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
@@ -56,41 +40,31 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Setup Rust
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform.target }}
+          targets: ${{ matrix.target }}
 
       - name: Install Linux dependencies
-        if: matrix.platform.os == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-            patchelf \
-            libgtk-3-dev
+            patchelf
 
       - name: Install frontend dependencies
         run: npm ci
-
-      - name: Build frontend
-        run: npm run build
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "FMMLoader26 ${{ github.ref_name }}"
-          releaseBody: "See the CHANGELOG for details."
-          releaseDraft: true
-          prerelease: false
-          args: --target ${{ matrix.platform.target }}
+          args: --target ${{ matrix.target }}
 
-  # Release job - only runs on tags
   release:
     name: Create GitHub Release
     needs: build
@@ -99,8 +73,6 @@ jobs:
 
     permissions:
       contents: write
-      packages: write
-      actions: read
 
     steps:
       - name: Checkout repository
