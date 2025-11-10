@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
 
 // Wait for Tauri to be ready
 const waitForTauri = async (timeout = 5000): Promise<boolean> => {
@@ -18,7 +18,10 @@ const isTauri = () => {
 };
 
 // Wrapper to ensure we're in Tauri context
-const safeInvoke = async <T>(cmd: string, args?: any): Promise<T> => {
+const safeInvoke = async <T>(
+  cmd: string,
+  args?: InvokeArgs
+): Promise<T> => {
   if (!isTauri()) {
     // Try waiting for Tauri to load
     const ready = await waitForTauri();

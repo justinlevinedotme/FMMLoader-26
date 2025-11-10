@@ -6,15 +6,15 @@ export function TitleBar() {
   const appWindow = getCurrentWindow();
 
   const handleClose = () => {
-    appWindow.close();
+    void appWindow.close();
   };
 
   const handleMinimize = () => {
-    appWindow.minimize();
+    void appWindow.minimize();
   };
 
   const handleMaximize = () => {
-    appWindow.toggleMaximize();
+    void appWindow.toggleMaximize();
   };
 
   return (
@@ -89,7 +89,7 @@ export function TitleBar() {
       </div>
 
       {/* Spacer for balance */}
-      <div className="w-20"></div>
+      <div className="w-20" />
     </div>
   );
 }

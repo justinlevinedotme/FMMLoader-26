@@ -52,23 +52,24 @@ export function ModMetadataDialog({
   // Auto-detect mod type when dialog opens
   useEffect(() => {
     if (open && sourcePath) {
-      setDetecting(true);
-      tauriCommands
-        .detectModType(sourcePath)
-        .then((detectedType) => {
+      const detectType = async () => {
+        setDetecting(true);
+        try {
+          const detectedType = await tauriCommands.detectModType(sourcePath);
           setModType(detectedType);
-        })
-        .catch((err) => {
-          console.error("Failed to detect mod type:", err);
-        })
-        .finally(() => {
+        } catch (err) {
+          console.error('Failed to detect mod type:', err);
+        } finally {
           setDetecting(false);
-        });
+        }
+      };
+
+      void detectType();
 
       // Extract a default name from the path
       const pathParts = sourcePath.split(/[/\\]/);
       const lastPart = pathParts[pathParts.length - 1];
-      const nameWithoutExt = lastPart.replace(/\.(zip|bundle|fmf)$/i, "");
+      const nameWithoutExt = lastPart.replace(/\.(zip|bundle|fmf)$/i, '');
       setName(nameWithoutExt);
     }
   }, [open, sourcePath]);
@@ -100,7 +101,7 @@ export function ModMetadataDialog({
         <DialogHeader>
           <DialogTitle>Mod Information Required</DialogTitle>
           <DialogDescription>
-            This mod doesn't have a manifest.json file. Please provide some
+            This mod doesn&apos;t have a manifest.json file. Please provide some
             information about it.
           </DialogDescription>
         </DialogHeader>

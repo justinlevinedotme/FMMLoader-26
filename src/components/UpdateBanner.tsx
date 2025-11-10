@@ -37,7 +37,7 @@ export function UpdateBanner({ updateInfo, onDismiss }: UpdateBannerProps) {
         <AlertTitle>Update Available</AlertTitle>
         <AlertDescription className="flex items-center justify-between">
           <span>
-            Version {updateInfo.latest_version} is now available! You're
+            Version {updateInfo.latest_version} is now available! You&apos;re
             currently running {updateInfo.current_version}.
           </span>
           <div className="flex items-center gap-2 ml-4">

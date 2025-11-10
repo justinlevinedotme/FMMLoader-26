@@ -40,7 +40,7 @@ export function RestorePointsDialog({
 
   useEffect(() => {
     if (open) {
-      loadRestorePoints();
+      void loadRestorePoints();
     }
   }, [open]);
 
@@ -68,8 +68,10 @@ export function RestorePointsDialog({
       }
       onOpenChange(false);
     } catch (error) {
-      console.error("Failed to restore:", error);
-      alert(`Failed to restore: ${error}`);
+      console.error('Failed to restore:', error);
+      alert(
+        `Failed to restore: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   };
 
@@ -85,8 +87,10 @@ export function RestorePointsDialog({
       setShowCreateForm(false);
       await loadRestorePoints();
     } catch (error) {
-      console.error("Failed to create restore point:", error);
-      alert(`Failed to create restore point: ${error}`);
+      console.error('Failed to create restore point:', error);
+      alert(
+        `Failed to create restore point: ${error instanceof Error ? error.message : String(error)}`
+      );
     } finally {
       setCreating(false);
     }
@@ -172,8 +176,8 @@ export function RestorePointsDialog({
                 onChange={(e) => setNewPointName(e.target.value)}
                 placeholder="e.g., Before installing new tactics"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !creating) {
-                    handleCreate();
+                  if (e.key === 'Enter' && !creating) {
+                    void handleCreate();
                   }
                 }}
               />

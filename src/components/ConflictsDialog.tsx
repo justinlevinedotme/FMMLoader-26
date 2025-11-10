@@ -26,7 +26,7 @@ export function ConflictsDialog({
 
   useEffect(() => {
     if (open) {
-      loadConflicts();
+      void loadConflicts();
     }
   }, [open]);
 

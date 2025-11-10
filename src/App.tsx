@@ -66,6 +66,14 @@ interface ModWithInfo extends ModManifest {
   enabled: boolean;
 }
 
+// Helper function to safely convert unknown errors to strings
+const formatError = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+};
+
 function App() {
   const [config, setConfig] = useState<Config | null>(null);
   const [mods, setMods] = useState<ModWithInfo[]>([]);
@@ -75,8 +83,8 @@ function App() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   // Editable path states
-  const [gameTargetInput, setGameTargetInput] = useState("");
-  const [userDirInput, setUserDirInput] = useState("");
+  const [gameTargetInput, setGameTargetInput] = useState('');
+  const [userDirInput, setUserDirInput] = useState('');
   const [darkMode, setDarkMode] = useState(false);
 
   // Dialog states
@@ -98,11 +106,11 @@ function App() {
     try {
       const cfg = await tauriCommands.getConfig();
       setConfig(cfg);
-      setGameTargetInput(cfg.target_path || "");
-      setUserDirInput(cfg.user_dir_path || "");
-      addLog("Configuration loaded");
+      setGameTargetInput(cfg.target_path ?? '');
+      setUserDirInput(cfg.user_dir_path ?? '');
+      addLog('Configuration loaded');
     } catch (error) {
-      addLog(`Error loading config: ${error}`);
+      addLog(`Error loading config: ${formatError(error)}`);
     }
   };
 
@@ -118,17 +126,17 @@ function App() {
           modsWithInfo.push({
             ...manifest,
             id: name,
-            enabled: config?.enabled_mods?.includes(name) || false,
+            enabled: config?.enabled_mods?.includes(name) ?? false,
           });
         } catch (error) {
-          addLog(`Failed to load mod ${name}: ${error}`);
+          addLog(`Failed to load mod ${name}: ${formatError(error)}`);
         }
       }
 
       setMods(modsWithInfo);
       addLog(`Loaded ${modsWithInfo.length} mods`);
     } catch (error) {
-      addLog(`Error loading mods: ${error}`);
+      addLog(`Error loading mods: ${formatError(error)}`);
     } finally {
       setLoading(false);
     }
@@ -145,10 +153,10 @@ function App() {
         await loadConfig();
         addLog(`Game path detected: ${paths[0]}`);
       } else {
-        addLog("No game installation found");
+        addLog('No game installation found');
       }
     } catch (error) {
-      addLog(`Error detecting game path: ${error}`);
+      addLog(`Error detecting game path: ${formatError(error)}`);
     } finally {
       setLoading(false);
     }
@@ -163,12 +171,12 @@ function App() {
       });
 
       if (selected) {
-        await tauriCommands.setGameTarget(selected as string);
+        await tauriCommands.setGameTarget(selected);
         await loadConfig();
         addLog(`Game target set to: ${selected}`);
       }
     } catch (error) {
-      addLog(`Error selecting game path: ${error}`);
+      addLog(`Error selecting game path: ${formatError(error)}`);
     }
   };
 
@@ -183,14 +191,14 @@ function App() {
       if (selected) {
         const updatedConfig = {
           ...config!,
-          user_dir_path: selected as string,
+          user_dir_path: selected,
         };
         await tauriCommands.updateConfig(updatedConfig);
         await loadConfig();
         addLog(`User directory set to: ${selected}`);
       }
     } catch (error) {
-      addLog(`Error selecting user directory: ${error}`);
+      addLog(`Error selecting user directory: ${formatError(error)}`);
     }
   };
 
@@ -209,9 +217,9 @@ function App() {
         await loadConfig();
         addLog(`Game target updated to: ${gameTargetInput}`);
       } catch (error) {
-        addLog(`Error updating game target: ${error}`);
+        addLog(`Error updating game target: ${formatError(error)}`);
         // Revert on error
-        setGameTargetInput(config?.target_path || "");
+        setGameTargetInput(config?.target_path ?? '');
       }
     }
   };
@@ -227,9 +235,9 @@ function App() {
         await loadConfig();
         addLog(`User directory updated to: ${userDirInput}`);
       } catch (error) {
-        addLog(`Error updating user directory: ${error}`);
+        addLog(`Error updating user directory: ${formatError(error)}`);
         // Revert on error
-        setUserDirInput(config?.user_dir_path || "");
+        setUserDirInput(config?.user_dir_path ?? '');
       }
     }
   };
@@ -246,7 +254,7 @@ function App() {
       await loadConfig();
       await loadMods();
     } catch (error) {
-      addLog(`Error toggling mod: ${error}`);
+      addLog(`Error toggling mod: ${formatError(error)}`);
     }
   };
 
@@ -264,10 +272,12 @@ function App() {
       const result = await tauriCommands.applyMods();
       addLog(result);
       addLog("Mods applied successfully");
-      toast.success("Mods applied successfully!", { id: "apply-mods" });
+      toast.success('Mods applied successfully!', { id: 'apply-mods' });
     } catch (error) {
-      addLog(`Error applying mods: ${error}`);
-      toast.error(`Failed to apply mods: ${error}`, { id: "apply-mods" });
+      addLog(`Error applying mods: ${formatError(error)}`);
+      toast.error(`Failed to apply mods: ${formatError(error)}`, {
+        id: 'apply-mods',
+      });
     } finally {
       setLoading(false);
     }
@@ -291,8 +301,8 @@ function App() {
 
       await loadMods();
     } catch (error) {
-      addLog(`Error removing mod: ${error}`);
-      toast.error(`Failed to remove mod: ${error}`);
+      addLog(`Error removing mod: ${formatError(error)}`);
+      toast.error(`Failed to remove mod: ${formatError(error)}`);
     }
   };
 
@@ -310,10 +320,10 @@ function App() {
       });
 
       if (selected) {
-        await handleImport(selected as string);
+        await handleImport(selected);
       }
     } catch (error) {
-      addLog(`Error selecting file: ${error}`);
+      addLog(`Error selecting file: ${formatError(error)}`);
     }
   };
 
@@ -331,10 +341,10 @@ function App() {
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
-        toast.info("Please provide mod metadata");
+        toast.info('Please provide mod metadata');
       } else {
-        addLog(`Import failed: ${error}`);
-        toast.error(`Import failed: ${error}`);
+        addLog(`Import failed: ${formatError(error)}`);
+        toast.error(`Import failed: ${formatError(error)}`);
       }
     }
   };
@@ -350,7 +360,7 @@ function App() {
       setPendingImportPath(null);
       await loadMods();
     } catch (error) {
-      addLog(`Import failed: ${error}`);
+      addLog(`Import failed: ${formatError(error)}`);
     }
   };
 
@@ -373,7 +383,7 @@ function App() {
       await loadConfig();
       addLog(`User directory detected: ${detectedPath}`);
     } catch (error) {
-      addLog(`Error detecting user directory: ${error}`);
+      addLog(`Error detecting user directory: ${formatError(error)}`);
     } finally {
       setLoading(false);
     }
@@ -400,26 +410,32 @@ function App() {
         addLog("FMMLoader26 initialized");
 
         // Set up Tauri drag and drop event listeners
-        const unlistenDrop = await listen("tauri://file-drop", (event: any) => {
-          const files = event.payload as string[];
-          if (files && files.length > 0) {
-            handleImport(files[0]);
+        const unlistenDrop = await listen<string[]>(
+          'tauri://file-drop',
+          (event) => {
+            const files = event.payload;
+            if (files && files.length > 0) {
+              void handleImport(files[0]);
+            }
+            setIsDragging(false);
           }
-          setIsDragging(false);
-        });
+        );
 
-        const unlistenDragOver = await listen("tauri://drag-over", () => {
+        const unlistenDragOver = await listen('tauri://drag-over', () => {
           setIsDragging(true);
         });
 
-        const unlistenDragDrop = await listen("tauri://drag-drop", (event: any) => {
-          // In Tauri v2, drag-drop contains the file paths
-          const paths = event.payload?.paths as string[];
-          if (paths && paths.length > 0) {
-            handleImport(paths[0]);
+        const unlistenDragDrop = await listen<{ paths: string[] }>(
+          'tauri://drag-drop',
+          (event) => {
+            // In Tauri v2, drag-drop contains the file paths
+            const paths = event.payload?.paths;
+            if (paths && paths.length > 0) {
+              void handleImport(paths[0]);
+            }
+            setIsDragging(false);
           }
-          setIsDragging(false);
-        });
+        );
 
         const unlistenDragLeave = await listen("tauri://drag-leave", () => {
           setIsDragging(false);
@@ -444,17 +460,19 @@ function App() {
           unlistenDragLeave();
         };
       } catch (error) {
-        addLog(`Initialization error: ${error}`);
+        addLog(`Initialization error: ${formatError(error)}`);
       }
     };
 
-    init();
+    void init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (config) {
-      loadMods();
+      void loadMods();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
   return (
@@ -701,7 +719,7 @@ function App() {
                             <Switch
                               checked={mod.enabled}
                               onCheckedChange={(checked: boolean) => {
-                                toggleMod(mod.id, checked);
+                                void toggleMod(mod.id, checked);
                               }}
                               onClick={(e: React.MouseEvent) =>
                                 e.stopPropagation()
@@ -728,7 +746,7 @@ function App() {
                               size="icon"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                removeMod(mod.id);
+                                void removeMod(mod.id);
                               }}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
@@ -799,7 +817,7 @@ function App() {
       <ModMetadataDialog
         open={metadataDialogOpen}
         onOpenChange={setMetadataDialogOpen}
-        sourcePath={pendingImportPath || ""}
+        sourcePath={pendingImportPath ?? ''}
         onSubmit={handleMetadataSubmit}
       />
 
@@ -813,8 +831,8 @@ function App() {
         open={restoreDialogOpen}
         onOpenChange={setRestoreDialogOpen}
         onRestore={() => {
-          loadMods();
-          addLog("Restored from backup");
+          void loadMods();
+          addLog('Restored from backup');
         }}
       />
 
@@ -822,7 +840,7 @@ function App() {
       <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px]">
           <SheetHeader>
-            <SheetTitle>{selectedMod?.name || "Mod Details"}</SheetTitle>
+            <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
             <SheetDescription>
               {selectedMod
                 ? `Version ${selectedMod.version}`
@@ -934,9 +952,9 @@ function App() {
                   onClick={async () => {
                     try {
                       await tauriCommands.openLogsFolder();
-                      addLog("Opened logs folder");
+                      addLog('Opened logs folder');
                     } catch (error) {
-                      addLog(`Failed to open logs folder: ${error}`);
+                      addLog(`Failed to open logs folder: ${formatError(error)}`);
                     }
                   }}
                 >
