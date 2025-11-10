@@ -1,11 +1,11 @@
-use crate::config::load_config;
+use crate::config::{load_config, get_app_data_dir};
 use std::fs;
 use std::path::{Path, PathBuf};
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 use std::io::{Read, Write};
 
-const NAME_FIX_RELEASE_URL: &str = "https://github.com/jo13310/NameFixFM26/releases/latest/download/NameFixFM26.zip";
+const NAME_FIX_RELEASE_URL: &str = "https://github.com/jo13310/NameFixFM26/archive/refs/tags/v1.0.zip";
 const NAME_FIX_FILE: &str = "FM26-open-names.lnc";
 
 // Files to delete as part of the installation
@@ -227,7 +227,8 @@ fn extract_lnc_file(zip_data: &[u8]) -> Result<Vec<u8>, String> {
 
 /// Create backups of files that will be modified or deleted
 fn create_backups(db_dir: &Path) -> Result<(), String> {
-    let backup_dir = db_dir.join("name_fix_backup");
+    let app_data_dir = get_app_data_dir();
+    let backup_dir = app_data_dir.join("name_fix_backup");
 
     // Clean up old backup if it exists
     if backup_dir.exists() {
@@ -266,7 +267,8 @@ fn create_backups(db_dir: &Path) -> Result<(), String> {
 
 /// Restore files from backup
 fn restore_from_backup(db_dir: &Path) -> Result<(), String> {
-    let backup_dir = db_dir.join("name_fix_backup");
+    let app_data_dir = get_app_data_dir();
+    let backup_dir = app_data_dir.join("name_fix_backup");
 
     if !backup_dir.exists() {
         return Err("No backup found. Cannot uninstall FM Name Fix.".to_string());
@@ -363,6 +365,7 @@ pub fn install() -> Result<String, String> {
     delete_licensing_files(&db_dir)?;
 
     tracing::info!("FM Name Fix installation completed successfully");
+    let app_data_dir = get_app_data_dir();
     Ok(format!(
         "FM Name Fix installed successfully! The following changes were made:\n\
         - Installed {} to fix licensing issues\n\
@@ -370,7 +373,7 @@ pub fn install() -> Result<String, String> {
         - Created backup at {}\n\n\
         Note: For existing saves, Brazilian clubs will update after you start a new save.",
         NAME_FIX_FILE,
-        db_dir.join("name_fix_backup").display()
+        app_data_dir.join("name_fix_backup").display()
     ))
 }
 
