@@ -1,123 +1,137 @@
-name: Build & Release FM26 Mod Manager
+name: Build & Release FMMLoader26
 
 on:
   push:
+    branches:
+      - main
+      - claude/**
     tags:
-      - "v*"     # e.g., v0.4.2
+      - "v*"
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  pyinstaller-build:
-    name: Build (${{ matrix.name }})
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            name: Windows
-            artifact_name: FMMLoader26-Windows
-          - os: macos-latest
-            name: macOS (Apple Silicon)
-            artifact_name: FMMLoader26-macOS-AppleSilicon
-          - os: macos-13
-            name: macOS (Intel)
-            artifact_name: FMMLoader26-macOS-Intel
-          - os: ubuntu-latest
-            name: Linux
-            artifact_name: FMMLoader26-Linux
-    runs-on: ${{ matrix.os }}
+  # Lint and format check job
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.11"
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
 
       - name: Install dependencies
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          if [ -f src/requirements.txt ]; then pip install -r src/requirements.txt; fi
+        run: npm ci
 
-      # ---------- WINDOWS ----------
-      - name: Build with PyInstaller (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: |
-          pyinstaller ^
-            --clean ^
-            --noconfirm ^
-            --windowed ^
-            --onefile ^
-            --name "FMMLoader26" ^
-            --icon src\assets\icon.ico ^
-            src\fmmloader26.py
+      - name: Check frontend formatting
+        run: npm run format:check:js
 
-      - name: Package artifact (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: |
-          mkdir upload
-          copy "dist\FMMLoader26.exe" "upload\FMMLoader26.exe"
+      - name: Lint frontend
+        run: npm run lint:js
 
-      # ---------- macOS ----------
-      - name: Build with PyInstaller (macOS)
-        if: startsWith(matrix.os, 'macos')
-        shell: bash
-        run: |
-          pyinstaller \
-            --clean \
-            --noconfirm \
-            --windowed \
-            --onefile \
-            --name "FMMLoader26" \
-            --icon src/assets/icon.icns \
-            src/fmmloader26.py
+      - name: Check Rust formatting
+        run: npm run format:check:rust
 
-      - name: Package artifact (macOS)
-        if: startsWith(matrix.os, 'macos')
-        shell: bash
-        run: |
-          mkdir -p upload
-          cd dist
-          zip -r "../upload/${{ matrix.artifact_name }}.zip" "FMMLoader26.app"
-          cd ..
+      - name: Lint Rust
+        run: npm run lint:rust
+        continue-on-error: true  # Clippy may fail due to missing system dependencies in CI
 
-      # ---------- Linux ----------
-      - name: Build with PyInstaller (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        shell: bash
-        run: |
-          pyinstaller \
-            --clean \
-            --noconfirm \
-            --windowed \
-            --onefile \
-            --name "FMMLoader26" \
-            src/fmmloader26.py
+  # Build job for each platform
+  build:
+    name: Build (${{ matrix.platform.name }})
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Windows
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: FMMLoader26-Windows-x64
+            artifact_ext: .exe
 
-      - name: Package artifact (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        shell: bash
-        run: |
-          mkdir -p upload
-          cd dist
-          tar -czf "../upload/FMMLoader26-Linux.tar.gz" "FMMLoader26"
-          cd ..
+          - name: macOS (Apple Silicon)
+            os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: FMMLoader26-macOS-ARM64
+            artifact_ext: .app
 
-      # ---------- Upload ----------
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+          - name: macOS (Intel)
+            os: macos-13
+            target: x86_64-apple-darwin
+            artifact_name: FMMLoader26-macOS-x64
+            artifact_ext: .app
+
+          - name: Linux
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact_name: FMMLoader26-Linux-x64
+            artifact_ext: .AppImage
+
+    runs-on: ${{ matrix.platform.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: upload/*
+          node-version: '20'
+          cache: 'npm'
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Install Linux dependencies
+        if: matrix.platform.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "FMMLoader26 ${{ github.ref_name }}"
+          releaseBody: "See the CHANGELOG for details."
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.platform.target }}
+
+  # Release job - only runs on tags
   release:
     name: Create GitHub Release
-    needs: pyinstaller-build
+    needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
 
@@ -127,50 +141,25 @@ jobs:
       actions: read
 
     steps:
-      - name: Download Windows artifact
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: FMMLoader26-Windows
-          path: artifacts/windows
-        continue-on-error: true
+          path: artifacts
 
-      - name: Download macOS (Apple Silicon) artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: FMMLoader26-macOS-AppleSilicon
-          path: artifacts/macos-arm
-        continue-on-error: true
-
-      - name: Download macOS (Intel) artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: FMMLoader26-macOS-Intel
-          path: artifacts/macos-intel
-        continue-on-error: true
-
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: FMMLoader26-Linux
-          path: artifacts/linux
-        continue-on-error: true
-
-      - name: List downloaded files
+      - name: List artifacts
         run: |
-          echo "Windows artifacts:"; ls -lah artifacts/windows || true
-          echo "macOS (Apple Silicon) artifacts:"; ls -lah artifacts/macos-arm || true
-          echo "macOS (Intel) artifacts:"; ls -lah artifacts/macos-intel || true
-          echo "Linux artifacts:"; ls -lah artifacts/linux || true
+          echo "Downloaded artifacts:"
+          ls -R artifacts/
 
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/windows/FMMLoader26.exe
-            artifacts/macos-arm/FMMLoader26-macOS-AppleSilicon.zip
-            artifacts/macos-intel/FMMLoader26-macOS-Intel.zip
-            artifacts/linux/FMMLoader26-Linux.tar.gz
+          files: artifacts/**/*
           draft: false
           prerelease: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
