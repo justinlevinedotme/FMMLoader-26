@@ -33,20 +33,21 @@
 
 ## 📝 About
 
-**FMMLoader26** is a powerful, user-friendly **cross-platform mod manager** for *Football Manager 2026*. It simplifies the entire modding experience—from installation to conflict resolution—making it easy to customize your game with UI enhancements, tactics, graphics packs, skins, and more.
+**FMMLoader26** is a powerful, user-friendly **cross-platform mod manager** for *Football Manager 2026*. Built with **Tauri v2**, **React**, **Vite**, **Tailwind CSS**, and **shadcn/ui**, it simplifies the entire modding experience—from installation to conflict resolution—making it easy to customize your game with UI enhancements, tactics, graphics packs, skins, and more.
 
 **Developed with ❤️ by [Justin Levine](https://justinlevine.me) (JALCO / notJalco)**
 
 ### 🎯 Why FMMLoader26?
 
-- **⚡ Zero Installation** - Standalone executables for Windows and macOS, runs from source on Linux
-- **🎨 Beautiful GUI** - Clean, intuitive interface built with Tkinter
+- **⚡ Modern Tech Stack** - Built with Tauri v2 + React for a fast, native experience
+- **🎨 Beautiful UI** - Clean, modern interface built with Tailwind CSS and shadcn/ui
 - **🔄 Drag & Drop** - Import mods effortlessly with drag-and-drop support
 - **🛡️ Safe & Reversible** - Automatic backups and restore points before every change
 - **🔍 Smart Detection** - Automatically finds your FM26 installation (Steam, Epic, Game Pass, Steam Deck)
 - **⚙️ Type-Aware** - Intelligently installs different mod types to the correct locations
 - **🚨 Conflict Resolution** - Detects and helps resolve file conflicts between mods
 - **📊 Detailed Logging** - Comprehensive logs for troubleshooting
+- **🦀 Rust Backend** - Blazing fast and memory-safe operations
 
 ---
 
@@ -75,16 +76,20 @@
 
 | Component | Requirement |
 |-----------|-------------|
-| **OS** | Windows 10/11, macOS 10.14+, Linux (Ubuntu 20.04+) |
+| **OS** | Windows 10/11, macOS 10.15+, Linux (Ubuntu 20.04+) |
 | **RAM** | 512 MB |
 | **Disk Space** | 100 MB (plus space for mods) |
 | **FM26** | Football Manager 2026 installed (Steam, Epic, Game Pass, or Steam Deck) |
 
-### Optional Dependencies
+### Development Requirements
 
-- **Python 3.8+** (only for running from source)
-- **psutil** (for FM process detection)
-- **tkinterdnd2** (for drag-and-drop support)
+To build from source, you'll need:
+- **Node.js 18+** and **npm**
+- **Rust 1.70+** and **Cargo**
+- **Platform-specific dependencies**:
+  - **Linux**: `webkit2gtk`, `libayatana-appindicator3`
+  - **macOS**: Xcode Command Line Tools
+  - **Windows**: WebView2 (usually pre-installed on Windows 10/11)
 
 ---
 
@@ -738,24 +743,31 @@ We welcome contributions from the community! Whether it's bug fixes, new feature
 git clone https://github.com/justinlevinedotme/FMMLoader-26.git
 cd FMMLoader-26
 
-# Install dependencies
-pip install -r src/requirements.txt
+# Install Node.js dependencies
+npm install
 
-# Optional: Install development dependencies
-pip install pyinstaller tkinterdnd2 psutil
-
-# Run from source
-python src/fmmloader26.py
+# Run in development mode (opens dev window with hot reload)
+npm run tauri dev
 ```
 
 ### Build from Source
 
-```bash
-# Windows
-pyinstaller src/fm26_mod_manager.spec
+**Prerequisites:**
+- Node.js 18+ and npm
+- Rust 1.70+ (install from https://rustup.rs)
+- Platform-specific system dependencies:
+  - **Linux**: `sudo apt install libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev`
+  - **macOS**: Xcode Command Line Tools
+  - **Windows**: WebView2 (pre-installed on Windows 10/11)
 
-# macOS
-pyinstaller src/fm26_mod_manager.spec
+```bash
+# Build for production (creates installers/executables)
+npm run tauri build
+
+# Outputs will be in src-tauri/target/release/bundle/
+# - Windows: .msi and .exe installers
+# - macOS: .dmg and .app bundle
+# - Linux: .deb, .AppImage packages
 ```
 
 ---
@@ -842,11 +854,14 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial-
 
 ### Built With
 
-- **Python 3** - Core language
-- **Tkinter** - GUI framework
-- **tkinterdnd2** - Drag & drop support
-- **psutil** - Process detection
-- **PyInstaller** - Executable creation
+- **Tauri v2** - Native cross-platform framework
+- **Rust** - High-performance backend
+- **React 18** - UI framework
+- **TypeScript** - Type-safe JavaScript
+- **Vite** - Fast build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Beautiful, accessible components
+- **Lucide React** - Icon library
 - **shields.io** - Beautiful badges
 - **claude** - doing a bunch of stuff I don't have time for.
 

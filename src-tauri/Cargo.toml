@@ -1,0 +1,36 @@
+[package]
+name = "fmmloader26"
+version = "1.0.0"
+description = "A mod manager for Football Manager 2026"
+authors = ["Justin Levine"]
+license = "CC-BY-NC-SA-4.0"
+repository = "https://github.com/justinlevinedotme/FMMLoader-26"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = ["devtools"] }
+tauri-plugin-dialog = "2.0.0"
+tauri-plugin-fs = "2.0.0"
+tauri-plugin-os = "2.0.0"
+tauri-plugin-process = "2.0.0"
+tauri-plugin-shell = "2.0.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+zip = "0.6"
+walkdir = "2"
+regex = "1"
+dirs = "5"
+chrono = "0.4"
+uuid = { version = "1", features = ["v4"] }
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+hostname = "0.3"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
