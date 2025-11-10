@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build (${{ matrix.platform }})
+    name: Build & Release (${{ matrix.platform }})
     strategy:
       fail-fast: false
       matrix:
@@ -24,6 +24,9 @@ jobs:
             target: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -58,37 +61,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --target ${{ matrix.target }}
-
-  release:
-    name: Create GitHub Release
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: List artifacts
-        run: |
-          echo "Downloaded artifacts:"
-          ls -R artifacts/
-
-      - name: Create/Update GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/**/*
-          draft: false
+          tagName: ${{ github.ref_name }}
+          releaseName: "FMMLoader26 v__VERSION__"
+          releaseBody: "See the assets to download this version and install."
+          releaseDraft: false
           prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          args: --target ${{ matrix.target }}
