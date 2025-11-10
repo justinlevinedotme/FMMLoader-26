@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
-import { open } from "@tauri-apps/plugin-dialog";
-import { open as openUrl } from "@tauri-apps/plugin-shell";
-import { listen } from "@tauri-apps/api/event";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from 'react';
+import { open } from '@tauri-apps/plugin-dialog';
+import { open as openUrl } from '@tauri-apps/plugin-shell';
+import { listen } from '@tauri-apps/api/event';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -19,24 +13,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
+} from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 import {
   tauriCommands,
   type Config,
   type ModManifest,
   type ModMetadata,
   type UpdateInfo,
-} from "@/hooks/useTauri";
+} from '@/hooks/useTauri';
 import {
-  Folder,
   FolderOpen,
   RefreshCw,
   Download,
@@ -45,21 +38,16 @@ import {
   AlertTriangle,
   History,
   Settings,
-} from "lucide-react";
-import { FaDiscord } from "react-icons/fa6";
-import { SiKofi } from "react-icons/si";
-import { ModMetadataDialog } from "@/components/ModMetadataDialog";
-import { ConflictsDialog } from "@/components/ConflictsDialog";
-import { RestorePointsDialog } from "@/components/RestorePointsDialog";
-import { UpdateBanner } from "@/components/UpdateBanner";
-import { TitleBar } from "@/components/TitleBar";
-import { Toaster } from "@/components/ui/sonner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from 'lucide-react';
+import { FaDiscord } from 'react-icons/fa6';
+import { SiKofi } from 'react-icons/si';
+import { ModMetadataDialog } from '@/components/ModMetadataDialog';
+import { ConflictsDialog } from '@/components/ConflictsDialog';
+import { RestorePointsDialog } from '@/components/RestorePointsDialog';
+import { UpdateBanner } from '@/components/UpdateBanner';
+import { TitleBar } from '@/components/TitleBar';
+import { Toaster } from '@/components/ui/sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ModWithInfo extends ModManifest {
   id: string;
@@ -93,9 +81,7 @@ function App() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modDetailsOpen, setModDetailsOpen] = useState(false);
-  const [pendingImportPath, setPendingImportPath] = useState<string | null>(
-    null
-  );
+  const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -145,7 +131,7 @@ function App() {
   const detectGamePath = async () => {
     try {
       setLoading(true);
-      addLog("Detecting game path...");
+      addLog('Detecting game path...');
       const paths = await tauriCommands.detectGamePath();
 
       if (paths.length > 0) {
@@ -167,7 +153,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 Game Target Folder",
+        title: 'Select FM26 Game Target Folder',
       });
 
       if (selected) {
@@ -185,7 +171,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 User Directory",
+        title: 'Select FM26 User Directory',
       });
 
       if (selected) {
@@ -260,18 +246,18 @@ function App() {
 
   const applyMods = async () => {
     if (!config?.target_path) {
-      addLog("Please set game target first");
-      toast.warning("Please set game target first");
+      addLog('Please set game target first');
+      toast.warning('Please set game target first');
       return;
     }
 
     try {
       setLoading(true);
-      addLog("Applying mods...");
-      toast.loading("Applying mods...", { id: "apply-mods" });
+      addLog('Applying mods...');
+      toast.loading('Applying mods...', { id: 'apply-mods' });
       const result = await tauriCommands.applyMods();
       addLog(result);
-      addLog("Mods applied successfully");
+      addLog('Mods applied successfully');
       toast.success('Mods applied successfully!', { id: 'apply-mods' });
     } catch (error) {
       addLog(`Error applying mods: ${formatError(error)}`);
@@ -313,8 +299,8 @@ function App() {
         directory: false,
         filters: [
           {
-            name: "Mod Files",
-            extensions: ["zip", "bundle", "fmf"],
+            name: 'Mod Files',
+            extensions: ['zip', 'bundle', 'fmf'],
           },
         ],
       });
@@ -337,7 +323,7 @@ function App() {
     } catch (error) {
       const errorStr = String(error);
 
-      if (errorStr === "NEEDS_METADATA") {
+      if (errorStr === 'NEEDS_METADATA') {
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
@@ -371,7 +357,7 @@ function App() {
   const detectUserDirectory = async () => {
     try {
       setLoading(true);
-      addLog("Detecting user directory...");
+      addLog('Detecting user directory...');
       const detectedPath = await tauriCommands.detectUserDir();
 
       // Update the config with the detected path
@@ -392,9 +378,9 @@ function App() {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     if (!darkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
   };
 
@@ -407,37 +393,31 @@ function App() {
         await tauriCommands.initApp();
         await loadConfig();
         await loadMods();
-        addLog("FMMLoader26 initialized");
+        addLog('FMMLoader26 initialized');
 
         // Set up Tauri drag and drop event listeners
-        const unlistenDrop = await listen<string[]>(
-          'tauri://file-drop',
-          (event) => {
-            const files = event.payload;
-            if (files && files.length > 0) {
-              void handleImport(files[0]);
-            }
-            setIsDragging(false);
+        const unlistenDrop = await listen<string[]>('tauri://file-drop', (event) => {
+          const files = event.payload;
+          if (files && files.length > 0) {
+            void handleImport(files[0]);
           }
-        );
+          setIsDragging(false);
+        });
 
         const unlistenDragOver = await listen('tauri://drag-over', () => {
           setIsDragging(true);
         });
 
-        const unlistenDragDrop = await listen<{ paths: string[] }>(
-          'tauri://drag-drop',
-          (event) => {
-            // In Tauri v2, drag-drop contains the file paths
-            const paths = event.payload?.paths;
-            if (paths && paths.length > 0) {
-              void handleImport(paths[0]);
-            }
-            setIsDragging(false);
+        const unlistenDragDrop = await listen<{ paths: string[] }>('tauri://drag-drop', (event) => {
+          // In Tauri v2, drag-drop contains the file paths
+          const paths = event.payload?.paths;
+          if (paths && paths.length > 0) {
+            void handleImport(paths[0]);
           }
-        );
+          setIsDragging(false);
+        });
 
-        const unlistenDragLeave = await listen("tauri://drag-leave", () => {
+        const unlistenDragLeave = await listen('tauri://drag-leave', () => {
           setIsDragging(false);
         });
 
@@ -450,7 +430,7 @@ function App() {
           }
         } catch (error) {
           // Silently fail update check - not critical
-          console.error("Failed to check for updates:", error);
+          console.error('Failed to check for updates:', error);
         }
 
         return () => {
@@ -478,495 +458,445 @@ function App() {
   return (
     <TooltipProvider>
       <div className="h-screen flex flex-col bg-background">
-      {/* Custom TitleBar */}
-      <TitleBar />
+        {/* Custom TitleBar */}
+        <TitleBar />
 
-      {/* Update Banner */}
-      {updateInfo && updateInfo.has_update && (
-        <UpdateBanner
-          updateInfo={updateInfo}
-          onDismiss={() => setUpdateInfo(null)}
-        />
-      )}
-
-      {/* File Drop Zone - covers everything below titlebar */}
-      {/* This invisible overlay catches file drops without blocking interactions */}
-      <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
-        {/* Drag overlay visual feedback */}
-        {isDragging && (
-          <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary flex items-center justify-center z-40 pointer-events-none">
-            <div className="bg-background/95 p-8 rounded-lg shadow-lg">
-              <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
-              <p className="text-xl font-semibold">Drop mod file to import</p>
-            </div>
-          </div>
+        {/* Update Banner */}
+        {updateInfo && updateInfo.has_update && (
+          <UpdateBanner updateInfo={updateInfo} onDismiss={() => setUpdateInfo(null)} />
         )}
-      </div>
 
-      {/* Header */}
-      <div className="border-b pt-12">
-        <div className="flex items-center justify-between p-4">
-          <div>
-            <h1 className="text-2xl font-bold">FMMLoader26</h1>
-            <p className="text-sm text-muted-foreground">
-              Football Manager 2026 Mod Manager
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleImportClick}
-                  disabled={loading}
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  Import
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Import mod from ZIP, folder, or file</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setConflictsDialogOpen(true)}
-                  disabled={loading || !config?.target_path}
-                >
-                  <AlertTriangle className="mr-2 h-4 w-4" />
-                  Conflicts
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Check for file conflicts between mods</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setRestoreDialogOpen(true)}
-                  disabled={loading}
-                >
-                  <History className="mr-2 h-4 w-4" />
-                  Restore
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Rollback to a previous backup</p>
-              </TooltipContent>
-            </Tooltip>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={detectGamePath}
-              disabled={loading}
-            >
-              <Folder className="mr-2 h-4 w-4" />
-              Detect Game
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadMods}
-              disabled={loading}
-            >
-              <RefreshCw
-                className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSettingsOpen(true)}
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Game Target and User Directory */}
-        <div className="px-4 pb-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 flex-1">
-              <FolderOpen className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                Game Target:
-              </span>
-              <input
-                type="text"
-                value={gameTargetInput}
-                onChange={(e) => handleGameTargetChange(e.target.value)}
-                onBlur={saveGameTarget}
-                onKeyDown={(e) => e.key === "Enter" && saveGameTarget()}
-                className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                placeholder="Not set - click 'Select' or 'Detect Game'"
-                disabled={loading}
-              />
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={selectGamePath}
-              disabled={loading}
-            >
-              Select...
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 flex-1">
-              <Folder className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                User Directory:
-              </span>
-              <input
-                type="text"
-                value={userDirInput}
-                onChange={(e) => handleUserDirChange(e.target.value)}
-                onBlur={saveUserDirectory}
-                onKeyDown={(e) => e.key === "Enter" && saveUserDirectory()}
-                className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                placeholder="Auto-detected from system"
-                disabled={loading}
-              />
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={detectUserDirectory}
-              disabled={loading}
-            >
-              Detect
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={selectUserDirectory}
-              disabled={loading}
-            >
-              Select...
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        <Tabs defaultValue="mods" className="h-full flex flex-col">
-          <TabsList className="mx-4 mt-4">
-            <TabsTrigger value="mods">Mods</TabsTrigger>
-            <TabsTrigger value="logs">Logs</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
-            <div className="h-full">
-              {/* Mods List */}
-              <Card className="flex flex-col h-full">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Installed Mods</CardTitle>
-                      <CardDescription>
-                        {mods.length} mods installed
-                      </CardDescription>
-                    </div>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={applyMods}
-                          disabled={loading || !config?.target_path}
-                        >
-                          <Download className="mr-2 h-4 w-4" />
-                          Apply Mods
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Apply enabled mods to game (creates backup)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 overflow-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12">Status</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Version</TableHead>
-                        <TableHead>Author</TableHead>
-                        <TableHead className="w-24">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {mods.map((mod) => (
-                        <TableRow
-                          key={mod.id}
-                          className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => {
-                            setSelectedMod(mod);
-                            setModDetailsOpen(true);
-                          }}
-                        >
-                          <TableCell>
-                            <Switch
-                              checked={mod.enabled}
-                              onCheckedChange={(checked: boolean) => {
-                                void toggleMod(mod.id, checked);
-                              }}
-                              onClick={(e: React.MouseEvent) =>
-                                e.stopPropagation()
-                              }
-                            />
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {mod.name}
-                          </TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                              {mod.mod_type}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {mod.version}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {mod.author}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                void removeMod(mod.id);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="logs" className="flex-1 overflow-hidden m-4 mt-2">
-            <Card className="h-full flex flex-col">
-              <CardHeader>
-                <CardTitle>Activity Logs</CardTitle>
-                <CardDescription>
-                  Recent activity and operations
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-auto">
-                <div className="font-mono text-xs space-y-1">
-                  {logs.map((log, i) => (
-                    <div key={i} className="text-muted-foreground">
-                      {log}
-                    </div>
-                  ))}
-                  {logs.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No logs yet</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Footer */}
-      <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
-        <div className="text-xs text-muted-foreground font-medium">
-          FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => openUrl("https://ko-fi.com/jalco")}
-            className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
-          >
-            <SiKofi className="mr-2 h-4 w-4" />
-            Support on Ko-Fi
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => openUrl("https://discord.gg/AspRvTTAch")}
-            className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
-          >
-            <FaDiscord className="mr-2 h-4 w-4" />
-            Discord
-          </Button>
-        </div>
-      </div>
-
-      {/* Dialogs */}
-      <ModMetadataDialog
-        open={metadataDialogOpen}
-        onOpenChange={setMetadataDialogOpen}
-        sourcePath={pendingImportPath ?? ''}
-        onSubmit={handleMetadataSubmit}
-      />
-
-      <ConflictsDialog
-        open={conflictsDialogOpen}
-        onOpenChange={setConflictsDialogOpen}
-        onDisableMod={handleConflictDisable}
-      />
-
-      <RestorePointsDialog
-        open={restoreDialogOpen}
-        onOpenChange={setRestoreDialogOpen}
-        onRestore={() => {
-          void loadMods();
-          addLog('Restored from backup');
-        }}
-      />
-
-      {/* Mod Details Sheet */}
-      <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
-        <SheetContent className="w-[400px] sm:w-[540px]">
-          <SheetHeader>
-            <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
-            <SheetDescription>
-              {selectedMod
-                ? `Version ${selectedMod.version}`
-                : "Select a mod to view details"}
-            </SheetDescription>
-          </SheetHeader>
-          {selectedMod && (
-            <div className="mt-6 space-y-4">
-              <div className="space-y-2">
-                <div>
-                  <span className="text-sm font-medium">Author:</span>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedMod.author || "Unknown"}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-sm font-medium">Type:</span>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedMod.mod_type}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-sm font-medium">Description:</span>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedMod.description || "No description available"}
-                  </p>
-                </div>
-
-                {selectedMod.license && (
-                  <div>
-                    <span className="text-sm font-medium">License:</span>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedMod.license}
-                    </p>
-                  </div>
-                )}
-
-                {selectedMod.files && selectedMod.files.length > 0 && (
-                  <div>
-                    <span className="text-sm font-medium">
-                      Files ({selectedMod.files.length}):
-                    </span>
-                    <ul className="text-sm text-muted-foreground list-disc list-inside max-h-60 overflow-y-auto">
-                      {selectedMod.files.map((file, i) => (
-                        <li key={i} className="truncate">
-                          {file.source}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              <div className="pt-4 space-y-2">
-                <Button
-                  className="w-full"
-                  variant={selectedMod.enabled ? "destructive" : "default"}
-                  onClick={() =>
-                    toggleMod(selectedMod.id, !selectedMod.enabled)
-                  }
-                >
-                  {selectedMod.enabled ? "Disable Mod" : "Enable Mod"}
-                </Button>
-                <Button
-                  className="w-full"
-                  variant="outline"
-                  onClick={() => removeMod(selectedMod.id)}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Remove Mod
-                </Button>
+        {/* File Drop Zone - covers everything below titlebar */}
+        {/* This invisible overlay catches file drops without blocking interactions */}
+        <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
+          {/* Drag overlay visual feedback */}
+          {isDragging && (
+            <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary flex items-center justify-center z-40 pointer-events-none">
+              <div className="bg-background/95 p-8 rounded-lg shadow-lg">
+                <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
+                <p className="text-xl font-semibold">Drop mod file to import</p>
               </div>
             </div>
           )}
-        </SheetContent>
-      </Sheet>
+        </div>
 
-      {/* Settings Sheet */}
-      <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Settings</SheetTitle>
-            <SheetDescription>
-              Configure FMMLoader26 preferences
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="text-sm font-medium">Dark Mode</div>
-                <div className="text-sm text-muted-foreground">
-                  Toggle dark mode theme
-                </div>
-              </div>
-              <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+        {/* Header */}
+        <div className="border-b pt-6">
+          <div className="flex items-center justify-between p-4">
+            <div>
+              <h1 className="text-2xl font-bold">FMMLoader26</h1>
+              <p className="text-sm text-muted-foreground">Football Manager 2026 Mod Manager</p>
             </div>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleImportClick}
+                    disabled={loading}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Import mod from ZIP, folder, or file</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setConflictsDialogOpen(true)}
+                    disabled={loading || !config?.target_path}
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Conflicts
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Check for file conflicts between mods</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setRestoreDialogOpen(true)}
+                    disabled={loading}
+                  >
+                    <History className="mr-2 h-4 w-4" />
+                    Restore
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Rollback to a previous backup</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <div className="border-t pt-4">
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Application Logs</div>
-                <div className="text-sm text-muted-foreground">
-                  View application logs for troubleshooting. Logs from the last 10 sessions are kept.
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full mt-2"
-                  onClick={async () => {
-                    try {
-                      await tauriCommands.openLogsFolder();
-                      addLog('Opened logs folder');
-                    } catch (error) {
-                      addLog(`Failed to open logs folder: ${formatError(error)}`);
-                    }
-                  }}
-                >
-                  <FolderOpen className="mr-2 h-4 w-4" />
-                  Open Logs Folder
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" onClick={loadMods} disabled={loading}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+                <Settings className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
-      <Toaster />
+
+          {/* Game Target and User Directory */}
+          <div className="px-4 pb-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      Game Directory:
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>The FM26 installation folder containing the .bundle files</p>
+                  </TooltipContent>
+                </Tooltip>
+                <input
+                  type="text"
+                  value={gameTargetInput}
+                  onChange={(e) => handleGameTargetChange(e.target.value)}
+                  onBlur={saveGameTarget}
+                  onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
+                  className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  placeholder="Not set - click 'Select' or 'Detect Game'"
+                  disabled={loading}
+                />
+              </div>
+              <Button variant="outline" size="sm" onClick={detectGamePath} disabled={loading}>
+                Detect
+              </Button>
+              <Button variant="outline" size="sm" onClick={selectGamePath} disabled={loading}>
+                <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      User Directory:
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>The FM26 User Directory where saves and settings are stored</p>
+                  </TooltipContent>
+                </Tooltip>
+                <input
+                  type="text"
+                  value={userDirInput}
+                  onChange={(e) => handleUserDirChange(e.target.value)}
+                  onBlur={saveUserDirectory}
+                  onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
+                  className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  placeholder="Auto-detected from system"
+                  disabled={loading}
+                />
+              </div>
+              <Button variant="outline" size="sm" onClick={detectUserDirectory} disabled={loading}>
+                Detect
+              </Button>
+              <Button variant="outline" size="sm" onClick={selectUserDirectory} disabled={loading}>
+                <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-hidden">
+          <Tabs defaultValue="mods" className="h-full flex flex-col">
+            <TabsList className="mx-4 mt-4">
+              <TabsTrigger value="mods">Mods</TabsTrigger>
+              <TabsTrigger value="logs">Logs</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
+              <div className="h-full">
+                {/* Mods List */}
+                <Card className="flex flex-col h-full">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Installed Mods</CardTitle>
+                        <CardDescription>{mods.length} mods installed</CardDescription>
+                      </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button onClick={applyMods} disabled={loading || !config?.target_path}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Apply Mods
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Apply enabled mods to game (creates backup)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 overflow-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">Status</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Version</TableHead>
+                          <TableHead>Author</TableHead>
+                          <TableHead className="w-24">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mods.map((mod) => (
+                          <TableRow
+                            key={mod.id}
+                            className="cursor-pointer hover:bg-muted/50"
+                            onClick={() => {
+                              setSelectedMod(mod);
+                              setModDetailsOpen(true);
+                            }}
+                          >
+                            <TableCell>
+                              <Switch
+                                checked={mod.enabled}
+                                onCheckedChange={(checked: boolean) => {
+                                  void toggleMod(mod.id, checked);
+                                }}
+                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                              />
+                            </TableCell>
+                            <TableCell className="font-medium">{mod.name}</TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                {mod.mod_type}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">{mod.version}</TableCell>
+                            <TableCell className="text-muted-foreground">{mod.author}</TableCell>
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void removeMod(mod.id);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="logs" className="flex-1 overflow-hidden m-4 mt-2">
+              <Card className="h-full flex flex-col">
+                <CardHeader>
+                  <CardTitle>Activity Logs</CardTitle>
+                  <CardDescription>Recent activity and operations</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto">
+                  <div className="font-mono text-xs space-y-1">
+                    {logs.map((log, i) => (
+                      <div key={i} className="text-muted-foreground">
+                        {log}
+                      </div>
+                    ))}
+                    {logs.length === 0 && (
+                      <p className="text-sm text-muted-foreground">No logs yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
+          <div className="text-xs text-muted-foreground font-medium">
+            FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openUrl('https://ko-fi.com/jalco')}
+              className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
+            >
+              <SiKofi className="mr-2 h-4 w-4" />
+              Support on Ko-Fi
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
+              className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
+            >
+              <FaDiscord className="mr-2 h-4 w-4" />
+              Discord
+            </Button>
+          </div>
+        </div>
+
+        {/* Dialogs */}
+        <ModMetadataDialog
+          open={metadataDialogOpen}
+          onOpenChange={setMetadataDialogOpen}
+          sourcePath={pendingImportPath ?? ''}
+          onSubmit={handleMetadataSubmit}
+        />
+
+        <ConflictsDialog
+          open={conflictsDialogOpen}
+          onOpenChange={setConflictsDialogOpen}
+          onDisableMod={handleConflictDisable}
+        />
+
+        <RestorePointsDialog
+          open={restoreDialogOpen}
+          onOpenChange={setRestoreDialogOpen}
+          onRestore={() => {
+            void loadMods();
+            addLog('Restored from backup');
+          }}
+        />
+
+        {/* Mod Details Sheet */}
+        <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
+          <SheetContent className="w-[400px] sm:w-[540px]">
+            <SheetHeader>
+              <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
+              <SheetDescription>
+                {selectedMod ? `Version ${selectedMod.version}` : 'Select a mod to view details'}
+              </SheetDescription>
+            </SheetHeader>
+            {selectedMod && (
+              <div className="mt-6 space-y-4">
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-sm font-medium">Author:</span>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedMod.author || 'Unknown'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-sm font-medium">Type:</span>
+                    <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-sm font-medium">Description:</span>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedMod.description || 'No description available'}
+                    </p>
+                  </div>
+
+                  {selectedMod.license && (
+                    <div>
+                      <span className="text-sm font-medium">License:</span>
+                      <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
+                    </div>
+                  )}
+
+                  {selectedMod.files && selectedMod.files.length > 0 && (
+                    <div>
+                      <span className="text-sm font-medium">
+                        Files ({selectedMod.files.length}):
+                      </span>
+                      <ul className="text-sm text-muted-foreground list-disc list-inside max-h-60 overflow-y-auto">
+                        {selectedMod.files.map((file, i) => (
+                          <li key={i} className="truncate">
+                            {file.source}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-4 space-y-2">
+                  <Button
+                    className="w-full"
+                    variant={selectedMod.enabled ? 'destructive' : 'default'}
+                    onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
+                  >
+                    {selectedMod.enabled ? 'Disable Mod' : 'Enable Mod'}
+                  </Button>
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => removeMod(selectedMod.id)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Remove Mod
+                  </Button>
+                </div>
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
+
+        {/* Settings Sheet */}
+        <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Settings</SheetTitle>
+              <SheetDescription>Configure FMMLoader26 preferences</SheetDescription>
+            </SheetHeader>
+            <div className="mt-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="text-sm font-medium">Dark Mode</div>
+                  <div className="text-sm text-muted-foreground">Toggle dark mode theme</div>
+                </div>
+                <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Application Logs</div>
+                  <div className="text-sm text-muted-foreground">
+                    View application logs for troubleshooting. Logs from the last 10 sessions are
+                    kept.
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={async () => {
+                      try {
+                        await tauriCommands.openLogsFolder();
+                        addLog('Opened logs folder');
+                      } catch (error) {
+                        addLog(`Failed to open logs folder: ${formatError(error)}`);
+                      }
+                    }}
+                  >
+                    <FolderOpen className="mr-2 h-4 w-4" />
+                    Open Logs Folder
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+        <Toaster />
       </div>
     </TooltipProvider>
   );

@@ -1,5 +1,5 @@
-import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useState } from "react";
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import { useState } from 'react';
 
 export function TitleBar() {
   const [isHovered, setIsHovered] = useState(false);
@@ -81,11 +81,9 @@ export function TitleBar() {
       {/* Title - draggable */}
       <div
         data-tauri-drag-region
-        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center pointer-events-auto"
+        className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center cursor-grabbing pointer-events-auto"
       >
-        <div className="text-sm font-medium text-foreground/70">
-          FMMLoader26
-        </div>
+        <div className="text-sm font-medium text-foreground/70 ">FMMLoader26</div>
       </div>
 
       {/* Spacer for balance */}
