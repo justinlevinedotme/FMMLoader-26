@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:debug": "npm run build && tauri build --debug",
+    "build:release": "npm run build && tauri build",
     "preview": "vite preview",
     "tauri": "tauri"
   },

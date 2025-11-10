@@ -38,6 +38,9 @@ import {
   AlertTriangle,
   History,
   Settings,
+  Wrench,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa6';
 import { SiKofi } from 'react-icons/si';
@@ -83,6 +86,11 @@ function App() {
   const [modDetailsOpen, setModDetailsOpen] = useState(false);
   const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
 
+  // FM Name Fix states
+  const [nameFixInstalled, setNameFixInstalled] = useState(false);
+  const [checkingNameFix, setCheckingNameFix] = useState(false);
+  const [installingNameFix, setInstallingNameFix] = useState(false);
+
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs((prev) => [`[${timestamp}] ${message}`, ...prev].slice(0, 100));
@@ -94,6 +102,16 @@ function App() {
       setConfig(cfg);
       setGameTargetInput(cfg.target_path ?? '');
       setUserDirInput(cfg.user_dir_path ?? '');
+
+      // Load dark mode preference
+      const shouldUseDarkMode = cfg.dark_mode ?? false;
+      setDarkMode(shouldUseDarkMode);
+      if (shouldUseDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
       addLog('Configuration loaded');
     } catch (error) {
       addLog(`Error loading config: ${formatError(error)}`);
@@ -375,12 +393,74 @@ function App() {
     }
   };
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    if (!darkMode) {
+  const toggleDarkMode = async () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    if (newDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+
+    // Save dark mode preference to config
+    if (config) {
+      const updatedConfig = { ...config, dark_mode: newDarkMode };
+      try {
+        await tauriCommands.updateConfig(updatedConfig);
+        setConfig(updatedConfig);
+        addLog(`Dark mode ${newDarkMode ? 'enabled' : 'disabled'}`);
+      } catch (error) {
+        addLog(`Error saving dark mode preference: ${formatError(error)}`);
+      }
+    }
+  };
+
+  // FM Name Fix handlers
+  const checkNameFixStatus = async () => {
+    try {
+      setCheckingNameFix(true);
+      addLog('Checking FM Name Fix installation status...');
+      const isInstalled = await tauriCommands.checkNameFixInstalled();
+      setNameFixInstalled(isInstalled);
+      addLog(`FM Name Fix is ${isInstalled ? 'installed' : 'not installed'}`);
+    } catch (error) {
+      addLog(`Error checking FM Name Fix status: ${formatError(error)}`);
+    } finally {
+      setCheckingNameFix(false);
+    }
+  };
+
+  const installNameFix = async () => {
+    try {
+      setInstallingNameFix(true);
+      addLog('Installing FM Name Fix...');
+      const result = await tauriCommands.installNameFix();
+      addLog(result);
+      toast.success('FM Name Fix installed successfully!');
+      setNameFixInstalled(true);
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error installing FM Name Fix: ${errorMsg}`);
+      toast.error(`Failed to install FM Name Fix: ${errorMsg}`);
+    } finally {
+      setInstallingNameFix(false);
+    }
+  };
+
+  const uninstallNameFix = async () => {
+    try {
+      setInstallingNameFix(true);
+      addLog('Uninstalling FM Name Fix...');
+      const result = await tauriCommands.uninstallNameFix();
+      addLog(result);
+      toast.success('FM Name Fix uninstalled successfully!');
+      setNameFixInstalled(false);
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error uninstalling FM Name Fix: ${errorMsg}`);
+      toast.error(`Failed to uninstall FM Name Fix: ${errorMsg}`);
+    } finally {
+      setInstallingNameFix(false);
     }
   };
 
@@ -431,6 +511,15 @@ function App() {
         } catch (error) {
           // Silently fail update check - not critical
           console.error('Failed to check for updates:', error);
+        }
+
+        // Check FM Name Fix installation status
+        try {
+          const isInstalled = await tauriCommands.checkNameFixInstalled();
+          setNameFixInstalled(isInstalled);
+        } catch (error) {
+          // Silently fail - not critical
+          console.error('Failed to check FM Name Fix status:', error);
         }
 
         return () => {
@@ -618,6 +707,7 @@ function App() {
           <Tabs defaultValue="mods" className="h-full flex flex-col">
             <TabsList className="mx-4 mt-4">
               <TabsTrigger value="mods">Mods</TabsTrigger>
+              <TabsTrigger value="utilities">Utilities</TabsTrigger>
               <TabsTrigger value="logs">Logs</TabsTrigger>
             </TabsList>
 
@@ -702,6 +792,117 @@ function App() {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="utilities" className="flex-1 overflow-hidden m-4 mt-2">
+              <Card className="h-full flex flex-col">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wrench className="h-5 w-5" />
+                    FM Utilities
+                  </CardTitle>
+                  <CardDescription>Additional tools and utilities for Football Manager</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto space-y-4">
+                  {/* FM Name Fix */}
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">FM Name Fix</CardTitle>
+                          <CardDescription className="mt-1">
+                            Fixes licensing issues and unlocks real names for clubs, players, and competitions
+                          </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {checkingNameFix ? (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              Checking...
+                            </div>
+                          ) : nameFixInstalled ? (
+                            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Installed
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <XCircle className="h-4 w-4" />
+                              Not installed
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-sm text-muted-foreground space-y-2">
+                        <p><strong>What it does:</strong></p>
+                        <ul className="list-disc list-inside space-y-1 ml-2">
+                          <li>Unlocks real names for clubs like AC Milan, Inter, and Lazio</li>
+                          <li>Fixes Japanese player names</li>
+                          <li>Removes fake/unlicensed content</li>
+                          <li>Works with all leagues and competitions</li>
+                        </ul>
+                        <p className="text-xs mt-2">
+                          Source:{' '}
+                          <a
+                            href="https://github.com/jo13310/NameFixFM26"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              void openUrl('https://github.com/jo13310/NameFixFM26');
+                            }}
+                            className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                          >
+                            github.com/jo13310/NameFixFM26
+                          </a>
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        {!nameFixInstalled ? (
+                          <Button
+                            onClick={() => void installNameFix()}
+                            disabled={installingNameFix || !config?.user_dir_path}
+                          >
+                            {installingNameFix ? (
+                              <>
+                                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                Installing...
+                              </>
+                            ) : (
+                              <>
+                                <Download className="mr-2 h-4 w-4" />
+                                Install Name Fix
+                              </>
+                            )}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="destructive"
+                            onClick={() => void uninstallNameFix()}
+                            disabled={installingNameFix}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Uninstall
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          onClick={() => void checkNameFixStatus()}
+                          disabled={checkingNameFix}
+                        >
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Check Status
+                        </Button>
+                      </div>
+                      {!config?.user_dir_path && (
+                        <p className="text-sm text-amber-600 dark:text-amber-400">
+                          Please set your User Directory first
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="logs" className="flex-1 overflow-hidden m-4 mt-2">

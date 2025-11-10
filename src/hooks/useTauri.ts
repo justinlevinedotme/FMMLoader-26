@@ -36,6 +36,7 @@ export interface Config {
   target_path?: string;
   user_dir_path?: string;
   enabled_mods: string[];
+  dark_mode?: boolean;
 }
 
 export interface ModManifest {
@@ -142,4 +143,11 @@ export const tauriCommands = {
   openLogsFolder: () => safeInvoke<void>("open_logs_folder"),
 
   getLogsPath: () => safeInvoke<string>("get_logs_path"),
+
+  // FM Name Fix commands
+  checkNameFixInstalled: () => safeInvoke<boolean>("check_name_fix_installed"),
+
+  installNameFix: () => safeInvoke<string>("install_name_fix"),
+
+  uninstallNameFix: () => safeInvoke<string>("uninstall_name_fix"),
 };

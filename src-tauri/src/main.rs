@@ -7,6 +7,7 @@ mod game_detection;
 mod import;
 mod logging;
 mod mod_manager;
+mod name_fix;
 mod restore;
 mod types;
 mod updater;
@@ -347,6 +348,22 @@ fn get_logs_path() -> Result<String, String> {
     Ok(logs_dir.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+fn check_name_fix_installed() -> Result<bool, String> {
+    let config = load_config()?;
+    name_fix::check_installed(config.user_dir_path.as_deref())
+}
+
+#[tauri::command]
+fn install_name_fix() -> Result<String, String> {
+    name_fix::install()
+}
+
+#[tauri::command]
+fn uninstall_name_fix() -> Result<String, String> {
+    name_fix::uninstall()
+}
+
 // Helper function for recursive directory copy
 fn copy_dir_recursive(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
     use std::fs;
@@ -415,6 +432,9 @@ fn main() {
             check_updates,
             open_logs_folder,
             get_logs_path,
+            check_name_fix_installed,
+            install_name_fix,
+            uninstall_name_fix,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
