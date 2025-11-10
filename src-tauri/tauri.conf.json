@@ -11,7 +11,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "dmg", "appimage"],
     "icon": ["icons/icon.icns", "icons/icon.ico", "icons/icon.png"],
     "resources": [],
     "externalBin": [],
