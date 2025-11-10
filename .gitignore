@@ -9,7 +9,6 @@ __pycache__/
 
 # Node.js / npm
 node_modules/
-package-lock.json
 
 # Build outputs
 dist/
@@ -19,7 +18,6 @@ FMMLoader26.spec
 
 # Tauri
 src-tauri/target/
-src-tauri/Cargo.lock
 
 # Logs
 *.log
