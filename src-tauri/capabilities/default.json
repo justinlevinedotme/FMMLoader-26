@@ -26,6 +26,7 @@
     "os:allow-platform",
     "os:allow-os-type",
     "process:allow-restart",
-    "process:allow-exit"
+    "process:allow-exit",
+    "core:window:allow-start-dragging"
   ]
 }
