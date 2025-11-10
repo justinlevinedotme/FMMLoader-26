@@ -31,6 +31,11 @@ fn init_app() -> Result<(), String> {
 }
 
 #[tauri::command]
+fn get_app_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
+#[tauri::command]
 fn get_config() -> Result<Config, String> {
     load_config()
 }
@@ -406,6 +411,7 @@ fn main() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             init_app,
+            get_app_version,
             get_config,
             update_config,
             detect_game_path,

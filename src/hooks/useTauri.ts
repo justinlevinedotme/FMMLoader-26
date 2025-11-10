@@ -83,6 +83,8 @@ export interface ModMetadata {
 export const tauriCommands = {
   initApp: () => safeInvoke<void>("init_app"),
 
+  getAppVersion: () => safeInvoke<string>("get_app_version"),
+
   getConfig: () => safeInvoke<Config>("get_config"),
 
   updateConfig: (config: Config) => safeInvoke<void>("update_config", { config }),
