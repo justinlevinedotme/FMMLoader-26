@@ -5,3 +5,5 @@ __pycache__/
 /build/FMMLoader26
 /dist
 FMMLoader26.spec
+/node_modules
+/src-tauri/target
