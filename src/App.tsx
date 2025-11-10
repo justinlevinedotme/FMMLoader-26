@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
-import { open } from "@tauri-apps/plugin-dialog";
-import { open as openUrl } from "@tauri-apps/plugin-shell";
-import { listen } from "@tauri-apps/api/event";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from 'react';
+import { open } from '@tauri-apps/plugin-dialog';
+import { open as openUrl } from '@tauri-apps/plugin-shell';
+import { listen } from '@tauri-apps/api/event';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -19,22 +13,22 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
+} from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 import {
   tauriCommands,
   type Config,
   type ModManifest,
   type ModMetadata,
   type UpdateInfo,
-} from "@/hooks/useTauri";
+} from '@/hooks/useTauri';
 import {
   FolderOpen,
   RefreshCw,
@@ -44,21 +38,16 @@ import {
   AlertTriangle,
   History,
   Settings,
-} from "lucide-react";
-import { FaDiscord } from "react-icons/fa6";
-import { SiKofi } from "react-icons/si";
-import { ModMetadataDialog } from "@/components/ModMetadataDialog";
-import { ConflictsDialog } from "@/components/ConflictsDialog";
-import { RestorePointsDialog } from "@/components/RestorePointsDialog";
-import { UpdateBanner } from "@/components/UpdateBanner";
-import { TitleBar } from "@/components/TitleBar";
-import { Toaster } from "@/components/ui/sonner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from 'lucide-react';
+import { FaDiscord } from 'react-icons/fa6';
+import { SiKofi } from 'react-icons/si';
+import { ModMetadataDialog } from '@/components/ModMetadataDialog';
+import { ConflictsDialog } from '@/components/ConflictsDialog';
+import { RestorePointsDialog } from '@/components/RestorePointsDialog';
+import { UpdateBanner } from '@/components/UpdateBanner';
+import { TitleBar } from '@/components/TitleBar';
+import { Toaster } from '@/components/ui/sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ModWithInfo extends ModManifest {
   id: string;
@@ -82,8 +71,8 @@ function App() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   // Editable path states
-  const [gameTargetInput, setGameTargetInput] = useState("");
-  const [userDirInput, setUserDirInput] = useState("");
+  const [gameTargetInput, setGameTargetInput] = useState('');
+  const [userDirInput, setUserDirInput] = useState('');
   const [darkMode, setDarkMode] = useState(false);
 
   // Dialog states
@@ -92,9 +81,7 @@ function App() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modDetailsOpen, setModDetailsOpen] = useState(false);
-  const [pendingImportPath, setPendingImportPath] = useState<string | null>(
-    null
-  );
+  const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -105,9 +92,9 @@ function App() {
     try {
       const cfg = await tauriCommands.getConfig();
       setConfig(cfg);
-      setGameTargetInput(cfg.target_path ?? "");
-      setUserDirInput(cfg.user_dir_path ?? "");
-      addLog("Configuration loaded");
+      setGameTargetInput(cfg.target_path ?? '');
+      setUserDirInput(cfg.user_dir_path ?? '');
+      addLog('Configuration loaded');
     } catch (error) {
       addLog(`Error loading config: ${formatError(error)}`);
     }
@@ -144,7 +131,7 @@ function App() {
   const detectGamePath = async () => {
     try {
       setLoading(true);
-      addLog("Detecting game path...");
+      addLog('Detecting game path...');
       const paths = await tauriCommands.detectGamePath();
 
       if (paths.length > 0) {
@@ -152,7 +139,7 @@ function App() {
         await loadConfig();
         addLog(`Game path detected: ${paths[0]}`);
       } else {
-        addLog("No game installation found");
+        addLog('No game installation found');
       }
     } catch (error) {
       addLog(`Error detecting game path: ${formatError(error)}`);
@@ -166,7 +153,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 Game Target Folder",
+        title: 'Select FM26 Game Target Folder',
       });
 
       if (selected) {
@@ -184,7 +171,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 User Directory",
+        title: 'Select FM26 User Directory',
       });
 
       if (selected) {
@@ -218,7 +205,7 @@ function App() {
       } catch (error) {
         addLog(`Error updating game target: ${formatError(error)}`);
         // Revert on error
-        setGameTargetInput(config?.target_path ?? "");
+        setGameTargetInput(config?.target_path ?? '');
       }
     }
   };
@@ -236,7 +223,7 @@ function App() {
       } catch (error) {
         addLog(`Error updating user directory: ${formatError(error)}`);
         // Revert on error
-        setUserDirInput(config?.user_dir_path ?? "");
+        setUserDirInput(config?.user_dir_path ?? '');
       }
     }
   };
@@ -259,23 +246,23 @@ function App() {
 
   const applyMods = async () => {
     if (!config?.target_path) {
-      addLog("Please set game target first");
-      toast.warning("Please set game target first");
+      addLog('Please set game target first');
+      toast.warning('Please set game target first');
       return;
     }
 
     try {
       setLoading(true);
-      addLog("Applying mods...");
-      toast.loading("Applying mods...", { id: "apply-mods" });
+      addLog('Applying mods...');
+      toast.loading('Applying mods...', { id: 'apply-mods' });
       const result = await tauriCommands.applyMods();
       addLog(result);
-      addLog("Mods applied successfully");
-      toast.success("Mods applied successfully!", { id: "apply-mods" });
+      addLog('Mods applied successfully');
+      toast.success('Mods applied successfully!', { id: 'apply-mods' });
     } catch (error) {
       addLog(`Error applying mods: ${formatError(error)}`);
       toast.error(`Failed to apply mods: ${formatError(error)}`, {
-        id: "apply-mods",
+        id: 'apply-mods',
       });
     } finally {
       setLoading(false);
@@ -312,8 +299,8 @@ function App() {
         directory: false,
         filters: [
           {
-            name: "Mod Files",
-            extensions: ["zip", "bundle", "fmf"],
+            name: 'Mod Files',
+            extensions: ['zip', 'bundle', 'fmf'],
           },
         ],
       });
@@ -336,11 +323,11 @@ function App() {
     } catch (error) {
       const errorStr = String(error);
 
-      if (errorStr === "NEEDS_METADATA") {
+      if (errorStr === 'NEEDS_METADATA') {
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
-        toast.info("Please provide mod metadata");
+        toast.info('Please provide mod metadata');
       } else {
         addLog(`Import failed: ${formatError(error)}`);
         toast.error(`Import failed: ${formatError(error)}`);
@@ -370,7 +357,7 @@ function App() {
   const detectUserDirectory = async () => {
     try {
       setLoading(true);
-      addLog("Detecting user directory...");
+      addLog('Detecting user directory...');
       const detectedPath = await tauriCommands.detectUserDir();
 
       // Update the config with the detected path
@@ -391,9 +378,9 @@ function App() {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     if (!darkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
   };
 
@@ -406,37 +393,31 @@ function App() {
         await tauriCommands.initApp();
         await loadConfig();
         await loadMods();
-        addLog("FMMLoader26 initialized");
+        addLog('FMMLoader26 initialized');
 
         // Set up Tauri drag and drop event listeners
-        const unlistenDrop = await listen<string[]>(
-          "tauri://file-drop",
-          (event) => {
-            const files = event.payload;
-            if (files && files.length > 0) {
-              void handleImport(files[0]);
-            }
-            setIsDragging(false);
+        const unlistenDrop = await listen<string[]>('tauri://file-drop', (event) => {
+          const files = event.payload;
+          if (files && files.length > 0) {
+            void handleImport(files[0]);
           }
-        );
+          setIsDragging(false);
+        });
 
-        const unlistenDragOver = await listen("tauri://drag-over", () => {
+        const unlistenDragOver = await listen('tauri://drag-over', () => {
           setIsDragging(true);
         });
 
-        const unlistenDragDrop = await listen<{ paths: string[] }>(
-          "tauri://drag-drop",
-          (event) => {
-            // In Tauri v2, drag-drop contains the file paths
-            const paths = event.payload?.paths;
-            if (paths && paths.length > 0) {
-              void handleImport(paths[0]);
-            }
-            setIsDragging(false);
+        const unlistenDragDrop = await listen<{ paths: string[] }>('tauri://drag-drop', (event) => {
+          // In Tauri v2, drag-drop contains the file paths
+          const paths = event.payload?.paths;
+          if (paths && paths.length > 0) {
+            void handleImport(paths[0]);
           }
-        );
+          setIsDragging(false);
+        });
 
-        const unlistenDragLeave = await listen("tauri://drag-leave", () => {
+        const unlistenDragLeave = await listen('tauri://drag-leave', () => {
           setIsDragging(false);
         });
 
@@ -449,7 +430,7 @@ function App() {
           }
         } catch (error) {
           // Silently fail update check - not critical
-          console.error("Failed to check for updates:", error);
+          console.error('Failed to check for updates:', error);
         }
 
         return () => {
@@ -482,10 +463,7 @@ function App() {
 
         {/* Update Banner */}
         {updateInfo && updateInfo.has_update && (
-          <UpdateBanner
-            updateInfo={updateInfo}
-            onDismiss={() => setUpdateInfo(null)}
-          />
+          <UpdateBanner updateInfo={updateInfo} onDismiss={() => setUpdateInfo(null)} />
         )}
 
         {/* File Drop Zone - covers everything below titlebar */}
@@ -507,9 +485,7 @@ function App() {
           <div className="flex items-center justify-between p-4">
             <div>
               <h1 className="text-2xl font-bold">FMMLoader26</h1>
-              <p className="text-sm text-muted-foreground">
-                Football Manager 2026 Mod Manager
-              </p>
+              <p className="text-sm text-muted-foreground">Football Manager 2026 Mod Manager</p>
             </div>
             <div className="flex items-center gap-2">
               <Tooltip>
@@ -561,22 +537,11 @@ function App() {
                 </TooltipContent>
               </Tooltip>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={loadMods}
-                disabled={loading}
-              >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-                />
+              <Button variant="outline" size="sm" onClick={loadMods} disabled={loading}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSettingsOpen(true)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
@@ -593,9 +558,7 @@ function App() {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      The FM26 installation folder containing the .bundle files
-                    </p>
+                    <p>The FM26 installation folder containing the .bundle files</p>
                   </TooltipContent>
                 </Tooltip>
                 <input
@@ -603,26 +566,16 @@ function App() {
                   value={gameTargetInput}
                   onChange={(e) => handleGameTargetChange(e.target.value)}
                   onBlur={saveGameTarget}
-                  onKeyDown={(e) => e.key === "Enter" && saveGameTarget()}
+                  onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
                   className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   placeholder="Not set - click 'Select' or 'Detect Game'"
                   disabled={loading}
                 />
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={detectGamePath}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={detectGamePath} disabled={loading}>
                 Detect
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={selectGamePath}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={selectGamePath} disabled={loading}>
                 <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
               </Button>
             </div>
@@ -636,10 +589,7 @@ function App() {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      The FM26 User Directory where saves and settings are
-                      stored
-                    </p>
+                    <p>The FM26 User Directory where saves and settings are stored</p>
                   </TooltipContent>
                 </Tooltip>
                 <input
@@ -647,26 +597,16 @@ function App() {
                   value={userDirInput}
                   onChange={(e) => handleUserDirChange(e.target.value)}
                   onBlur={saveUserDirectory}
-                  onKeyDown={(e) => e.key === "Enter" && saveUserDirectory()}
+                  onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
                   className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   placeholder="Auto-detected from system"
                   disabled={loading}
                 />
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={detectUserDirectory}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={detectUserDirectory} disabled={loading}>
                 Detect
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={selectUserDirectory}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={selectUserDirectory} disabled={loading}>
                 <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
               </Button>
             </div>
@@ -681,10 +621,7 @@ function App() {
               <TabsTrigger value="logs">Logs</TabsTrigger>
             </TabsList>
 
-            <TabsContent
-              value="mods"
-              className="flex-1 overflow-hidden m-4 mt-2"
-            >
+            <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
               <div className="h-full">
                 {/* Mods List */}
                 <Card className="flex flex-col h-full">
@@ -692,16 +629,11 @@ function App() {
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle>Installed Mods</CardTitle>
-                        <CardDescription>
-                          {mods.length} mods installed
-                        </CardDescription>
+                        <CardDescription>{mods.length} mods installed</CardDescription>
                       </div>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            onClick={applyMods}
-                            disabled={loading || !config?.target_path}
-                          >
+                          <Button onClick={applyMods} disabled={loading || !config?.target_path}>
                             <Download className="mr-2 h-4 w-4" />
                             Apply Mods
                           </Button>
@@ -740,25 +672,17 @@ function App() {
                                 onCheckedChange={(checked: boolean) => {
                                   void toggleMod(mod.id, checked);
                                 }}
-                                onClick={(e: React.MouseEvent) =>
-                                  e.stopPropagation()
-                                }
+                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
                               />
                             </TableCell>
-                            <TableCell className="font-medium">
-                              {mod.name}
-                            </TableCell>
+                            <TableCell className="font-medium">{mod.name}</TableCell>
                             <TableCell>
                               <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                 {mod.mod_type}
                               </span>
                             </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {mod.version}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {mod.author}
-                            </TableCell>
+                            <TableCell className="text-muted-foreground">{mod.version}</TableCell>
+                            <TableCell className="text-muted-foreground">{mod.author}</TableCell>
                             <TableCell>
                               <Button
                                 variant="ghost"
@@ -780,16 +704,11 @@ function App() {
               </div>
             </TabsContent>
 
-            <TabsContent
-              value="logs"
-              className="flex-1 overflow-hidden m-4 mt-2"
-            >
+            <TabsContent value="logs" className="flex-1 overflow-hidden m-4 mt-2">
               <Card className="h-full flex flex-col">
                 <CardHeader>
                   <CardTitle>Activity Logs</CardTitle>
-                  <CardDescription>
-                    Recent activity and operations
-                  </CardDescription>
+                  <CardDescription>Recent activity and operations</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto">
                   <div className="font-mono text-xs space-y-1">
@@ -799,9 +718,7 @@ function App() {
                       </div>
                     ))}
                     {logs.length === 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        No logs yet
-                      </p>
+                      <p className="text-sm text-muted-foreground">No logs yet</p>
                     )}
                   </div>
                 </CardContent>
@@ -813,13 +730,13 @@ function App() {
         {/* Footer */}
         <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
           <div className="text-xs text-muted-foreground font-medium">
-            FMMLoader26 v1.0| Created by JALCO / Justin Levine
+            FMMLoader26 v0.1.0 | Created by JALCO / Justin Levine
           </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => openUrl("https://ko-fi.com/jalco")}
+              onClick={() => openUrl('https://ko-fi.com/jalco')}
               className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
             >
               <SiKofi className="mr-2 h-4 w-4" />
@@ -828,7 +745,7 @@ function App() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => openUrl("https://discord.gg/AspRvTTAch")}
+              onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
               className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
             >
               <FaDiscord className="mr-2 h-4 w-4" />
@@ -841,7 +758,7 @@ function App() {
         <ModMetadataDialog
           open={metadataDialogOpen}
           onOpenChange={setMetadataDialogOpen}
-          sourcePath={pendingImportPath ?? ""}
+          sourcePath={pendingImportPath ?? ''}
           onSubmit={handleMetadataSubmit}
         />
 
@@ -856,7 +773,7 @@ function App() {
           onOpenChange={setRestoreDialogOpen}
           onRestore={() => {
             void loadMods();
-            addLog("Restored from backup");
+            addLog('Restored from backup');
           }}
         />
 
@@ -864,11 +781,9 @@ function App() {
         <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
           <SheetContent className="w-[400px] sm:w-[540px]">
             <SheetHeader>
-              <SheetTitle>{selectedMod?.name ?? "Mod Details"}</SheetTitle>
+              <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
               <SheetDescription>
-                {selectedMod
-                  ? `Version ${selectedMod.version}`
-                  : "Select a mod to view details"}
+                {selectedMod ? `Version ${selectedMod.version}` : 'Select a mod to view details'}
               </SheetDescription>
             </SheetHeader>
             {selectedMod && (
@@ -877,30 +792,26 @@ function App() {
                   <div>
                     <span className="text-sm font-medium">Author:</span>
                     <p className="text-sm text-muted-foreground">
-                      {selectedMod.author || "Unknown"}
+                      {selectedMod.author || 'Unknown'}
                     </p>
                   </div>
 
                   <div>
                     <span className="text-sm font-medium">Type:</span>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedMod.mod_type}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
                   </div>
 
                   <div>
                     <span className="text-sm font-medium">Description:</span>
                     <p className="text-sm text-muted-foreground">
-                      {selectedMod.description || "No description available"}
+                      {selectedMod.description || 'No description available'}
                     </p>
                   </div>
 
                   {selectedMod.license && (
                     <div>
                       <span className="text-sm font-medium">License:</span>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedMod.license}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
                     </div>
                   )}
 
@@ -923,12 +834,10 @@ function App() {
                 <div className="pt-4 space-y-2">
                   <Button
                     className="w-full"
-                    variant={selectedMod.enabled ? "destructive" : "default"}
-                    onClick={() =>
-                      toggleMod(selectedMod.id, !selectedMod.enabled)
-                    }
+                    variant={selectedMod.enabled ? 'destructive' : 'default'}
+                    onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
                   >
-                    {selectedMod.enabled ? "Disable Mod" : "Enable Mod"}
+                    {selectedMod.enabled ? 'Disable Mod' : 'Enable Mod'}
                   </Button>
                   <Button
                     className="w-full"
@@ -949,17 +858,13 @@ function App() {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Settings</SheetTitle>
-              <SheetDescription>
-                Configure FMMLoader26 preferences
-              </SheetDescription>
+              <SheetDescription>Configure FMMLoader26 preferences</SheetDescription>
             </SheetHeader>
             <div className="mt-6 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-sm font-medium">Dark Mode</div>
-                  <div className="text-sm text-muted-foreground">
-                    Toggle dark mode theme
-                  </div>
+                  <div className="text-sm text-muted-foreground">Toggle dark mode theme</div>
                 </div>
                 <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
               </div>
@@ -968,8 +873,8 @@ function App() {
                 <div className="space-y-2">
                   <div className="text-sm font-medium">Application Logs</div>
                   <div className="text-sm text-muted-foreground">
-                    View application logs for troubleshooting. Logs from the
-                    last 10 sessions are kept.
+                    View application logs for troubleshooting. Logs from the last 10 sessions are
+                    kept.
                   </div>
                   <Button
                     variant="outline"
@@ -977,11 +882,9 @@ function App() {
                     onClick={async () => {
                       try {
                         await tauriCommands.openLogsFolder();
-                        addLog("Opened logs folder");
+                        addLog('Opened logs folder');
                       } catch (error) {
-                        addLog(
-                          `Failed to open logs folder: ${formatError(error)}`
-                        );
+                        addLog(`Failed to open logs folder: ${formatError(error)}`);
                       }
                     }}
                   >

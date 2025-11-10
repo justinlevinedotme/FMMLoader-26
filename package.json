@@ -1,6 +1,6 @@
 {
   "name": "fmmloader26",
-  "version": "1.0",
+  "version": "0.1.0",
   "description": "A mod manager for Football Manager 2026",
   "type": "module",
   "scripts": {
