@@ -1,0 +1,27 @@
+# Rust formatting configuration
+# See: https://rust-lang.github.io/rustfmt/
+
+edition = "2021"
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+newline_style = "Unix"
+
+# Import organization
+imports_granularity = "Crate"
+group_imports = "StdExternalCrate"
+reorder_imports = true
+
+# Code style
+use_small_heuristics = "Default"
+fn_args_layout = "Tall"
+match_block_trailing_comma = true
+trailing_comma = "Vertical"
+trailing_semicolon = true
+
+# Documentation
+format_code_in_doc_comments = true
+wrap_comments = false
+
+# Strings
+format_strings = true

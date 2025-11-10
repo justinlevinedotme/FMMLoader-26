@@ -34,3 +34,22 @@ hostname = "0.3"
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
+
+[lints.clippy]
+# Pedantic lints for better code quality
+pedantic = "warn"
+# Specific allows for pedantic lints that might be too strict
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+
+# Deny common mistakes
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+todo = "warn"
+unimplemented = "warn"
+
+# Nursery lints (experimental but useful)
+nursery = "warn"

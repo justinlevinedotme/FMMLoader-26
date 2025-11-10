@@ -7,7 +7,17 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "lint": "npm run lint:js && npm run lint:rust",
+    "lint:js": "eslint . --max-warnings 0",
+    "lint:js:fix": "eslint . --fix",
+    "lint:rust": "cd src-tauri && cargo clippy --all-targets --all-features -- -D warnings",
+    "format": "npm run format:js && npm run format:rust",
+    "format:js": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.{js,ts,json,md}\"",
+    "format:rust": "cd src-tauri && cargo fmt",
+    "format:check": "npm run format:check:js && npm run format:check:rust",
+    "format:check:js": "prettier --check \"src/**/*.{ts,tsx,css}\" \"*.{js,ts,json,md}\"",
+    "format:check:rust": "cd src-tauri && cargo fmt -- --check"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -34,14 +44,24 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@tauri-apps/cli": "^2.0.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "postcss": "^8.4.47",
+    "prettier": "^3.6.2",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",
+    "typescript-eslint": "^8.46.3",
     "vite": "^5.4.8"
   }
 }
