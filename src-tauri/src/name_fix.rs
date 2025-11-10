@@ -49,61 +49,127 @@ const FILES_TO_DELETE: &[(&str, &[&str])] = &[
     ]),
 ];
 
-/// Get the FM26 database directory based on user_dir_path
-fn get_db_dir(user_dir_path: Option<&str>) -> Result<PathBuf, String> {
-    let user_dir = if let Some(path) = user_dir_path {
-        PathBuf::from(path)
-    } else {
-        #[cfg(target_os = "windows")]
-        {
-            let home = dirs::home_dir()
-                .ok_or("Could not determine home directory")?;
-            home.join("Documents")
-                .join("Sports Interactive")
-                .join("Football Manager 26")
-        }
+/// Get the FM26 database directory based on game installation path (target_path)
+///
+/// The database directory structure differs by platform:
+/// - Windows: <game_root>/shared/data/database/db/2600/
+/// - macOS: <game_root>/fm.app/Contents/PlugIns/game_plugin.bundle/Contents/Resources/shared/data/database/db/2600/
+/// - Linux: <game_root>/shared/data/database/db/2600/
+fn get_db_dir(target_path: Option<&str>) -> Result<PathBuf, String> {
+    let target_path = target_path.ok_or(
+        "Game target path not set. Please detect or set your FM26 game directory first."
+    )?;
 
-        #[cfg(target_os = "macos")]
-        {
-            let home = dirs::home_dir()
-                .ok_or("Could not determine home directory")?;
-            home.join("Library")
-                .join("Application Support")
-                .join("Sports Interactive")
-                .join("Football Manager 26")
-        }
+    let game_target = PathBuf::from(target_path);
 
-        #[cfg(target_os = "linux")]
-        {
-            let home = dirs::home_dir()
-                .ok_or("Could not determine home directory")?;
-            home.join(".local")
-                .join("share")
-                .join("Sports Interactive")
-                .join("Football Manager 26")
-        }
-    };
-
-    let db_dir = user_dir
-        .join("shared")
-        .join("data")
-        .join("database")
-        .join("db")
-        .join("2600");
-
-    if !db_dir.exists() {
+    if !game_target.exists() {
         return Err(format!(
-            "FM26 database directory not found at: {}. Please ensure FM26 is installed and you've launched it at least once.",
-            db_dir.display()
+            "Game target path does not exist: {}",
+            game_target.display()
         ));
     }
 
-    Ok(db_dir)
+    // The target_path points to StreamingAssets (e.g., fm_Data/StreamingAssets/aa/StandaloneWindows64)
+    // We need to navigate to the database directory from there
+
+    #[cfg(target_os = "windows")]
+    {
+        // From: Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneWindows64
+        // To:   Football Manager 26/shared/data/database/db/2600
+        // Navigate up to game root, then to shared/data/database/db/2600
+
+        let game_root = game_target
+            .parent() // aa
+            .and_then(|p| p.parent()) // StreamingAssets
+            .and_then(|p| p.parent()) // fm_Data or data
+            .and_then(|p| p.parent()) // Football Manager 26
+            .ok_or("Could not determine game root directory")?;
+
+        let db_dir = game_root
+            .join("shared")
+            .join("data")
+            .join("database")
+            .join("db")
+            .join("2600");
+
+        if !db_dir.exists() {
+            return Err(format!(
+                "FM26 database directory not found at: {}. Please ensure FM26 is installed and you've launched it at least once.",
+                db_dir.display()
+            ));
+        }
+
+        Ok(db_dir)
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // From: Football Manager 26/fm.app/Contents/Resources/Data/StreamingAssets/aa/StandaloneOSX
+        // To:   Football Manager 26/fm.app/Contents/PlugIns/game_plugin.bundle/Contents/Resources/shared/data/database/db/2600
+
+        // Navigate up to fm.app/Contents
+        let fm_app_contents = game_target
+            .parent() // aa
+            .and_then(|p| p.parent()) // StreamingAssets
+            .and_then(|p| p.parent()) // Data
+            .and_then(|p| p.parent()) // Resources
+            .and_then(|p| p.parent()) // Contents
+            .ok_or("Could not determine fm.app/Contents directory")?;
+
+        let db_dir = fm_app_contents
+            .join("PlugIns")
+            .join("game_plugin.bundle")
+            .join("Contents")
+            .join("Resources")
+            .join("shared")
+            .join("data")
+            .join("database")
+            .join("db")
+            .join("2600");
+
+        if !db_dir.exists() {
+            return Err(format!(
+                "FM26 database directory not found at: {}. Please ensure FM26 is installed and you've launched it at least once.",
+                db_dir.display()
+            ));
+        }
+
+        Ok(db_dir)
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        // From: Football Manager 26/fm_Data/StreamingAssets/aa/StandaloneLinux64
+        // To:   Football Manager 26/shared/data/database/db/2600
+
+        let game_root = game_target
+            .parent() // aa
+            .and_then(|p| p.parent()) // StreamingAssets
+            .and_then(|p| p.parent()) // fm_Data or data
+            .and_then(|p| p.parent()) // Football Manager 26
+            .ok_or("Could not determine game root directory")?;
+
+        let db_dir = game_root
+            .join("shared")
+            .join("data")
+            .join("database")
+            .join("db")
+            .join("2600");
+
+        if !db_dir.exists() {
+            return Err(format!(
+                "FM26 database directory not found at: {}. Please ensure FM26 is installed and you've launched it at least once.",
+                db_dir.display()
+            ));
+        }
+
+        Ok(db_dir)
+    }
 }
 
 /// Check if FM Name Fix is installed
-pub fn check_installed(user_dir_path: Option<&str>) -> Result<bool, String> {
-    let db_dir = get_db_dir(user_dir_path)?;
+pub fn check_installed(target_path: Option<&str>) -> Result<bool, String> {
+    let db_dir = get_db_dir(target_path)?;
     let lnc_file = db_dir.join("lnc").join("all").join(NAME_FIX_FILE);
 
     Ok(lnc_file.exists())
@@ -266,7 +332,7 @@ fn delete_licensing_files(db_dir: &Path) -> Result<(), String> {
 /// Install FM Name Fix
 pub fn install() -> Result<String, String> {
     let config = load_config()?;
-    let db_dir = get_db_dir(config.user_dir_path.as_deref())?;
+    let db_dir = get_db_dir(config.target_path.as_deref())?;
 
     tracing::info!("Starting FM Name Fix installation");
 
@@ -311,7 +377,7 @@ pub fn install() -> Result<String, String> {
 /// Uninstall FM Name Fix
 pub fn uninstall() -> Result<String, String> {
     let config = load_config()?;
-    let db_dir = get_db_dir(config.user_dir_path.as_deref())?;
+    let db_dir = get_db_dir(config.target_path.as_deref())?;
 
     tracing::info!("Starting FM Name Fix uninstallation");
 

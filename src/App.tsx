@@ -861,7 +861,7 @@ function App() {
                         {!nameFixInstalled ? (
                           <Button
                             onClick={() => void installNameFix()}
-                            disabled={installingNameFix || !config?.user_dir_path}
+                            disabled={installingNameFix || !config?.target_path}
                           >
                             {installingNameFix ? (
                               <>
@@ -894,9 +894,9 @@ function App() {
                           Check Status
                         </Button>
                       </div>
-                      {!config?.user_dir_path && (
+                      {!config?.target_path && (
                         <p className="text-sm text-amber-600 dark:text-amber-400">
-                          Please set your User Directory first
+                          Please set your Game Directory first
                         </p>
                       )}
                     </CardContent>

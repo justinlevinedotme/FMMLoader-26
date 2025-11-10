@@ -351,7 +351,7 @@ fn get_logs_path() -> Result<String, String> {
 #[tauri::command]
 fn check_name_fix_installed() -> Result<bool, String> {
     let config = load_config()?;
-    name_fix::check_installed(config.user_dir_path.as_deref())
+    name_fix::check_installed(config.target_path.as_deref())
 }
 
 #[tauri::command]
