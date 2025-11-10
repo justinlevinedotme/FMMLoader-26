@@ -1,9 +1,0 @@
-{
-  "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "tauri-apps.tauri-vscode",
-    "bradlc.vscode-tailwindcss",
-    "editorconfig.editorconfig"
-  ]
-}

@@ -30,17 +30,11 @@ logs/
 .env.local
 
 # IDE
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
+.vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# Linting/Formatting cache
-.eslintcache
-.prettierccache
 
 # Backup
 src-old/

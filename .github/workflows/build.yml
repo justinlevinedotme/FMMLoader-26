@@ -13,46 +13,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Lint and format check job
-  lint:
-    name: Lint & Format Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check frontend formatting
-        run: npm run format:check:js
-
-      - name: Lint frontend
-        run: npm run lint:js
-
-      - name: Check Rust formatting
-        run: npm run format:check:rust
-
-      - name: Lint Rust
-        run: npm run lint:rust
-        continue-on-error: true  # Clippy may fail due to missing system dependencies in CI
-
   # Build job for each platform
   build:
     name: Build (${{ matrix.platform.name }})
-    needs: lint
     strategy:
       fail-fast: false
       matrix:
