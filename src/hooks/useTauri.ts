@@ -80,13 +80,6 @@ export interface ModMetadata {
   description?: string;
 }
 
-export interface UpdateInfo {
-  has_update: boolean;
-  current_version: string;
-  latest_version: string;
-  download_url: string;
-}
-
 export const tauriCommands = {
   initApp: () => safeInvoke<void>("init_app"),
 
@@ -137,8 +130,6 @@ export const tauriCommands = {
 
   createBackupPoint: (name: string) =>
     safeInvoke<string>("create_backup_point", { name }),
-
-  checkUpdates: () => safeInvoke<UpdateInfo>("check_updates"),
 
   openLogsFolder: () => safeInvoke<void>("open_logs_folder"),
 

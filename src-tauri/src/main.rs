@@ -10,7 +10,6 @@ mod mod_manager;
 mod name_fix;
 mod restore;
 mod types;
-mod updater;
 
 use config::{get_mods_dir, init_storage, load_config, save_config};
 use conflicts::find_conflicts;
@@ -19,7 +18,6 @@ use import::{auto_detect_mod_type, extract_zip, find_mod_root, generate_manifest
 use mod_manager::{cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods};
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
 use types::{Config, ConflictInfo, ModManifest, RestorePoint};
-use updater::{check_for_updates, UpdateInfo};
 use std::path::PathBuf;
 
 #[tauri::command]
@@ -306,11 +304,6 @@ fn create_backup_point(name: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn check_updates() -> Result<UpdateInfo, String> {
-    check_for_updates()
-}
-
-#[tauri::command]
 fn open_logs_folder() -> Result<(), String> {
     let logs_dir = logging::get_logs_dir();
     tracing::info!("Opening logs folder: {:?}", logs_dir);
@@ -410,6 +403,7 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             init_app,
             get_config,
@@ -429,7 +423,6 @@ fn main() {
             get_restore_points,
             restore_from_point,
             create_backup_point,
-            check_updates,
             open_logs_folder,
             get_logs_path,
             check_name_fix_installed,

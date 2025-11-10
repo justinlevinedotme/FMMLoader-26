@@ -27,7 +27,6 @@ import {
   type Config,
   type ModManifest,
   type ModMetadata,
-  type UpdateInfo,
 } from '@/hooks/useTauri';
 import {
   FolderOpen,
@@ -47,7 +46,6 @@ import { SiKofi } from 'react-icons/si';
 import { ModMetadataDialog } from '@/components/ModMetadataDialog';
 import { ConflictsDialog } from '@/components/ConflictsDialog';
 import { RestorePointsDialog } from '@/components/RestorePointsDialog';
-import { UpdateBanner } from '@/components/UpdateBanner';
 import { TitleBar } from '@/components/TitleBar';
 import { Toaster } from '@/components/ui/sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -71,7 +69,6 @@ function App() {
   const [selectedMod, setSelectedMod] = useState<ModWithInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
-  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   // Editable path states
   const [gameTargetInput, setGameTargetInput] = useState('');
@@ -501,18 +498,6 @@ function App() {
           setIsDragging(false);
         });
 
-        // Check for updates
-        try {
-          const updates = await tauriCommands.checkUpdates();
-          setUpdateInfo(updates);
-          if (updates.has_update) {
-            addLog(`Update available: ${updates.latest_version}`);
-          }
-        } catch (error) {
-          // Silently fail update check - not critical
-          console.error('Failed to check for updates:', error);
-        }
-
         // Check FM Name Fix installation status
         try {
           const isInstalled = await tauriCommands.checkNameFixInstalled();
@@ -549,11 +534,6 @@ function App() {
       <div className="h-screen flex flex-col bg-background">
         {/* Custom TitleBar */}
         <TitleBar />
-
-        {/* Update Banner */}
-        {updateInfo && updateInfo.has_update && (
-          <UpdateBanner updateInfo={updateInfo} onDismiss={() => setUpdateInfo(null)} />
-        )}
 
         {/* File Drop Zone - covers everything below titlebar */}
         {/* This invisible overlay catches file drops without blocking interactions */}

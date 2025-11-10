@@ -58,5 +58,17 @@
       "csp": null
     }
   },
-  "plugins": {}
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json"
+      ],
+      "dialog": true,
+      "pubkey": "",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
 }
