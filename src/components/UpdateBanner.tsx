@@ -1,55 +1,84 @@
-import { useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Download, X } from 'lucide-react';
-import { open as openUrl } from '@tauri-apps/plugin-shell';
-import type { UpdateInfo } from '@/hooks/useTauri';
+import { Button } from "@/components/ui/button";
+import { RefreshCw, Download, AlertTriangle } from "lucide-react";
+import { useUpdater } from "@/hooks/useUpdater";
 
-interface UpdateBannerProps {
-  updateInfo: UpdateInfo;
-  onDismiss: () => void;
-}
+export function UpdateBanner() {
+  const { status, downloadAndInstall } = useUpdater();
 
-export function UpdateBanner({ updateInfo, onDismiss }: UpdateBannerProps) {
-  const [dismissed, setDismissed] = useState(false);
-
-  if (dismissed || !updateInfo.has_update) {
+  // Don't show banner if no update is available, still checking, or there's an error
+  if (!status.available || status.checking) {
     return null;
   }
 
-  const handleDownload = async () => {
-    try {
-      await openUrl(updateInfo.download_url);
-    } catch (error) {
-      console.error('Failed to open download URL:', error);
-    }
-  };
-
-  const handleDismiss = () => {
-    setDismissed(true);
-    onDismiss();
-  };
-
   return (
-    <div className="mx-4 mt-4 pt-10 ">
-      <Alert className="relative">
-        <Download className="h-4 w-4" />
-        <AlertTitle>Update Available</AlertTitle>
-        <AlertDescription className="flex items-center justify-between">
-          <span>
-            Version {updateInfo.latest_version} is now available! You&apos;re currently running{' '}
-            {updateInfo.current_version}.
-          </span>
-          <div className="flex items-center gap-2 ml-4">
-            <Button size="sm" onClick={handleDownload}>
-              Download
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleDismiss} className="h-6 w-6">
-              <X className="h-4 w-4" />
-            </Button>
+    <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+      <div className="flex items-center gap-3 flex-1">
+        <Download className="h-5 w-5 flex-shrink-0" />
+        <div className="flex-1">
+          <p className="font-medium">
+            Update Available: v{status.latestVersion}
+          </p>
+          <p className="text-sm text-blue-100">
+            A new version is ready to install
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        {status.downloading && (
+          <div className="flex items-center gap-2 mr-4">
+            <div className="text-sm">
+              Downloading: {status.downloadProgress}%
+            </div>
+            <div className="w-32 h-2 bg-blue-800/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-white transition-all duration-300"
+                style={{ width: `${status.downloadProgress}%` }}
+              />
+            </div>
           </div>
-        </AlertDescription>
-      </Alert>
+        )}
+
+        {status.installing && (
+          <div className="flex items-center gap-2 text-sm mr-4">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            Installing...
+          </div>
+        )}
+
+        {status.error && (
+          <div className="flex items-center gap-2 text-sm text-red-200 mr-4">
+            <AlertTriangle className="h-4 w-4" />
+            {status.error}
+          </div>
+        )}
+
+        {!status.downloading && !status.installing && (
+          <Button
+            onClick={() => downloadAndInstall()}
+            disabled={status.downloading || status.installing}
+            variant="secondary"
+            size="sm"
+          >
+            {status.downloading ? (
+              <>
+                <Download className="mr-2 h-4 w-4 animate-spin" />
+                Downloading...
+              </>
+            ) : status.installing ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Installing...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Update Now
+              </>
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

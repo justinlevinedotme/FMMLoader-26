@@ -50,6 +50,8 @@ pub struct Config {
     pub user_dir_path: Option<String>,
     #[serde(default)]
     pub enabled_mods: Vec<String>,
+    #[serde(default)]
+    pub dark_mode: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

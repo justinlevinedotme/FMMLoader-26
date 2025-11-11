@@ -65,6 +65,7 @@ pub fn load_config() -> Result<Config, String> {
             target_path: None,
             user_dir_path: None,
             enabled_mods: Vec::new(),
+            dark_mode: false,
         });
     }
 

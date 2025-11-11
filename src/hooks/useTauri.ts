@@ -36,6 +36,7 @@ export interface Config {
   target_path?: string;
   user_dir_path?: string;
   enabled_mods: string[];
+  dark_mode?: boolean;
 }
 
 export interface ModManifest {
@@ -79,15 +80,10 @@ export interface ModMetadata {
   description?: string;
 }
 
-export interface UpdateInfo {
-  has_update: boolean;
-  current_version: string;
-  latest_version: string;
-  download_url: string;
-}
-
 export const tauriCommands = {
   initApp: () => safeInvoke<void>("init_app"),
+
+  getAppVersion: () => safeInvoke<string>("get_app_version"),
 
   getConfig: () => safeInvoke<Config>("get_config"),
 
@@ -137,9 +133,14 @@ export const tauriCommands = {
   createBackupPoint: (name: string) =>
     safeInvoke<string>("create_backup_point", { name }),
 
-  checkUpdates: () => safeInvoke<UpdateInfo>("check_updates"),
-
   openLogsFolder: () => safeInvoke<void>("open_logs_folder"),
 
   getLogsPath: () => safeInvoke<string>("get_logs_path"),
+
+  // FM Name Fix commands
+  checkNameFixInstalled: () => safeInvoke<boolean>("check_name_fix_installed"),
+
+  installNameFix: () => safeInvoke<string>("install_name_fix"),
+
+  uninstallNameFix: () => safeInvoke<string>("uninstall_name_fix"),
 };
