@@ -402,13 +402,25 @@ fn main() {
 
     tracing::info!("Starting FMMLoader26");
 
+    let app_version = env!("CARGO_PKG_VERSION");
+    tracing::info!("Application version: {}", app_version);
+    tracing::info!("Updater endpoint: https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin({
+            tracing::info!("Initializing updater plugin");
+            tauri_plugin_updater::Builder::new().build()
+        })
+        .setup(|app| {
+            tracing::info!("Tauri app setup complete");
+            tracing::info!("Updater is active and will check for updates");
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             init_app,
             get_app_version,

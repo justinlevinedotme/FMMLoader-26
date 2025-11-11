@@ -54,6 +54,7 @@ import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
 import { TitleBar } from "@/components/TitleBar";
 import { Toaster } from "@/components/ui/sonner";
+import { UpdaterCard } from "@/components/UpdaterCard";
 import {
   Tooltip,
   TooltipContent,
@@ -981,6 +982,9 @@ function App() {
                       )}
                     </CardContent>
                   </Card>
+
+                  {/* App Updater */}
+                  <UpdaterCard />
                 </CardContent>
               </Card>
             </TabsContent>
