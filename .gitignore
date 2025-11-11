@@ -17,7 +17,7 @@ build/
 FMMLoader26.spec
 
 # Tauri
-src-tauri/target/
+src-tauri/target */
 
 # Logs
 *.log
@@ -40,3 +40,6 @@ src-tauri/gen/schemas/acl-manifests.json
 src-tauri/gen/schemas/capabilities.json
 src-tauri/gen/schemas/desktop-schema.json
 src-tauri/gen/schemas/macOS-schema.json
+/src-tauri/target 2
+/src-tauri/target 3
+/src-tauri/target

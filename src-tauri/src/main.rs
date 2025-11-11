@@ -7,9 +7,9 @@ mod game_detection;
 mod import;
 mod logging;
 mod mod_manager;
+mod name_fix;
 mod restore;
 mod types;
-mod updater;
 
 use config::{get_mods_dir, init_storage, load_config, save_config};
 use conflicts::find_conflicts;
@@ -18,7 +18,6 @@ use import::{auto_detect_mod_type, extract_zip, find_mod_root, generate_manifest
 use mod_manager::{cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods};
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
 use types::{Config, ConflictInfo, ModManifest, RestorePoint};
-use updater::{check_for_updates, UpdateInfo};
 use std::path::PathBuf;
 
 #[tauri::command]
@@ -29,6 +28,11 @@ fn init_app() -> Result<(), String> {
     cleanup_old_restore_points(10)?;
     tracing::info!("Application initialized successfully");
     Ok(())
+}
+
+#[tauri::command]
+fn get_app_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
 }
 
 #[tauri::command]
@@ -305,11 +309,6 @@ fn create_backup_point(name: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn check_updates() -> Result<UpdateInfo, String> {
-    check_for_updates()
-}
-
-#[tauri::command]
 fn open_logs_folder() -> Result<(), String> {
     let logs_dir = logging::get_logs_dir();
     tracing::info!("Opening logs folder: {:?}", logs_dir);
@@ -345,6 +344,22 @@ fn open_logs_folder() -> Result<(), String> {
 fn get_logs_path() -> Result<String, String> {
     let logs_dir = logging::get_logs_dir();
     Ok(logs_dir.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn check_name_fix_installed() -> Result<bool, String> {
+    let config = load_config()?;
+    name_fix::check_installed(config.target_path.as_deref())
+}
+
+#[tauri::command]
+fn install_name_fix() -> Result<String, String> {
+    name_fix::install()
+}
+
+#[tauri::command]
+fn uninstall_name_fix() -> Result<String, String> {
+    name_fix::uninstall()
 }
 
 // Helper function for recursive directory copy
@@ -387,22 +402,9 @@ fn main() {
 
     tracing::info!("Starting FMMLoader26");
 
-    let mut updater_builder = tauri_plugin_updater::Builder::new();
-
-    match std::env::var("TAURI_UPDATER_PUBKEY") {
-        Ok(value) if !value.trim().is_empty() => {
-            updater_builder = updater_builder.pubkey(value);
-        }
-        Ok(_) => {
-            tracing::warn!("TAURI_UPDATER_PUBKEY is set but empty; updater signatures cannot be verified");
-        }
-        Err(std::env::VarError::NotPresent) => {
-            tracing::warn!("TAURI_UPDATER_PUBKEY not set; updater signatures cannot be verified");
-        }
-        Err(err) => {
-            tracing::error!(?err, "Failed to read TAURI_UPDATER_PUBKEY; updater signatures cannot be verified");
-        }
-    }
+    let app_version = env!("CARGO_PKG_VERSION");
+    tracing::info!("Application version: {}", app_version);
+    tracing::info!("Updater endpoint: https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json");
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -410,9 +412,10 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(updater_builder.build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             init_app,
+            get_app_version,
             get_config,
             update_config,
             detect_game_path,
@@ -430,9 +433,11 @@ fn main() {
             get_restore_points,
             restore_from_point,
             create_backup_point,
-            check_updates,
             open_logs_folder,
             get_logs_path,
+            check_name_fix_installed,
+            install_name_fix,
+            uninstall_name_fix,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

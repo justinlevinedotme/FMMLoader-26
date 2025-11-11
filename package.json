@@ -1,11 +1,13 @@
 {
   "name": "fmmloader26",
-  "version": "0.1.0",
+  "version": "1.0.4",
   "description": "A mod manager for Football Manager 2026",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:debug": "npm run build && tauri build --debug",
+    "build:release": "npm run build && tauri build",
     "preview": "vite preview",
     "tauri": "tauri"
   },
@@ -24,6 +26,7 @@
     "@tauri-apps/plugin-os": "^2.0.0",
     "@tauri-apps/plugin-process": "^2.0.0",
     "@tauri-apps/plugin-shell": "^2.0.0",
+    "@tauri-apps/plugin-updater": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.553.0",
