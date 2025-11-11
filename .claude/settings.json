@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/kickstart_session_start.js"
+            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/session_start.js"
           }
         ]
       }

@@ -8,12 +8,11 @@ created: 2025-11-11
 # Implement Fansite Name Fix Mod Support
 
 ## Problem/Goal
-Extend the existing name fix mod support in FMMLoader (Football Manager Mod Loader) to handle additional name fix mods from various fansite sources. Currently, the loader supports one open source name fix mod via GitHub download. This task adds the capability to import and manage name fix mods from RAR or ZIP files (downloaded by users from fansites) alongside the existing GitHub one.
+Extend the existing name fix mod support in FMMLoader (Football Manager Mod Loader) to handle additional name fix mods from various fansite sources. Currently, the loader supports one open source name fix mod via GitHub download. This task adds the capability to load and manage name fix mods from other sites alongside the existing one.
 
 ## Success Criteria
-- [ ] FMMLoader can import name fix mods from RAR or ZIP files via drag-and-drop or file picker
-- [ ] Multiple name fix sources can be stored and managed (user can switch between them)
-- [ ] Users can see which name fix is currently installed and select from available ones
+- [ ] FMMLoader can detect and load name fix mods from fansite sources (in addition to the existing GitHub one)
+- [ ] Users have a clear way to add/configure fansite name fix mods to the loader
 - [ ] Existing GitHub name fix mod support continues to work without regression
 
 ## Context Manifest
@@ -91,21 +90,20 @@ The frontend maintains three state variables for the name fix:
 
 **Challenge:**
 
-Currently, the system is hardcoded to support exactly one name fix mod from a single GitHub URL. We need to extend this to support multiple name fix mods imported from local RAR/ZIP files (that users download from fansites) while maintaining the existing GitHub one.
+Currently, the system is hardcoded to support exactly one name fix mod from a single GitHub URL. We need to extend this to support multiple name fix mods from various fansite sources (potentially non-GitHub sources like direct download links from fansites) while maintaining the existing GitHub one.
 
 **Required Changes:**
 
 1. **Configuration Extension**: The config.rs needs to store information about multiple name fix sources. This could be a list of name fix configurations, each containing:
    - Source name/identifier
-   - Local file path or stored archive location
-   - Expected filename(s) extracted from the archive
+   - Download URL (may not be GitHub)
+   - Expected filename(s) to extract
    - Installation status
-   - Metadata (description, author, source URL for reference)
+   - Metadata (description, author, homepage)
 
 2. **Backend Refactoring**: The name_fix.rs module needs significant changes:
-   - Add import logic to handle local RAR/ZIP files (similar to regular mod import)
-   - Add RAR extraction support (currently only ZIP is supported)
-   - Support multiple name fix sources stored locally (library of name fixes)
+   - Abstract the download logic to handle both GitHub releases and direct file URLs
+   - Support multiple installed name fixes coexisting (or mutual exclusivity if they conflict)
    - Track which name fix is currently installed in the backup directory
    - Handle different file structures—not all name fixes may be single .lnc files
    - Modify the FILES_TO_DELETE list or make it configurable per name fix source
@@ -117,17 +115,15 @@ Currently, the system is hardcoded to support exactly one name fix mod from a si
    - Should we restore original files before installing a different name fix?
 
 4. **Frontend UI Changes**: The Utilities tab needs to:
-   - Show a list of imported name fix mods (plus the built-in GitHub one)
+   - Show a list of available name fix mods instead of just one
    - Display which one (if any) is currently installed
    - Allow users to switch between them
-   - Add import functionality (drag-and-drop or file picker) to add new name fixes
-   - Show metadata for each name fix (name, author, source)
+   - Potentially allow users to add custom name fix sources via URL
 
-5. **Import and Storage Management**: Need to determine:
-   - Where to store imported name fix archives? (In FMMLoader26 AppData directory?)
-   - How to detect/identify what's in a name fix archive?
-   - Should we validate/verify name fix packages before accepting them?
-   - How to handle metadata for imported name fixes (manual entry vs auto-detection)?
+5. **Data Source Management**: Need to determine:
+   - Where does the list of available name fixes come from? (Hardcoded? Config file? Remote JSON?)
+   - How do users discover/add new name fix sources?
+   - Should we validate/verify name fix packages before installation?
 
 **Integration Points:**
 
@@ -140,11 +136,10 @@ Currently, the system is hardcoded to support exactly one name fix mod from a si
 **Potential Pitfalls:**
 
 - Name fixes from different sources may have conflicting file deletions
-- RAR format support requires additional dependencies (need to add RAR extraction crate)
-- Archive structures may vary between sources (nested folders, different filenames)
-- Users may import non-name-fix archives by mistake
+- Download URLs from fansites may change or become unavailable
+- ZIP structures may vary between sources (nested folders, different filenames)
+- Some sources may require authentication or have rate limiting
 - Users may try to install incompatible name fixes simultaneously
-- Storage management: imported archives take up disk space
 
 ### Technical Reference Details
 
@@ -160,18 +155,16 @@ pub fn uninstall() -> Result<String, String>
 
 // Internal helpers that will need refactoring
 fn get_db_dir(target_path: Option<&str>) -> Result<PathBuf, String>
-fn download_name_fix() -> Result<Vec<u8>, String>  // Keep for GitHub one
-fn import_name_fix_archive(source_path: &str) -> Result<NameFixData, String>  // NEW
-fn extract_from_zip(zip_data: &[u8]) -> Result<Vec<u8>, String>
-fn extract_from_rar(rar_path: &str) -> Result<Vec<u8>, String>  // NEW
+fn download_name_fix() -> Result<Vec<u8>, String>
+fn extract_lnc_file(zip_data: &[u8]) -> Result<Vec<u8>, String>
 fn create_backups(db_dir: &Path) -> Result<(), String>
 fn restore_from_backup(db_dir: &Path) -> Result<(), String>
 fn delete_licensing_files(db_dir: &Path) -> Result<(), String>
 
-// Constants that will need to become configurable per name fix source
-const NAME_FIX_RELEASE_URL: &str = "..."  // Still used for built-in GitHub one
-const NAME_FIX_FILE: &str = "FM26-open-names.lnc"  // Default, may vary
-const FILES_TO_DELETE: &[(&str, &[&str])] = &[...]  // May vary per source
+// Constants that will need to become configurable
+const NAME_FIX_RELEASE_URL: &str = "..."
+const NAME_FIX_FILE: &str = "FM26-open-names.lnc"
+const FILES_TO_DELETE: &[(&str, &[&str])] = &[...]
 ```
 
 **Tauri Commands (main.rs lines 350-363):**
@@ -265,13 +258,10 @@ Contains:
 - `/Users/jstn/Documents/GitHub/FMMLoader-26/src/App.tsx` - UI for multiple name fixes
 
 **Dependencies Already Available:**
-- `reqwest` (0.11) - HTTP downloads with blocking client (for built-in GitHub name fix)
+- `reqwest` (0.11) - HTTP downloads with blocking client
 - `zip` (0.6) - ZIP archive extraction
 - `serde`/`serde_json` - Serialization for configs
 - `tracing` - Logging throughout
-
-**Dependencies Needed:**
-- RAR extraction crate (e.g., `unrar` or `compress-tools`) - For RAR file support
 
 #### Error Handling Patterns
 
@@ -287,15 +277,7 @@ The codebase uses `Result<T, String>` consistently, with errors formatted as use
 6. **Config Persistence**: All persistent state goes through config.rs save/load functions
 
 ## User Notes
-
-**Implementation Approach Clarification:**
-This feature is based on importing local RAR/ZIP files that users have already downloaded from fansites, NOT downloading directly from fansite URLs. The workflow is:
-1. User downloads name fix from a fansite (gets a RAR or ZIP file)
-2. User drags/drops the archive into FMMLoader or uses file picker
-3. FMMLoader imports and stores the name fix
-4. User can switch between installed name fixes (including the built-in GitHub one)
-
-This is similar to how regular mod imports work, but adapted for the name fix system.
+<!-- Any specific notes or requirements from the developer -->
 
 ## Work Log
 <!-- Updated as work progresses -->
