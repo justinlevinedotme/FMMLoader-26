@@ -1,4 +1,4 @@
-name: Build & Release (with AI Changelog)
+name: Build to release
 
 on:
   push:
@@ -6,71 +6,13 @@ on:
       - "v*"
 
 concurrency:
-  group: publish-${{ github.ref }}
+  group: publish-${{ github.ref }}     # ensure all matrix jobs for the same tag coordinate
   cancel-in-progress: false
 
-permissions:
-  contents: write
-
 jobs:
-  changelog:
-    name: Generate Changelog & Create Draft Release
-    runs-on: ubuntu-latest
-    outputs:
-      changelog: ${{ steps.generate.outputs.result }}
-      from_tag: ${{ steps.generate.outputs.from_tag }}
-      to_tag: ${{ steps.generate.outputs.to_tag }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Generate Changelog (AI)
-        id: generate
-        uses: mistricky/ccc@v0.2.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-
-      - name: Create GitHub Release (draft)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: FMMLoader26 ${{ github.ref_name }}
-          body: |
-            ## 🤖 Changelog by Claude
-            ${{ steps.generate.outputs.result }}
-
-            ---
-
-            🔗 **Full Changelog**:  
-            https://github.com/${{ github.repository }}/compare/${{ steps.generate.outputs.from_tag }}...${{ steps.generate.outputs.to_tag }}
-
-            ---
-
-            ## 📦 Downloads (Pick your installer)
-
-            **MacOS (Apple Silicon M1/M2/M3):**  
-            → Look for: `FMMLoader26_<ver>_aarch64.dmg`
-
-            **MacOS (Intel):**  
-            → Look for: `FMMLoader26_<ver>_x86_64.dmg`
-
-            **Windows:**  
-            → Look for: `FMMLoader26_<ver>_setup.exe`
-
-            **Linux (AppImage):**  
-            → Look for: `FMMLoader26_<ver>.AppImage`
-
-            **⚠️ Ignore:** `*.tar.gz`, `*.sig`, and `latest.json` — these are for the auto-updater.
-          draft: true
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   publish-tauri:
-    name: Build & Attach Artifacts (keeps draft)
-    needs: changelog
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -83,38 +25,50 @@ jobs:
             args: "--bundles appimage"
           - platform: windows-latest
             args: "--bundles nsis"
+
     runs-on: ${{ matrix.platform }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: npm
 
-      - name: Install Rust (stable)
+      - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ contains(matrix.platform, 'macos-15') && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: Install Linux dependencies
+      - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Install frontend deps
+      - name: install frontend dependencies
         run: npm ci
 
-      - name: Build & Publish (tauri-action)
+      - name: Build & publish (tauri-action)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseDraft: true
+          # ⬇️ Use the tag that triggered the workflow
+          tagName: ${{ github.ref_name }}               # e.g., v1.0.2
+          releaseName: "FMMLoader26 ${{ github.ref_name }}"
+          releaseBody: |
+            **Pick your installer:**
+            - macOS (Apple Silicon): `FMMLoader26_<ver>_aarch64.dmg`
+            - macOS (Intel): `FMMLoader26_<ver>_x86_64.dmg`
+            - Windows: `FMMLoader26_<ver>_setup.exe`
+            - Linux (AppImage): `FMMLoader26_<ver>.AppImage`
+
+            _Ignore the `*.tar.gz` / `*.sig` — used by the auto-updater._
+          releaseDraft: false          # set true if you want it to stay draft until you publish
           prerelease: false
           args: ${{ matrix.args }}
