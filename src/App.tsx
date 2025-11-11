@@ -54,7 +54,7 @@ import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
 import { TitleBar } from "@/components/TitleBar";
 import { Toaster } from "@/components/ui/sonner";
-import { UpdaterCard } from "@/components/UpdaterCard";
+import { UpdateBanner } from "@/components/UpdateBanner";
 import {
   Tooltip,
   TooltipContent,
@@ -558,6 +558,9 @@ function App() {
         {/* Custom TitleBar */}
         <TitleBar />
 
+        {/* Update Banner */}
+        <UpdateBanner />
+
         {/* File Drop Zone - covers everything below titlebar */}
         {/* This invisible overlay catches file drops without blocking interactions */}
         <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
@@ -982,9 +985,6 @@ function App() {
                       )}
                     </CardContent>
                   </Card>
-
-                  {/* App Updater */}
-                  <UpdaterCard />
                 </CardContent>
               </Card>
             </TabsContent>
