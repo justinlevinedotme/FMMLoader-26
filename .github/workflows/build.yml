@@ -1,67 +1,120 @@
-name: "Build to release"
+name: Build & Release (with AI Changelog)
 
 on:
   push:
     tags:
       - "v*"
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
 jobs:
+  changelog:
+    name: Generate Changelog & Create Draft Release
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.generate.outputs.result }}
+      from_tag: ${{ steps.generate.outputs.from_tag }}
+      to_tag: ${{ steps.generate.outputs.to_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog (AI)
+        id: generate
+        uses: mistricky/ccc@v0.2.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Create GitHub Release (draft)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: FMMLoader26 ${{ github.ref_name }}
+          body: |
+            ## 🤖 Changelog by Claude
+            ${{ steps.generate.outputs.result }}
+
+            ---
+
+            🔗 **Full Changelog**:  
+            https://github.com/${{ github.repository }}/compare/${{ steps.generate.outputs.from_tag }}...${{ steps.generate.outputs.to_tag }}
+
+            ---
+
+            ## 📦 Downloads (Pick your installer)
+
+            **MacOS (Apple Silicon M1/M2/M3):**  
+            → Look for: `FMMLoader26_<ver>_aarch64.dmg`
+
+            **MacOS (Intel):**  
+            → Look for: `FMMLoader26_<ver>_x86_64.dmg`
+
+            **Windows:**  
+            → Look for: `FMMLoader26_<ver>_setup.exe`
+
+            **Linux (AppImage):**  
+            → Look for: `FMMLoader26_<ver>.AppImage`
+
+            **⚠️ Ignore:** `*.tar.gz`, `*.sig`, and `latest.json` — these are for the auto-updater.
+          draft: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish-tauri:
-    permissions:
-      contents: write
+    name: Build & Attach Artifacts (keeps draft)
+    needs: changelog
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-15 # Arm Macs
+          - platform: macos-15
             args: "--target aarch64-apple-darwin --bundles dmg"
-          - platform: macos-15 # Intel Macs
+          - platform: macos-15
             args: "--target x86_64-apple-darwin --bundles dmg"
-          - platform: ubuntu-22.04 # Linux
+          - platform: ubuntu-22.04
             args: "--bundles appimage"
-          - platform: windows-latest # Windows
+          - platform: windows-latest
             args: "--bundles nsis"
-
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: npm
 
-      - name: install Rust stable
+      - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ contains(matrix.platform, 'macos-15') && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: install dependencies (ubuntu only)
+      - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: install frontend dependencies
+      - name: Install frontend deps
         run: npm ci
 
-      - name: Build & publish (tauri-action)
+      - name: Build & Publish (tauri-action)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          tagName: app-v__VERSION__
-          releaseName: "App v__VERSION__"
-          releaseBody: |
-            **Download the right installer:**
-            - macOS (Apple Silicon): `FMMLoader26_<version>_aarch64.dmg`
-            - macOS (Intel): `FMMLoader26_<version>_x86_64.dmg`
-            - Windows: `FMMLoader26_<version>_setup.exe`
-            - Linux: `FMMLoader26_<version>.AppImage`
-
-            _Ignore the `*.tar.gz` and `*.sig` files — they are used by the auto-updater._
+          tagName: ${{ github.ref_name }}
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
