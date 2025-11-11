@@ -65,9 +65,6 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": {
-        "fromEnv": "TAURI_UPDATER_PUBKEY"
-      },
       "endpoints": [
         "https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json"
       ]
