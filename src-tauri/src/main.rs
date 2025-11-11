@@ -412,15 +412,7 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin({
-            tracing::info!("Initializing updater plugin");
-            tauri_plugin_updater::Builder::new().build()
-        })
-        .setup(|app| {
-            tracing::info!("Tauri app setup complete");
-            tracing::info!("Updater is active and will check for updates");
-            Ok(())
-        })
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             init_app,
             get_app_version,
