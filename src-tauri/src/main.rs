@@ -387,12 +387,30 @@ fn main() {
 
     tracing::info!("Starting FMMLoader26");
 
+    let mut updater_builder = tauri_plugin_updater::Builder::new();
+
+    match std::env::var("TAURI_UPDATER_PUBKEY") {
+        Ok(value) if !value.trim().is_empty() => {
+            updater_builder = updater_builder.pubkey(value);
+        }
+        Ok(_) => {
+            tracing::warn!("TAURI_UPDATER_PUBKEY is set but empty; updater signatures cannot be verified");
+        }
+        Err(std::env::VarError::NotPresent) => {
+            tracing::warn!("TAURI_UPDATER_PUBKEY not set; updater signatures cannot be verified");
+        }
+        Err(err) => {
+            tracing::error!(?err, "Failed to read TAURI_UPDATER_PUBKEY; updater signatures cannot be verified");
+        }
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(updater_builder.build())
         .invoke_handler(tauri::generate_handler![
             init_app,
             get_config,
