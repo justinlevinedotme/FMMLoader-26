@@ -12,11 +12,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/icon.icns",
-      "icons/icon.ico",
-      "icons/icon.png"
-    ],
+    "icon": ["icons/icon.icns", "icons/icon.ico", "icons/icon.png"],
     "resources": [],
     "externalBin": [],
     "copyright": "",
@@ -65,6 +61,7 @@
   },
   "plugins": {
     "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI1QjE1NUY3QzdFQzE4MDAKUldRQUdPekg5MVd4SldSNHErZ1JqaWVZelkrV2hOeEEyeDJIVWlhVjk2bUxtcno5YWFOOWtDZHMK",
       "endpoints": [
         "https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json"
       ]
