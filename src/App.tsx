@@ -54,6 +54,7 @@ import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
 import { TitleBar } from "@/components/TitleBar";
 import { Toaster } from "@/components/ui/sonner";
+import { UpdateBanner } from "@/components/UpdateBanner";
 import {
   Tooltip,
   TooltipContent,
@@ -556,6 +557,9 @@ function App() {
       <div className="h-screen flex flex-col bg-background">
         {/* Custom TitleBar */}
         <TitleBar />
+
+        {/* Update Banner */}
+        <UpdateBanner />
 
         {/* File Drop Zone - covers everything below titlebar */}
         {/* This invisible overlay catches file drops without blocking interactions */}
