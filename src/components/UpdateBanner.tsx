@@ -11,7 +11,7 @@ export function UpdateBanner() {
   }
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+    <div className=" pt-10 bg-[#ff4f00] text-white px-4 py-3 flex items-center justify-between shadow-lg">
       <div className="flex items-center gap-3 flex-1">
         <Download className="h-5 w-5 flex-shrink-0" />
         <div className="flex-1">

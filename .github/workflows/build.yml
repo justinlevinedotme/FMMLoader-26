@@ -1,74 +1,67 @@
-name: Build & Release FMMLoader26
+name: "Build to release"
 
 on:
   push:
     tags:
       - "v*"
 
-  workflow_dispatch:
-
 jobs:
-  build:
-    name: Build & Release (${{ matrix.platform }})
+  publish-tauri:
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: windows-latest
-            target: x86_64-pc-windows-msvc
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-          - platform: macos-15-intel
-            target: x86_64-apple-darwin
-          - platform: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
+          - platform: macos-15 # Arm Macs
+            args: "--target aarch64-apple-darwin --bundles dmg"
+          - platform: macos-15 # Intel Macs
+            args: "--target x86_64-apple-darwin --bundles dmg"
+          - platform: ubuntu-22.04 # Linux
+            args: "--bundles appimage"
+          - platform: windows-latest # Windows
+            args: "--bundles nsis"
 
     runs-on: ${{ matrix.platform }}
-
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: lts/*
 
-      - name: Install Rust stable
+      - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ contains(matrix.platform, 'macos-15') && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: Install Linux dependencies
+      - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Install frontend dependencies
+      - name: install frontend dependencies
         run: npm ci
 
-      - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0.5.24
+      - name: Build & publish (tauri-action)
+        uses: tauri-apps/tauri-action@v0
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_UPDATER_PUBKEY: ${{ secrets.TAURI_UPDATER_PUBKEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "FMMLoader26 v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
-          releaseDraft: false
+          tagName: app-v__VERSION__
+          releaseName: "App v__VERSION__"
+          releaseBody: |
+            **Download the right installer:**
+            - macOS (Apple Silicon): `FMMLoader26_<version>_aarch64.dmg`
+            - macOS (Intel): `FMMLoader26_<version>_x86_64.dmg`
+            - Windows: `FMMLoader26_<version>_setup.exe`
+            - Linux: `FMMLoader26_<version>.AppImage`
+
+            _Ignore the `*.tar.gz` and `*.sig` files — they are used by the auto-updater._
+          releaseDraft: true
           prerelease: false
-          includeUpdaterJson: true
-          updaterJsonPreferNsis: true
-          args: --target ${{ matrix.target }}
+          args: ${{ matrix.args }}
