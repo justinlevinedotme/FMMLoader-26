@@ -347,6 +347,25 @@ fn get_logs_path() -> Result<String, String> {
 }
 
 #[tauri::command]
+fn log_update_event(
+    event_type: String,
+    current_version: String,
+    latest_version: Option<String>,
+    message: String,
+    details: Option<String>,
+) -> Result<(), String> {
+    tracing::info!(
+        "[UPDATE_{}] Current: {} | Latest: {} | {} | Details: {}",
+        event_type,
+        current_version,
+        latest_version.unwrap_or_else(|| "N/A".to_string()),
+        message,
+        details.unwrap_or_else(|| "None".to_string())
+    );
+    Ok(())
+}
+
+#[tauri::command]
 fn check_name_fix_installed() -> Result<bool, String> {
     let config = load_config()?;
     name_fix::check_installed(config.target_path.as_deref())
@@ -435,6 +454,7 @@ fn main() {
             create_backup_point,
             open_logs_folder,
             get_logs_path,
+            log_update_event,
             check_name_fix_installed,
             install_name_fix,
             uninstall_name_fix,

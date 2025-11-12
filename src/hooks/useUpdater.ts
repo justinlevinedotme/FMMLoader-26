@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { tauriCommands } from './useTauri';
 
 export interface UpdateStatus {
   checking: boolean;
@@ -26,6 +27,12 @@ export const useUpdater = () => {
     downloadProgress: 0,
     logs: [],
   });
+  const [appVersion, setAppVersion] = useState<string>('');
+
+  // Get app version on mount
+  useEffect(() => {
+    tauriCommands.getAppVersion().then(setAppVersion).catch(console.error);
+  }, []);
 
   const addLog = useCallback((message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -37,14 +44,33 @@ export const useUpdater = () => {
     }));
   }, []);
 
+  // Helper to log critical update events to backend file logs
+  const logToBackend = useCallback((
+    eventType: string,
+    message: string,
+    latestVersion: string | null = null,
+    details?: string
+  ) => {
+    if (!appVersion) return;
+    tauriCommands.logUpdateEvent(
+      eventType,
+      appVersion,
+      latestVersion,
+      message,
+      details
+    ).catch(err => console.error('Failed to log update event to backend:', err));
+  }, [appVersion]);
+
   const checkForUpdates = useCallback(async (manual = false) => {
     try {
       setStatus(prev => ({ ...prev, checking: true, error: null }));
 
       if (manual) {
         addLog('Manual update check initiated by user');
+        logToBackend('CHECK', 'Manual update check initiated by user');
       } else {
         addLog('Automatic update check started');
+        logToBackend('CHECK', 'Automatic update check started');
       }
 
       addLog('Checking updater endpoint: https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json');
@@ -53,6 +79,7 @@ export const useUpdater = () => {
 
       if (update === null) {
         addLog('No update available - app is up to date');
+        logToBackend('CHECK', 'No update available - app is up to date', appVersion);
         setStatus(prev => ({
           ...prev,
           checking: false,
@@ -65,6 +92,13 @@ export const useUpdater = () => {
       addLog(`Release date: ${update.date}`);
       addLog(`Update body: ${update.body || 'No release notes available'}`);
 
+      logToBackend(
+        'FOUND',
+        'Update available',
+        update.version,
+        `Release date: ${update.date}, Body: ${update.body || 'No release notes'}`
+      );
+
       setStatus(prev => ({
         ...prev,
         checking: false,
@@ -76,7 +110,13 @@ export const useUpdater = () => {
       return update;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorDetails = error instanceof Error
+        ? `${error.name}: ${error.message}\nStack: ${error.stack || 'No stack trace'}`
+        : `Non-Error object: ${JSON.stringify(error)}`;
+
+      console.error('[Updater] Full error details:', error);
       addLog(`Error checking for updates: ${errorMessage}`);
+      logToBackend('ERROR', `Error checking for updates: ${errorMessage}`, null, errorDetails);
       setStatus(prev => ({
         ...prev,
         checking: false,
@@ -84,7 +124,7 @@ export const useUpdater = () => {
       }));
       return null;
     }
-  }, [addLog]);
+  }, [addLog, logToBackend]);
 
   const downloadAndInstall = useCallback(async () => {
     try {
@@ -95,14 +135,17 @@ export const useUpdater = () => {
 
       if (update === null) {
         addLog('No update available to download');
+        logToBackend('DOWNLOAD', 'No update available to download', status.latestVersion);
         setStatus(prev => ({ ...prev, downloading: false }));
         return false;
       }
 
       addLog(`Downloading update ${update.version}...`);
+      logToBackend('DOWNLOAD', `Starting download of version ${update.version}`, update.version);
 
       let downloadedBytes = 0;
       let totalBytes = 0;
+      let lastLoggedProgress = 0;
 
       await update.downloadAndInstall((event) => {
         switch (event.event) {
@@ -117,15 +160,23 @@ export const useUpdater = () => {
               : 0;
             setStatus(prev => ({ ...prev, downloadProgress: progress }));
             addLog(`Download progress: ${downloadedBytes}/${totalBytes} bytes (${progress}%)`);
+
+            // Log progress to backend at 25% increments to avoid spam
+            if (progress >= lastLoggedProgress + 25 && progress > 0) {
+              logToBackend('DOWNLOAD', `Download progress: ${progress}%`, update.version);
+              lastLoggedProgress = progress;
+            }
             break;
           case 'Finished':
             addLog('Download finished successfully');
+            logToBackend('DOWNLOAD', 'Download finished successfully', update.version);
             setStatus(prev => ({ ...prev, downloading: false, installing: true }));
             break;
         }
       });
 
       addLog('Update installed successfully - restarting application...');
+      logToBackend('INSTALL', 'Update installed successfully - restarting application', update.version);
       setStatus(prev => ({ ...prev, installing: false }));
 
       // Relaunch the app to apply the update
@@ -136,7 +187,13 @@ export const useUpdater = () => {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorDetails = error instanceof Error
+        ? `${error.name}: ${error.message}\nStack: ${error.stack || 'No stack trace'}`
+        : `Non-Error object: ${JSON.stringify(error)}`;
+
+      console.error('[Updater] Full error details:', error);
       addLog(`Error downloading/installing update: ${errorMessage}`);
+      logToBackend('ERROR', `Error downloading/installing update: ${errorMessage}`, status.latestVersion, errorDetails);
       setStatus(prev => ({
         ...prev,
         downloading: false,
@@ -145,7 +202,7 @@ export const useUpdater = () => {
       }));
       return false;
     }
-  }, [addLog]);
+  }, [addLog, logToBackend, status.latestVersion]);
 
   // Check for updates on mount
   useEffect(() => {

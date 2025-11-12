@@ -137,6 +137,20 @@ export const tauriCommands = {
 
   getLogsPath: () => safeInvoke<string>("get_logs_path"),
 
+  logUpdateEvent: (
+    eventType: string,
+    currentVersion: string,
+    latestVersion: string | null,
+    message: string,
+    details?: string
+  ) => safeInvoke<void>("log_update_event", {
+    eventType,
+    currentVersion,
+    latestVersion,
+    message,
+    details,
+  }),
+
   // FM Name Fix commands
   checkNameFixInstalled: () => safeInvoke<boolean>("check_name_fix_installed"),
 
