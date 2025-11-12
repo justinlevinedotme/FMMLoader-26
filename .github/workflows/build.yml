@@ -18,13 +18,13 @@ jobs:
       matrix:
         include:
           - platform: macos-15
-            args: "--target aarch64-apple-darwin --bundles dmg,updater"
+            args: "--target aarch64-apple-darwin"
           - platform: macos-15
-            args: "--target x86_64-apple-darwin --bundles dmg,updater"
+            args: "--target x86_64-apple-darwin"
           - platform: ubuntu-22.04
-            args: "--bundles appimage,updater"
+            args: ""
           - platform: windows-latest
-            args: "--bundles nsis,updater"
+            args: ""
 
     runs-on: ${{ matrix.platform }}
 
