@@ -12,6 +12,7 @@ description: Tasks related to fixing bugs, errors, and unexpected behavior in FM
 - `h-fix-multiple-toast-notifications-on-import.md` - Fix duplicate toast notifications appearing when importing mods via drag-and-drop
 
 ### Medium Priority
+- `m-fix-update-logging-improvements.md` - Enhance update logging with robust console output and file logging for version information
 
 ### Low Priority
 
