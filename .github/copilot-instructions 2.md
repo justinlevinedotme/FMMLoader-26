@@ -28,7 +28,7 @@ React Component → tauriCommands (hooks/useTauri.ts)
 
 | Module              | Purpose                                                                  |
 | ------------------- | ------------------------------------------------------------------------ |
-| `main.rs`           | Tauri command definitions (`#[tauri::command]`), app initialization      |
+| `main.rs`           | Tauri command definitions (`#[tauri::command]`), app initialization, update event logging |
 | `mod_manager.rs`    | Core mod installation logic (copy_recursive, install_mod, read manifest) |
 | `config.rs`         | Config persistence (JSON file in platform-specific app data dirs)        |
 | `game_detection.rs` | Platform-specific FM26 path detection (Steam/Epic/GamePass/Linux)        |
@@ -36,7 +36,8 @@ React Component → tauriCommands (hooks/useTauri.ts)
 | `types.rs`          | Core data structures (ModManifest, Config, ConflictInfo)                 |
 | `import.rs`         | Handles ZIP extraction, mod validation, manifest auto-generation         |
 | `restore.rs`        | Backup/restore point creation and rollback logic                         |
-| `logging.rs`        | Structured logging with file output                                      |
+| `logging.rs`        | Structured logging with file output to platform-specific directories     |
+| `name_fix.rs`       | FM Name Fix utility installation and management                          |
 
 ### Critical Type Definitions (types.rs)
 
@@ -82,6 +83,13 @@ pub struct Config {
 | `UpdateBanner.tsx`        | Notifies user of new releases with download link                      |
 | `DropZone.tsx`            | Drag-and-drop zone for importing mod ZIPs                             |
 | `ui/*`                    | shadcn/ui components (Button, Card, Dialog, Table, Tabs, etc.)        |
+
+### React Hooks
+
+| Hook              | Purpose                                                                           |
+| ----------------- | --------------------------------------------------------------------------------- |
+| `useTauri.ts`     | Type-safe wrapper around Tauri commands, exports `tauriCommands` object          |
+| `useUpdater.ts`   | Update checking system with comprehensive logging to both console and file logs  |
 
 ### UI Library Integration
 
@@ -220,6 +228,35 @@ All paths look for FM26 in specific subdirectories (e.g., `fm_Data/StreamingAsse
 6. Copy mod to `{app-data}/mods/{mod-name}/`
 7. Refresh mod list
 
+### Update System Flow (with Logging)
+
+The update system uses a dual-logging approach: frontend console logs + backend file logs.
+
+1. **Check Phase** (`useUpdater.ts::checkForUpdates()`)
+   - Calls `@tauri-apps/plugin-updater::check()` to query GitHub releases
+   - Logs to console via `addLog()` (appears in UI logs tab)
+   - Logs to backend file via `tauriCommands.logUpdateEvent('CHECK', ...)`
+   - Sets `UpdateStatus` state with version information
+
+2. **Download Phase** (`useUpdater.ts::downloadAndInstall()`)
+   - Calls `update.downloadAndInstall()` with progress callback
+   - Logs progress milestones (25% increments) to backend to avoid spam
+   - All progress logged to console for UI visibility
+   - Backend logs include `[UPDATE_DOWNLOAD]` prefix
+
+3. **Install Phase**
+   - Logs installation success with version information
+   - Backend logs include `[UPDATE_INSTALL]` prefix
+   - Triggers `relaunch()` to restart app with new version
+
+4. **Backend Logging** (`main.rs::log_update_event()`)
+   - Receives structured event data from frontend
+   - Writes to platform-specific log files with `tracing::info!()`
+   - Format: `[UPDATE_{TYPE}] Current: {ver} | Latest: {ver} | {message} | Details: {details}`
+   - Log files: `{app-data}/logs/fmmloader.YYYY-MM-DD`
+
+**Key Pattern:** Frontend calls `logToBackend()` helper which invokes `log_update_event` Tauri command to persist critical events to disk, enabling post-mortem debugging of update issues.
+
 ---
 
 ## Common Pitfalls & Solutions
@@ -227,9 +264,15 @@ All paths look for FM26 in specific subdirectories (e.g., `fm_Data/StreamingAsse
 ### When Adding Tauri Commands
 
 1. Define in `main.rs` with `#[tauri::command]` attribute
-2. Add to `tauriCommands` object in `useTauri.ts` with matching signature
-3. Import in React component via `tauriCommands.yourNewCommand()`
-4. **Always** handle errors with try/catch or .catch() for promises
+2. Register in `invoke_handler![]` macro in `main.rs`
+3. Add to `tauriCommands` object in `useTauri.ts` with matching signature
+4. Import in React component via `tauriCommands.yourNewCommand()`
+5. **Always** handle errors with try/catch or .catch() for promises
+
+**Example:** The `log_update_event` command bridges frontend update events to backend file logs:
+- Rust: `main.rs::log_update_event()` - receives event data, writes to log with `tracing::info!()`
+- TypeScript: `useTauri.ts::logUpdateEvent()` - type-safe wrapper using `safeInvoke<void>()`
+- Usage: `useUpdater.ts::logToBackend()` - helper that calls the command at key update milestones
 
 ### When Modifying File Paths
 

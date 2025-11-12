@@ -346,6 +346,15 @@ fn get_logs_path() -> Result<String, String> {
     Ok(logs_dir.to_string_lossy().to_string())
 }
 
+/// Log update-related events to backend log files with structured [UPDATE_*] prefixes.
+/// This bridges frontend update checking with backend file logging infrastructure.
+///
+/// # Arguments
+/// * `event_type` - Type of update event (CHECK, FOUND, DOWNLOAD, INSTALL, ERROR)
+/// * `current_version` - Current application version
+/// * `latest_version` - Latest available version (if applicable)
+/// * `message` - Human-readable log message
+/// * `details` - Optional additional details (error traces, release notes, etc.)
 #[tauri::command]
 fn log_update_event(
     event_type: String,

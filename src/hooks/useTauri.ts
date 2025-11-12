@@ -137,6 +137,7 @@ export const tauriCommands = {
 
   getLogsPath: () => safeInvoke<string>("get_logs_path"),
 
+  // Log update events to backend file logs with structured [UPDATE_*] prefixes
   logUpdateEvent: (
     eventType: string,
     currentVersion: string,

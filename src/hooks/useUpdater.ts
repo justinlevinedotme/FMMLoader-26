@@ -44,7 +44,9 @@ export const useUpdater = () => {
     }));
   }, []);
 
-  // Helper to log critical update events to backend file logs
+  // Helper to log critical update events to backend file logs.
+  // This persists update events to platform-specific log files (e.g., ~/Library/Application Support/FMMLoader26/logs/)
+  // with structured [UPDATE_*] prefixes for easy filtering and troubleshooting.
   const logToBackend = useCallback((
     eventType: string,
     message: string,

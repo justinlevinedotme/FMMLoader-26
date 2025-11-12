@@ -267,11 +267,11 @@ Categories=Game;Utility;
   <tr>
     <td>
       <h4>📝 Detailed Logging</h4>
-      Every operation is logged with timestamps. View logs directly in the app or open the logs folder.
+      Every operation is logged with timestamps to both console and persistent log files. Update events are automatically logged to backend files for troubleshooting.
     </td>
     <td>
       <h4>🔄 Automatic Updates</h4>
-      Built-in update checker notifies you when new versions are available.
+      Built-in update checker with comprehensive logging of version checks, downloads, and installations.
     </td>
   </tr>
   <tr>
@@ -471,6 +471,13 @@ Made a mistake? Want to undo your mods? Use the rollback feature:
 2. See real-time operation logs
 3. Click **"Open Logs Folder"** to view all historical logs
 
+**Log File Locations:**
+- **Windows**: `%APPDATA%\FMMLoader26\logs\fmmloader.YYYY-MM-DD`
+- **macOS**: `~/Library/Application Support/FMMLoader26/logs/fmmloader.YYYY-MM-DD`
+- **Linux**: `~/.local/share/FMMLoader26/logs/fmmloader.YYYY-MM-DD`
+
+Log files include all application events including update checks, downloads, and installations with `[UPDATE_*]` prefixes for easy filtering.
+
 ---
 
 ### 9️⃣ Manage Folders
@@ -641,7 +648,7 @@ FMMLoader26 automatically keeps only the **10 most recent restore points** and d
 
 ### Still Having Issues?
 
-1. **Check the Logs**: Click the "Logs" tab to see detailed error messages
+1. **Check the Logs**: Click the "Logs" tab to see detailed error messages. For update-related issues, check the log files for entries starting with `[UPDATE_CHECK]`, `[UPDATE_FOUND]`, `[UPDATE_DOWNLOAD]`, or `[UPDATE_INSTALL]`.
 2. **Join Discord**: Get help from the community → [discord.gg/AspRvTTAch](https://discord.gg/AspRvTTAch)
 3. **Open an Issue**: Report bugs on GitHub → [github.com/justinlevinedotme/FMMLoader-26/issues](https://github.com/justinlevinedotme/FMMLoader-26/issues)
 4. **Read the Wiki**: Visit the [GitHub Wiki](https://github.com/justinlevinedotme/FMMLoader-26/wiki) for more help

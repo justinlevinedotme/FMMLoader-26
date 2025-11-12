@@ -142,7 +142,8 @@ FMMLoader-26/
 │   │   ├── RestorePointsDialog.tsx
 │   │   └── UpdateBanner.tsx
 │   ├── hooks/             # React hooks
-│   │   └── useTauri.ts    # Tauri command wrappers
+│   │   ├── useTauri.ts    # Tauri command wrappers
+│   │   └── useUpdater.ts  # Update system with backend logging
 │   ├── lib/               # Utilities
 │   ├── App.tsx            # Main app component
 │   └── main.tsx           # App entry point
@@ -152,11 +153,12 @@ FMMLoader-26/
 │   │   ├── conflicts.rs   # Conflict detection
 │   │   ├── game_detection.rs  # Auto-detect FM26
 │   │   ├── import.rs      # Mod import logic
+│   │   ├── logging.rs     # File logging infrastructure
 │   │   ├── mod_manager.rs # Core mod operations
+│   │   ├── name_fix.rs    # FM Name Fix utility
 │   │   ├── restore.rs     # Backup/restore
 │   │   ├── types.rs       # Type definitions
-│   │   ├── updater.rs     # GitHub version checking
-│   │   └── main.rs        # Tauri commands
+│   │   └── main.rs        # Tauri commands & update logging
 │   ├── Cargo.toml         # Rust dependencies
 │   └── tauri.conf.json    # Tauri configuration
 ├── package.json           # Node dependencies
@@ -179,7 +181,8 @@ FMMLoader-26/
 - ✅ Auto-detect mod types (UI, tactics, graphics, etc.)
 - ✅ Mod conflict detection
 - ✅ Backup and restore points
-- ✅ GitHub update checking
+- ✅ Automatic update checking with file logging
+- ✅ Comprehensive logging system (console and file-based)
 - ✅ Cross-platform (Windows, macOS, Linux)
 
 ## Troubleshooting
