@@ -1199,6 +1199,33 @@ function App() {
                   </Button>
                 </div>
               </div>
+
+              <div className="border-t pt-4">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Mods Storage</div>
+                  <div className="text-sm text-muted-foreground">
+                    View the folder where imported mods are stored. This is
+                    where mods are placed after import.
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={async () => {
+                      try {
+                        await tauriCommands.openModsFolder();
+                        addLog("Opened mods folder");
+                      } catch (error) {
+                        addLog(
+                          `Failed to open mods folder: ${formatError(error)}`
+                        );
+                      }
+                    }}
+                  >
+                    <FolderOpen className="mr-2 h-4 w-4" />
+                    Open Mods Folder
+                  </Button>
+                </div>
+              </div>
             </div>
           </SheetContent>
         </Sheet>

@@ -346,6 +346,38 @@ fn get_logs_path() -> Result<String, String> {
     Ok(logs_dir.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+fn open_mods_folder() -> Result<(), String> {
+    let mods_dir = get_mods_dir();
+    tracing::info!("Opening mods folder: {:?}", mods_dir);
+
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(&mods_dir)
+            .spawn()
+            .map_err(|e| format!("Failed to open mods folder: {}", e))?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&mods_dir)
+            .spawn()
+            .map_err(|e| format!("Failed to open mods folder: {}", e))?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&mods_dir)
+            .spawn()
+            .map_err(|e| format!("Failed to open mods folder: {}", e))?;
+    }
+
+    Ok(())
+}
+
 /// Log update-related events to backend log files with structured [UPDATE_*] prefixes.
 /// This bridges frontend update checking with backend file logging infrastructure.
 ///
@@ -462,6 +494,7 @@ fn main() {
             restore_from_point,
             create_backup_point,
             open_logs_folder,
+            open_mods_folder,
             get_logs_path,
             log_update_event,
             check_name_fix_installed,
