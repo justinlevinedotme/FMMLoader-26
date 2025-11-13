@@ -136,10 +136,9 @@ pub fn get_target_for_type(
     let user_path = get_fm_user_dir(user_dir);
 
     match mod_type {
-        "ui" | "bundle" => game_target.to_path_buf(),
+        "ui" | "bundle" | "skins" => game_target.to_path_buf(),
         "tactics" => user_path.join("tactics"),
         "graphics" => user_path.join("graphics"),
-        "skins" => user_path.join("skins"),
         "editor-data" => user_path.join("editor data"),
         _ => game_target.to_path_buf(),
     }
@@ -164,8 +163,16 @@ pub fn install_mod(
     }
 
     let mut installed_count = 0;
+    let current_platform = get_current_platform();
 
     for file_entry in &manifest.files {
+        // Skip files that don't match the current platform
+        if let Some(ref platform) = file_entry.platform {
+            if platform != &current_platform {
+                continue;
+            }
+        }
+
         let src = mod_dir.join(&file_entry.source);
 
         if !src.exists() {
@@ -190,6 +197,26 @@ pub fn install_mod(
         "Installed {} with {} files",
         mod_name, installed_count
     ))
+}
+
+/// Get the current platform identifier
+fn get_current_platform() -> String {
+    #[cfg(target_os = "windows")]
+    {
+        "windows".to_string()
+    }
+    #[cfg(target_os = "macos")]
+    {
+        "macos".to_string()
+    }
+    #[cfg(target_os = "linux")]
+    {
+        "linux".to_string()
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        "unknown".to_string()
+    }
 }
 
 pub fn uninstall_mod(
@@ -297,4 +324,96 @@ pub fn cleanup_old_restore_points(keep: usize) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_get_current_platform() {
+        let platform = get_current_platform();
+        
+        // Verify it returns one of the expected values
+        assert!(
+            platform == "windows" || platform == "macos" || platform == "linux" || platform == "unknown",
+            "Platform should be one of: windows, macos, linux, unknown"
+        );
+
+        // Verify it matches the current OS
+        #[cfg(target_os = "windows")]
+        assert_eq!(platform, "windows");
+        
+        #[cfg(target_os = "macos")]
+        assert_eq!(platform, "macos");
+        
+        #[cfg(target_os = "linux")]
+        assert_eq!(platform, "linux");
+    }
+
+    #[test]
+    fn test_get_target_for_type_skins() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = None;
+        
+        let target = get_target_for_type("skins", &game_target, user_dir);
+        
+        // Verify skins go to game target (bundle folder), not user skins folder
+        assert_eq!(target, game_target);
+    }
+
+    #[test]
+    fn test_get_target_for_type_ui() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = None;
+        
+        let target = get_target_for_type("ui", &game_target, user_dir);
+        assert_eq!(target, game_target);
+    }
+
+    #[test]
+    fn test_get_target_for_type_bundle() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = None;
+        
+        let target = get_target_for_type("bundle", &game_target, user_dir);
+        assert_eq!(target, game_target);
+    }
+
+    #[test]
+    fn test_get_target_for_type_tactics() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = None;
+        
+        let target = get_target_for_type("tactics", &game_target, user_dir);
+        
+        // Tactics should go to user tactics folder, not game target
+        assert_ne!(target, game_target);
+        assert!(target.ends_with("tactics"));
+    }
+
+    #[test]
+    fn test_get_target_for_type_graphics() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = None;
+        
+        let target = get_target_for_type("graphics", &game_target, user_dir);
+        
+        // Graphics should go to user graphics folder
+        assert_ne!(target, game_target);
+        assert!(target.ends_with("graphics"));
+    }
+
+    #[test]
+    fn test_get_target_for_type_editor_data() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = None;
+        
+        let target = get_target_for_type("editor-data", &game_target, user_dir);
+        
+        // Editor data should go to user editor data folder
+        assert_ne!(target, game_target);
+        assert!(target.ends_with("editor data"));
+    }
 }
