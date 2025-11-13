@@ -195,22 +195,44 @@ pub fn generate_manifest(
     // Collect all files in the mod directory with platform detection
     let mut files = Vec::new();
     let mut has_platform_folders = false;
+    let mut has_bundle_files = false;
 
-    // First pass: Check if we have platform-specific folders
+    // First pass: Check if we have platform-specific folders and bundle files
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.flatten() {
             let entry_path = entry.path();
             if entry_path.is_dir() {
                 if let Some(folder_name) = entry_path.file_name() {
                     let folder_str = folder_name.to_string_lossy().to_lowercase();
-                    if folder_str == "windows" || folder_str == "macos" || folder_str == "linux" {
+                    // Check for platform folder variants
+                    if ["windows", "win", "macos", "mac", "osx", "linux"].contains(&folder_str.as_str()) {
                         has_platform_folders = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Check if mod contains bundle files (indicates platform-specific content)
+    if let Ok(entries) = walkdir::WalkDir::new(dir).into_iter().collect::<Result<Vec<_>, _>>() {
+        for entry in &entries {
+            if entry.path().is_file() {
+                if let Some(ext) = entry.path().extension() {
+                    if ext.to_string_lossy().to_lowercase() == "bundle" {
+                        has_bundle_files = true;
                         break;
                     }
                 }
             }
         }
     }
+
+    // Determine if we should use platform-specific detection
+    // Only use platform detection if:
+    // 1. Platform folders exist AND
+    // 2. The mod type is UI/bundle-based (has .bundle files) OR mod_type is "ui" or "bundle"
+    let use_platform_detection = has_platform_folders && 
+        (has_bundle_files || mod_type == "ui" || mod_type == "bundle");
 
     // Second pass: Collect files with appropriate platform tags
     if let Ok(entries) = walkdir::WalkDir::new(dir).into_iter().collect::<Result<Vec<_>, _>>() {
@@ -221,7 +243,7 @@ pub fn generate_manifest(
                     let rel_str = rel_path.to_string_lossy().to_string();
                     
                     // Determine platform based on path
-                    let platform = if has_platform_folders {
+                    let platform = if use_platform_detection {
                         detect_platform_from_path(&rel_str)
                     } else {
                         None
@@ -273,15 +295,18 @@ pub fn generate_manifest(
 }
 
 /// Detect platform from file path based on platform-specific folder names
+/// Supports common variations: windows/win, macos/mac/osx, linux
 fn detect_platform_from_path(path: &str) -> Option<String> {
-    let path_lower = path.to_lowercase();
     let components: Vec<&str> = path.split('/').collect();
     
     for component in components {
         let comp_lower = component.to_lowercase();
         match comp_lower.as_str() {
-            "windows" => return Some("windows".to_string()),
-            "macos" => return Some("macos".to_string()),
+            // Windows variants
+            "windows" | "win" => return Some("windows".to_string()),
+            // macOS variants
+            "macos" | "mac" | "osx" => return Some("macos".to_string()),
+            // Linux variants
             "linux" => return Some("linux".to_string()),
             _ => continue,
         }
@@ -291,13 +316,24 @@ fn detect_platform_from_path(path: &str) -> Option<String> {
 }
 
 /// Remove platform folder prefix from target path
+/// Handles common platform name variations
 fn remove_platform_prefix(path: &str, platform: &str) -> String {
-    let platform_lower = platform.to_lowercase();
     let parts: Vec<&str> = path.split('/').collect();
     
-    // Find and remove the platform folder from the path
+    // Build a list of platform folder names to remove based on the detected platform
+    let platform_variants: Vec<&str> = match platform {
+        "windows" => vec!["windows", "win"],
+        "macos" => vec!["macos", "mac", "osx"],
+        "linux" => vec!["linux"],
+        _ => vec![],
+    };
+    
+    // Find and remove any platform folder variant from the path
     let filtered_parts: Vec<&str> = parts.into_iter()
-        .filter(|&part| part.to_lowercase() != platform_lower)
+        .filter(|&part| {
+            let part_lower = part.to_lowercase();
+            !platform_variants.contains(&part_lower.as_str())
+        })
         .collect();
     
     filtered_parts.join("/")
@@ -312,12 +348,15 @@ mod tests {
     fn test_detect_platform_from_path_windows() {
         assert_eq!(detect_platform_from_path("windows/test.bundle"), Some("windows".to_string()));
         assert_eq!(detect_platform_from_path("Windows/test.bundle"), Some("windows".to_string()));
+        assert_eq!(detect_platform_from_path("win/test.bundle"), Some("windows".to_string()));
     }
 
     #[test]
     fn test_detect_platform_from_path_macos() {
         assert_eq!(detect_platform_from_path("macos/test.bundle"), Some("macos".to_string()));
         assert_eq!(detect_platform_from_path("macOS/test.bundle"), Some("macos".to_string()));
+        assert_eq!(detect_platform_from_path("mac/test.bundle"), Some("macos".to_string()));
+        assert_eq!(detect_platform_from_path("osx/test.bundle"), Some("macos".to_string()));
     }
 
     #[test]
@@ -336,12 +375,15 @@ mod tests {
     fn test_remove_platform_prefix_windows() {
         assert_eq!(remove_platform_prefix("windows/test.bundle", "windows"), "test.bundle");
         assert_eq!(remove_platform_prefix("Windows/ui/test.bundle", "windows"), "ui/test.bundle");
+        assert_eq!(remove_platform_prefix("win/test.bundle", "windows"), "test.bundle");
     }
 
     #[test]
     fn test_remove_platform_prefix_macos() {
         assert_eq!(remove_platform_prefix("macos/test.bundle", "macos"), "test.bundle");
         assert_eq!(remove_platform_prefix("macOS/graphics/test.png", "macos"), "graphics/test.png");
+        assert_eq!(remove_platform_prefix("mac/test.bundle", "macos"), "test.bundle");
+        assert_eq!(remove_platform_prefix("osx/ui/test.bundle", "macos"), "ui/test.bundle");
     }
 
     #[test]
