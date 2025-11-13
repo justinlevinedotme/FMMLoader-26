@@ -135,6 +135,8 @@ export const tauriCommands = {
 
   openLogsFolder: () => safeInvoke<void>("open_logs_folder"),
 
+  openModsFolder: () => safeInvoke<void>("open_mods_folder"),
+
   getLogsPath: () => safeInvoke<string>("get_logs_path"),
 
   // Log update events to backend file logs with structured [UPDATE_*] prefixes
