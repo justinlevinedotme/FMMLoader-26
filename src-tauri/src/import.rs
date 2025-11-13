@@ -182,19 +182,63 @@ pub fn generate_manifest(
 ) -> Result<(), String> {
     use crate::types::{Compatibility, FileEntry, ModManifest};
 
-    // Collect all files in the mod directory
-    let mut files = Vec::new();
+    // Log validation warnings for missing fields
+    if author.is_empty() {
+        tracing::warn!("Manifest for '{}' is missing 'author' field", name);
+    }
+    if description.is_empty() {
+        tracing::warn!("Manifest for '{}' is missing 'description' field", name);
+    }
+    // Note: fm_version will be empty by default, warn about it
+    tracing::warn!("Manifest for '{}' is missing 'compatibility.fm_version' field", name);
 
+    // Collect all files in the mod directory with platform detection
+    let mut files = Vec::new();
+    let mut has_platform_folders = false;
+
+    // First pass: Check if we have platform-specific folders
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let entry_path = entry.path();
+            if entry_path.is_dir() {
+                if let Some(folder_name) = entry_path.file_name() {
+                    let folder_str = folder_name.to_string_lossy().to_lowercase();
+                    if folder_str == "windows" || folder_str == "macos" || folder_str == "linux" {
+                        has_platform_folders = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Second pass: Collect files with appropriate platform tags
     if let Ok(entries) = walkdir::WalkDir::new(dir).into_iter().collect::<Result<Vec<_>, _>>() {
         for entry in entries {
             let path = entry.path();
             if path.is_file() {
                 if let Ok(rel_path) = path.strip_prefix(dir) {
                     let rel_str = rel_path.to_string_lossy().to_string();
+                    
+                    // Determine platform based on path
+                    let platform = if has_platform_folders {
+                        detect_platform_from_path(&rel_str)
+                    } else {
+                        None
+                    };
+
+                    // For platform-specific files, adjust target_subpath to remove platform folder
+                    let target_subpath = if let Some(ref plat) = platform {
+                        // Remove the platform folder prefix from target path
+                        remove_platform_prefix(&rel_str, plat)
+                    } else {
+                        rel_str.clone()
+                    };
+
                     files.push(FileEntry {
-                        source: rel_str.clone(),
-                        target_subpath: rel_str,
-                        platform: None,
+                        source: rel_str,
+                        target_subpath,
+                        platform,
                     });
                 }
             }
@@ -226,4 +270,194 @@ pub fn generate_manifest(
         .map_err(|e| format!("Failed to write manifest: {}", e))?;
 
     Ok(())
+}
+
+/// Detect platform from file path based on platform-specific folder names
+fn detect_platform_from_path(path: &str) -> Option<String> {
+    let path_lower = path.to_lowercase();
+    let components: Vec<&str> = path.split('/').collect();
+    
+    for component in components {
+        let comp_lower = component.to_lowercase();
+        match comp_lower.as_str() {
+            "windows" => return Some("windows".to_string()),
+            "macos" => return Some("macos".to_string()),
+            "linux" => return Some("linux".to_string()),
+            _ => continue,
+        }
+    }
+    
+    None
+}
+
+/// Remove platform folder prefix from target path
+fn remove_platform_prefix(path: &str, platform: &str) -> String {
+    let platform_lower = platform.to_lowercase();
+    let parts: Vec<&str> = path.split('/').collect();
+    
+    // Find and remove the platform folder from the path
+    let filtered_parts: Vec<&str> = parts.into_iter()
+        .filter(|&part| part.to_lowercase() != platform_lower)
+        .collect();
+    
+    filtered_parts.join("/")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    #[test]
+    fn test_detect_platform_from_path_windows() {
+        assert_eq!(detect_platform_from_path("windows/test.bundle"), Some("windows".to_string()));
+        assert_eq!(detect_platform_from_path("Windows/test.bundle"), Some("windows".to_string()));
+    }
+
+    #[test]
+    fn test_detect_platform_from_path_macos() {
+        assert_eq!(detect_platform_from_path("macos/test.bundle"), Some("macos".to_string()));
+        assert_eq!(detect_platform_from_path("macOS/test.bundle"), Some("macos".to_string()));
+    }
+
+    #[test]
+    fn test_detect_platform_from_path_linux() {
+        assert_eq!(detect_platform_from_path("linux/test.bundle"), Some("linux".to_string()));
+        assert_eq!(detect_platform_from_path("Linux/ui/test.bundle"), Some("linux".to_string()));
+    }
+
+    #[test]
+    fn test_detect_platform_from_path_no_platform() {
+        assert_eq!(detect_platform_from_path("test.bundle"), None);
+        assert_eq!(detect_platform_from_path("ui/test.bundle"), None);
+    }
+
+    #[test]
+    fn test_remove_platform_prefix_windows() {
+        assert_eq!(remove_platform_prefix("windows/test.bundle", "windows"), "test.bundle");
+        assert_eq!(remove_platform_prefix("Windows/ui/test.bundle", "windows"), "ui/test.bundle");
+    }
+
+    #[test]
+    fn test_remove_platform_prefix_macos() {
+        assert_eq!(remove_platform_prefix("macos/test.bundle", "macos"), "test.bundle");
+        assert_eq!(remove_platform_prefix("macOS/graphics/test.png", "macos"), "graphics/test.png");
+    }
+
+    #[test]
+    fn test_remove_platform_prefix_linux() {
+        assert_eq!(remove_platform_prefix("linux/test.bundle", "linux"), "test.bundle");
+    }
+
+    #[test]
+    fn test_generate_manifest_with_platform_folders() {
+        let temp_dir = std::env::temp_dir().join(format!("test_manifest_{}", uuid::Uuid::new_v4()));
+        
+        // Create test structure with platform folders
+        let windows_dir = temp_dir.join("windows");
+        fs::create_dir_all(&windows_dir).expect("Failed to create windows dir");
+        
+        let mut file = fs::File::create(windows_dir.join("test.bundle")).expect("Failed to create file");
+        file.write_all(b"test content").expect("Failed to write content");
+        drop(file);
+
+        // Generate manifest
+        let result = generate_manifest(
+            &temp_dir,
+            "Test Mod".to_string(),
+            "1.0.0".to_string(),
+            "ui".to_string(),
+            "Test Author".to_string(),
+            "Test Description".to_string(),
+        );
+
+        assert!(result.is_ok(), "generate_manifest should succeed");
+
+        // Read the generated manifest
+        let manifest_path = temp_dir.join("manifest.json");
+        assert!(manifest_path.exists(), "manifest.json should be created");
+
+        let manifest_content = fs::read_to_string(&manifest_path).expect("Failed to read manifest");
+        let manifest: crate::types::ModManifest = serde_json::from_str(&manifest_content).expect("Failed to parse manifest");
+
+        // Verify platform-specific file entry
+        assert!(!manifest.files.is_empty(), "Manifest should have files");
+        
+        let windows_file = manifest.files.iter().find(|f| f.source.contains("windows"));
+        assert!(windows_file.is_some(), "Should have a file from windows folder");
+        
+        if let Some(file) = windows_file {
+            assert_eq!(file.platform, Some("windows".to_string()), "File should have windows platform tag");
+            assert!(!file.target_subpath.contains("windows"), "Target path should not contain 'windows' folder");
+        }
+
+        // Cleanup
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn test_generate_manifest_without_platform_folders() {
+        let temp_dir = std::env::temp_dir().join(format!("test_manifest_{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
+        
+        // Create a regular file without platform folder
+        let mut file = fs::File::create(temp_dir.join("test.bundle")).expect("Failed to create file");
+        file.write_all(b"test content").expect("Failed to write content");
+        drop(file);
+
+        // Generate manifest
+        let result = generate_manifest(
+            &temp_dir,
+            "Test Mod".to_string(),
+            "1.0.0".to_string(),
+            "ui".to_string(),
+            "Test Author".to_string(),
+            "Test Description".to_string(),
+        );
+
+        assert!(result.is_ok(), "generate_manifest should succeed");
+
+        // Read the generated manifest
+        let manifest_path = temp_dir.join("manifest.json");
+        let manifest_content = fs::read_to_string(&manifest_path).expect("Failed to read manifest");
+        let manifest: crate::types::ModManifest = serde_json::from_str(&manifest_content).expect("Failed to parse manifest");
+
+        // Verify no platform tags
+        for file in &manifest.files {
+            assert_eq!(file.platform, None, "Files should not have platform tags when no platform folders exist");
+        }
+
+        // Cleanup
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn test_auto_detect_mod_type_bundle() {
+        let temp_dir = std::env::temp_dir().join(format!("test_detect_{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
+        
+        let bundle_path = temp_dir.join("ui-test.bundle");
+        fs::File::create(&bundle_path).expect("Failed to create bundle file");
+
+        let mod_type = auto_detect_mod_type(&bundle_path);
+        assert_eq!(mod_type, "ui");
+
+        // Cleanup
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn test_auto_detect_mod_type_tactics() {
+        let temp_dir = std::env::temp_dir().join(format!("test_detect_{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
+        
+        let fmf_path = temp_dir.join("tactic.fmf");
+        fs::File::create(&fmf_path).expect("Failed to create fmf file");
+
+        let mod_type = auto_detect_mod_type(&fmf_path);
+        assert_eq!(mod_type, "tactics");
+
+        // Cleanup
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
 }
