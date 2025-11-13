@@ -52,6 +52,23 @@ pub struct Config {
     pub enabled_mods: Vec<String>,
     #[serde(default)]
     pub dark_mode: bool,
+    #[serde(default)]
+    pub active_name_fix: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NameFixSource {
+    pub id: String,
+    pub name: String,
+    pub source_type: NameFixSourceType,
+    pub description: String,
+    pub imported_date: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum NameFixSourceType {
+    GitHub,    // Built-in GitHub download
+    Imported,  // User-imported ZIP/RAR
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

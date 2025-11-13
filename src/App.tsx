@@ -33,6 +33,7 @@ import {
   type Config,
   type ModManifest,
   type ModMetadata,
+  type NameFixSource,
 } from "@/hooks/useTauri";
 import {
   FolderOpen,
@@ -102,6 +103,9 @@ function App() {
   const [nameFixInstalled, setNameFixInstalled] = useState(false);
   const [checkingNameFix, setCheckingNameFix] = useState(false);
   const [installingNameFix, setInstallingNameFix] = useState(false);
+  const [nameFixSources, setNameFixSources] = useState<NameFixSource[]>([]);
+  const [activeNameFixId, setActiveNameFixId] = useState<string | null>(null);
+  const [selectedNameFixId, setSelectedNameFixId] = useState<string>("");
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -434,6 +438,11 @@ function App() {
       addLog("Checking FM Name Fix installation status...");
       const isInstalled = await tauriCommands.checkNameFixInstalled();
       setNameFixInstalled(isInstalled);
+      
+      // Also load the active name fix ID
+      const activeId = await tauriCommands.getActiveNameFix();
+      setActiveNameFixId(activeId);
+      
       addLog(`FM Name Fix is ${isInstalled ? "installed" : "not installed"}`);
     } catch (error) {
       addLog(`Error checking FM Name Fix status: ${formatError(error)}`);
@@ -442,20 +451,103 @@ function App() {
     }
   };
 
-  const installNameFix = async () => {
+  const loadNameFixSources = async () => {
+    try {
+      const sources = await tauriCommands.listNameFixes();
+      setNameFixSources(sources);
+      
+      // Set default selection to GitHub if nothing selected
+      if (!selectedNameFixId && sources.length > 0) {
+        setSelectedNameFixId(sources[0].id);
+      }
+    } catch (error) {
+      addLog(`Error loading name fix sources: ${formatError(error)}`);
+    }
+  };
+
+  const installSelectedNameFix = async () => {
+    if (!selectedNameFixId) {
+      toast.error("Please select a name fix to install");
+      return;
+    }
+
     try {
       setInstallingNameFix(true);
-      addLog("Installing FM Name Fix...");
-      const result = await tauriCommands.installNameFix();
+      const selectedSource = nameFixSources.find(s => s.id === selectedNameFixId);
+      addLog(`Installing ${selectedSource?.name || "name fix"}...`);
+      const result = await tauriCommands.installNameFixById(selectedNameFixId);
       addLog(result);
-      toast.success("FM Name Fix installed successfully!");
+      toast.success("Name fix installed successfully!");
       setNameFixInstalled(true);
+      await checkNameFixStatus();
     } catch (error) {
       const errorMsg = formatError(error);
-      addLog(`Error installing FM Name Fix: ${errorMsg}`);
-      toast.error(`Failed to install FM Name Fix: ${errorMsg}`);
+      addLog(`Error installing name fix: ${errorMsg}`);
+      toast.error(`Failed to install name fix: ${errorMsg}`);
     } finally {
       setInstallingNameFix(false);
+    }
+  };
+
+  const handleImportNameFix = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        directory: false,
+        filters: [
+          {
+            name: "Name Fix Archives",
+            extensions: ["zip"],
+          },
+        ],
+      });
+
+      if (selected) {
+        // Prompt for name
+        const name = prompt("Enter a name for this name fix:", "Custom Name Fix");
+        if (!name) return;
+
+        addLog(`Importing name fix: ${name}`);
+        const result = await tauriCommands.importNameFix(selected, name);
+        addLog(result);
+        toast.success(result);
+        
+        // Reload sources
+        await loadNameFixSources();
+      }
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error importing name fix: ${errorMsg}`);
+      toast.error(`Failed to import name fix: ${errorMsg}`);
+    }
+  };
+
+  const handleDeleteNameFix = async (nameFixId: string) => {
+    const source = nameFixSources.find(s => s.id === nameFixId);
+    if (!source) return;
+
+    if (!confirm(`Are you sure you want to delete "${source.name}"?`)) {
+      return;
+    }
+
+    try {
+      addLog(`Deleting ${source.name}...`);
+      const result = await tauriCommands.deleteNameFix(nameFixId);
+      addLog(result);
+      toast.success(result);
+      
+      // Reload sources
+      await loadNameFixSources();
+      await checkNameFixStatus();
+      
+      // Reset selection if deleted source was selected
+      if (selectedNameFixId === nameFixId) {
+        setSelectedNameFixId(nameFixSources[0]?.id || "");
+      }
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error deleting name fix: ${errorMsg}`);
+      toast.error(`Failed to delete name fix: ${errorMsg}`);
     }
   };
 
@@ -467,6 +559,8 @@ function App() {
       addLog(result);
       toast.success("FM Name Fix uninstalled successfully!");
       setNameFixInstalled(false);
+      setActiveNameFixId(null);
+      await checkNameFixStatus();
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error uninstalling FM Name Fix: ${errorMsg}`);
@@ -521,10 +615,15 @@ function App() {
           setIsDragging(false);
         });
 
-        // Check FM Name Fix installation status
+        // Check FM Name Fix installation status and load sources
         try {
           const isInstalled = await tauriCommands.checkNameFixInstalled();
           setNameFixInstalled(isInstalled);
+          
+          const activeId = await tauriCommands.getActiveNameFix();
+          setActiveNameFixId(activeId);
+          
+          await loadNameFixSources();
         } catch (error) {
           // Silently fail - not critical
           console.error("Failed to check FM Name Fix status:", error);
@@ -925,40 +1024,70 @@ function App() {
                           <li>Removes fake/unlicensed content</li>
                           <li>Works with all leagues and competitions</li>
                         </ul>
-                        <p className="text-xs mt-2">
-                          Source:{" "}
-                          <a
-                            href="https://github.com/jo13310/NameFixFM26"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              void openUrl(
-                                "https://github.com/jo13310/NameFixFM26"
-                              );
-                            }}
-                            className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                          >
-                            github.com/jo13310/NameFixFM26
-                          </a>
-                        </p>
                       </div>
-                      <div className="flex gap-2">
-                        {!nameFixInstalled ? (
-                          <Button
-                            onClick={() => void installNameFix()}
-                            disabled={installingNameFix || !config?.target_path}
+
+                      {/* Show active name fix */}
+                      {activeNameFixId && (
+                        <div className="text-sm bg-muted p-3 rounded-md">
+                          <strong>Currently Active:</strong>{" "}
+                          {nameFixSources.find(s => s.id === activeNameFixId)?.name || "Unknown"}
+                        </div>
+                      )}
+
+                      {/* Name Fix Sources Selection */}
+                      {nameFixSources.length > 0 && (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            Select Name Fix Source:
+                          </label>
+                          <select
+                            value={selectedNameFixId}
+                            onChange={(e) => setSelectedNameFixId(e.target.value)}
+                            className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background"
+                            disabled={installingNameFix}
                           >
-                            {installingNameFix ? (
-                              <>
-                                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                Installing...
-                              </>
-                            ) : (
-                              <>
-                                <Download className="mr-2 h-4 w-4" />
-                                Install Name Fix
-                              </>
-                            )}
-                          </Button>
+                            {nameFixSources.map((source) => (
+                              <option key={source.id} value={source.id}>
+                                {source.name}
+                                {source.source_type === "GitHub" ? " (Built-in)" : " (Imported)"}
+                                {source.id === activeNameFixId ? " - Active" : ""}
+                              </option>
+                            ))}
+                          </select>
+                          <p className="text-xs text-muted-foreground">
+                            {nameFixSources.find(s => s.id === selectedNameFixId)?.description}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-2">
+                        {!nameFixInstalled ? (
+                          <>
+                            <Button
+                              onClick={() => void installSelectedNameFix()}
+                              disabled={installingNameFix || !config?.target_path || !selectedNameFixId}
+                            >
+                              {installingNameFix ? (
+                                <>
+                                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                  Installing...
+                                </>
+                              ) : (
+                                <>
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Install Selected
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => void handleImportNameFix()}
+                              disabled={installingNameFix}
+                            >
+                              <Upload className="mr-2 h-4 w-4" />
+                              Import from ZIP
+                            </Button>
+                          </>
                         ) : (
                           <Button
                             variant="destructive"
@@ -977,12 +1106,39 @@ function App() {
                           <RefreshCw className="mr-2 h-4 w-4" />
                           Check Status
                         </Button>
+                        {selectedNameFixId && 
+                         nameFixSources.find(s => s.id === selectedNameFixId)?.source_type === "Imported" && (
+                          <Button
+                            variant="outline"
+                            onClick={() => void handleDeleteNameFix(selectedNameFixId)}
+                            disabled={installingNameFix || selectedNameFixId === activeNameFixId}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Source
+                          </Button>
+                        )}
                       </div>
                       {!config?.target_path && (
                         <p className="text-sm text-amber-600 dark:text-amber-400">
                           Please set your Game Directory first
                         </p>
                       )}
+                      
+                      <p className="text-xs text-muted-foreground mt-2">
+                        GitHub source:{" "}
+                        <a
+                          href="https://github.com/jo13310/NameFixFM26"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            void openUrl(
+                              "https://github.com/jo13310/NameFixFM26"
+                            );
+                          }}
+                          className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                        >
+                          github.com/jo13310/NameFixFM26
+                        </a>
+                      </p>
                     </CardContent>
                   </Card>
                 </CardContent>
