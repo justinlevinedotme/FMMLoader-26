@@ -61,6 +61,7 @@ pub struct NameFixSource {
     pub id: String,
     pub name: String,
     pub source_type: NameFixSourceType,
+    pub install_type: NameFixInstallType,
     pub description: String,
     pub imported_date: String,
 }
@@ -69,6 +70,12 @@ pub struct NameFixSource {
 pub enum NameFixSourceType {
     GitHub,    // Built-in GitHub download
     Imported,  // User-imported ZIP/RAR
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum NameFixInstallType {
+    Files,     // FMScout style: Add specific .lnc/.edt/.dbc files
+    Folders,   // Sortitoutsi style: Replace entire dbc/edt/lnc folders + editor data
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

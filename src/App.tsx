@@ -22,12 +22,29 @@ import {
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   tauriCommands,
   type Config,
@@ -83,6 +100,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [appVersion, setAppVersion] = useState("");
+
+  // Import name fix dialog state
+  const [importNameFixDialogOpen, setImportNameFixDialogOpen] = useState(false);
+  const [pendingImportFilePath, setPendingImportFilePath] = useState<
+    string | null
+  >(null);
+  const [importNameFixName, setImportNameFixName] = useState("");
 
   // Editable path states
   const [gameTargetInput, setGameTargetInput] = useState("");
@@ -438,11 +462,11 @@ function App() {
       addLog("Checking FM Name Fix installation status...");
       const isInstalled = await tauriCommands.checkNameFixInstalled();
       setNameFixInstalled(isInstalled);
-      
+
       // Also load the active name fix ID
       const activeId = await tauriCommands.getActiveNameFix();
       setActiveNameFixId(activeId);
-      
+
       addLog(`FM Name Fix is ${isInstalled ? "installed" : "not installed"}`);
     } catch (error) {
       addLog(`Error checking FM Name Fix status: ${formatError(error)}`);
@@ -455,7 +479,7 @@ function App() {
     try {
       const sources = await tauriCommands.listNameFixes();
       setNameFixSources(sources);
-      
+
       // Set default selection to GitHub if nothing selected
       if (!selectedNameFixId && sources.length > 0) {
         setSelectedNameFixId(sources[0].id);
@@ -473,7 +497,9 @@ function App() {
 
     try {
       setInstallingNameFix(true);
-      const selectedSource = nameFixSources.find(s => s.id === selectedNameFixId);
+      const selectedSource = nameFixSources.find(
+        (s) => s.id === selectedNameFixId
+      );
       addLog(`Installing ${selectedSource?.name || "name fix"}...`);
       const result = await tauriCommands.installNameFixById(selectedNameFixId);
       addLog(result);
@@ -490,7 +516,9 @@ function App() {
   };
 
   const handleImportNameFix = async () => {
+    console.log("=== handleImportNameFix START ===");
     try {
+      console.log("Opening file picker dialog...");
       const selected = await open({
         multiple: false,
         directory: false,
@@ -502,28 +530,82 @@ function App() {
         ],
       });
 
-      if (selected) {
-        // Prompt for name
-        const name = prompt("Enter a name for this name fix:", "Custom Name Fix");
-        if (!name) return;
+      console.log("File picker closed. Selected file:", selected);
 
-        addLog(`Importing name fix: ${name}`);
-        const result = await tauriCommands.importNameFix(selected, name);
-        addLog(result);
-        toast.success(result);
-        
-        // Reload sources
-        await loadNameFixSources();
+      if (!selected) {
+        console.log("No file selected, user cancelled file picker");
+        return;
       }
+
+      console.log("File was selected, opening name dialog...");
+
+      // Open dialog for user to enter name
+      setPendingImportFilePath(selected);
+      setImportNameFixName("Custom Name Fix");
+      setImportNameFixDialogOpen(true);
     } catch (error) {
+      console.error("=== ERROR in handleImportNameFix ===");
+      console.error("Error type:", typeof error);
+      console.error("Error object:", error);
       const errorMsg = formatError(error);
+      console.error("Formatted error message:", errorMsg);
+      addLog(`Error importing name fix: ${errorMsg}`);
+      toast.error(`Failed to import name fix: ${errorMsg}`);
+    }
+    console.log("=== handleImportNameFix END ===");
+  };
+
+  const confirmImportNameFix = async () => {
+    if (!pendingImportFilePath || !importNameFixName.trim()) {
+      toast.error("Please enter a name for the name fix");
+      return;
+    }
+
+    try {
+      setImportNameFixDialogOpen(false);
+      const name = importNameFixName.trim();
+
+      console.log("Name validated, proceeding with import...");
+      addLog(`Importing name fix: ${name}`);
+      console.log(
+        "Calling tauriCommands.importNameFix with path:",
+        pendingImportFilePath,
+        "and name:",
+        name
+      );
+
+      const result = await tauriCommands.importNameFix(
+        pendingImportFilePath,
+        name
+      );
+      console.log("Import completed successfully. Result:", result);
+
+      addLog(result);
+      toast.success(result);
+
+      // Reload sources
+      console.log("Reloading name fix sources...");
+      await loadNameFixSources();
+      console.log("Sources reloaded successfully");
+
+      // Check installation status in case the imported fix matches what's in the game
+      await checkNameFixStatus();
+
+      // Clear state
+      setPendingImportFilePath(null);
+      setImportNameFixName("");
+    } catch (error) {
+      console.error("=== ERROR in confirmImportNameFix ===");
+      console.error("Error object:", error);
+      const errorMsg = formatError(error);
+      console.error("Formatted error message:", errorMsg);
       addLog(`Error importing name fix: ${errorMsg}`);
       toast.error(`Failed to import name fix: ${errorMsg}`);
     }
   };
 
   const handleDeleteNameFix = async (nameFixId: string) => {
-    const source = nameFixSources.find(s => s.id === nameFixId);
+    const source = nameFixSources.find((s) => s.id === nameFixId);
     if (!source) return;
 
     if (!confirm(`Are you sure you want to delete "${source.name}"?`)) {
@@ -535,11 +617,11 @@ function App() {
       const result = await tauriCommands.deleteNameFix(nameFixId);
       addLog(result);
       toast.success(result);
-      
+
       // Reload sources
       await loadNameFixSources();
       await checkNameFixStatus();
-      
+
       // Reset selection if deleted source was selected
       if (selectedNameFixId === nameFixId) {
         setSelectedNameFixId(nameFixSources[0]?.id || "");
@@ -619,10 +701,10 @@ function App() {
         try {
           const isInstalled = await tauriCommands.checkNameFixInstalled();
           setNameFixInstalled(isInstalled);
-          
+
           const activeId = await tauriCommands.getActiveNameFix();
           setActiveNameFixId(activeId);
-          
+
           await loadNameFixSources();
         } catch (error) {
           // Silently fail - not critical
@@ -1030,74 +1112,97 @@ function App() {
                       {activeNameFixId && (
                         <div className="text-sm bg-muted p-3 rounded-md">
                           <strong>Currently Active:</strong>{" "}
-                          {nameFixSources.find(s => s.id === activeNameFixId)?.name || "Unknown"}
+                          {nameFixSources.find((s) => s.id === activeNameFixId)
+                            ?.name || "Unknown"}
                         </div>
                       )}
 
                       {/* Name Fix Sources Selection */}
-                      {nameFixSources.length > 0 && (
+                      {nameFixSources.length > 0 ? (
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
                             Select Name Fix Source:
                           </label>
-                          <select
+                          <Select
                             value={selectedNameFixId}
-                            onChange={(e) => setSelectedNameFixId(e.target.value)}
-                            className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background"
+                            onValueChange={setSelectedNameFixId}
                             disabled={installingNameFix}
                           >
-                            {nameFixSources.map((source) => (
-                              <option key={source.id} value={source.id}>
-                                {source.name}
-                                {source.source_type === "GitHub" ? " (Built-in)" : " (Imported)"}
-                                {source.id === activeNameFixId ? " - Active" : ""}
-                              </option>
-                            ))}
-                          </select>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select a name fix source" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {nameFixSources.map((source) => (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                  {source.id === activeNameFixId
+                                    ? " - Active"
+                                    : ""}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <p className="text-xs text-muted-foreground">
-                            {nameFixSources.find(s => s.id === selectedNameFixId)?.description}
+                            {
+                              nameFixSources.find(
+                                (s) => s.id === selectedNameFixId
+                              )?.description
+                            }
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-sm bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
+                          <p className="text-amber-800 dark:text-amber-200">
+                            No name fix sources available. Import a name fix ZIP
+                            file to get started.
                           </p>
                         </div>
                       )}
 
                       <div className="flex flex-wrap gap-2">
-                        {!nameFixInstalled ? (
-                          <>
-                            <Button
-                              onClick={() => void installSelectedNameFix()}
-                              disabled={installingNameFix || !config?.target_path || !selectedNameFixId}
-                            >
-                              {installingNameFix ? (
-                                <>
-                                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                  Installing...
-                                </>
-                              ) : (
-                                <>
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Install Selected
-                                </>
-                              )}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => void handleImportNameFix()}
-                              disabled={installingNameFix}
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              Import from ZIP
-                            </Button>
-                          </>
-                        ) : (
+                        <Button
+                          onClick={() => void installSelectedNameFix()}
+                          disabled={
+                            installingNameFix ||
+                            !config?.target_path ||
+                            !selectedNameFixId ||
+                            nameFixSources.length === 0 ||
+                            nameFixInstalled
+                          }
+                        >
+                          {installingNameFix ? (
+                            <>
+                              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                              Installing...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="mr-2 h-4 w-4" />
+                              {nameFixInstalled ? "Reinstall" : "Install"}
+                            </>
+                          )}
+                        </Button>
+
+                        {nameFixInstalled && (
                           <Button
                             variant="destructive"
                             onClick={() => void uninstallNameFix()}
                             disabled={installingNameFix}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Uninstall
+                            Uninstall from Game
                           </Button>
                         )}
+
+                        <Button
+                          variant="outline"
+                          onClick={() => void handleImportNameFix()}
+                          disabled={installingNameFix}
+                        >
+                          <Upload className="mr-2 h-4 w-4" />
+                          Import from ZIP
+                        </Button>
+
                         <Button
                           variant="outline"
                           onClick={() => void checkNameFixStatus()}
@@ -1106,12 +1211,17 @@ function App() {
                           <RefreshCw className="mr-2 h-4 w-4" />
                           Check Status
                         </Button>
-                        {selectedNameFixId && 
-                         nameFixSources.find(s => s.id === selectedNameFixId)?.source_type === "Imported" && (
+
+                        {selectedNameFixId && nameFixSources.length > 0 && (
                           <Button
                             variant="outline"
-                            onClick={() => void handleDeleteNameFix(selectedNameFixId)}
-                            disabled={installingNameFix || selectedNameFixId === activeNameFixId}
+                            onClick={() =>
+                              void handleDeleteNameFix(selectedNameFixId)
+                            }
+                            disabled={
+                              installingNameFix ||
+                              selectedNameFixId === activeNameFixId
+                            }
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Source
@@ -1123,21 +1233,11 @@ function App() {
                           Please set your Game Directory first
                         </p>
                       )}
-                      
+
                       <p className="text-xs text-muted-foreground mt-2">
-                        GitHub source:{" "}
-                        <a
-                          href="https://github.com/jo13310/NameFixFM26"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            void openUrl(
-                              "https://github.com/jo13310/NameFixFM26"
-                            );
-                          }}
-                          className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                        >
-                          github.com/jo13310/NameFixFM26
-                        </a>
+                        You can download name fixes from the community or create
+                        your own. We reccomend fixes from our friends at
+                        SortItOutSI or FMScout
                       </p>
                     </CardContent>
                   </Card>
@@ -1386,6 +1486,49 @@ function App() {
           </SheetContent>
         </Sheet>
         <Toaster />
+
+        {/* Import Name Fix Dialog */}
+        <Dialog
+          open={importNameFixDialogOpen}
+          onOpenChange={setImportNameFixDialogOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Import Name Fix</DialogTitle>
+              <DialogDescription>
+                Enter a name for this name fix package
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="namefix-name">Name</Label>
+                <Input
+                  id="namefix-name"
+                  value={importNameFixName}
+                  onChange={(e) => setImportNameFixName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      void confirmImportNameFix();
+                    }
+                  }}
+                  placeholder="e.g., Real Names Fix v1.0"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setImportNameFixDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={() => void confirmImportNameFix()}>
+                Import
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
