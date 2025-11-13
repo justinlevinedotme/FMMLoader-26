@@ -80,6 +80,14 @@ export interface ModMetadata {
   description?: string;
 }
 
+export interface NameFixSource {
+  id: string;
+  name: string;
+  source_type: "GitHub" | "Imported";
+  description: string;
+  imported_date: string;
+}
+
 export const tauriCommands = {
   initApp: () => safeInvoke<void>("init_app"),
 
@@ -160,4 +168,17 @@ export const tauriCommands = {
   installNameFix: () => safeInvoke<string>("install_name_fix"),
 
   uninstallNameFix: () => safeInvoke<string>("uninstall_name_fix"),
+
+  listNameFixes: () => safeInvoke<NameFixSource[]>("list_name_fixes"),
+
+  importNameFix: (filePath: string, name: string) =>
+    safeInvoke<string>("import_name_fix", { filePath, name }),
+
+  installNameFixById: (nameFixId: string) =>
+    safeInvoke<string>("install_name_fix_by_id", { nameFixId }),
+
+  deleteNameFix: (nameFixId: string) =>
+    safeInvoke<string>("delete_name_fix", { nameFixId }),
+
+  getActiveNameFix: () => safeInvoke<string | null>("get_active_name_fix"),
 };

@@ -44,6 +44,7 @@ pub fn init_storage() -> Result<(), String> {
         base_dir.join("mods"),
         base_dir.join("logs"),
         base_dir.join("restore_points"),
+        base_dir.join("name_fixes"),
     ];
 
     for dir in dirs {
@@ -66,6 +67,7 @@ pub fn load_config() -> Result<Config, String> {
             user_dir_path: None,
             enabled_mods: Vec::new(),
             dark_mode: false,
+            active_name_fix: None,
         });
     }
 
@@ -102,4 +104,8 @@ pub fn get_restore_points_dir() -> PathBuf {
 
 pub fn get_logs_dir() -> PathBuf {
     get_app_data_dir().join("logs")
+}
+
+pub fn get_name_fixes_dir() -> PathBuf {
+    get_app_data_dir().join("name_fixes")
 }

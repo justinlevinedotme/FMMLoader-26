@@ -414,12 +414,38 @@ fn check_name_fix_installed() -> Result<bool, String> {
 
 #[tauri::command]
 fn install_name_fix() -> Result<String, String> {
-    name_fix::install()
+    // Install the GitHub name fix (backwards compatibility)
+    name_fix::install_name_fix(name_fix::GITHUB_NAME_FIX_ID.to_string())
 }
 
 #[tauri::command]
 fn uninstall_name_fix() -> Result<String, String> {
     name_fix::uninstall()
+}
+
+#[tauri::command]
+fn list_name_fixes() -> Result<Vec<crate::types::NameFixSource>, String> {
+    name_fix::list_name_fixes()
+}
+
+#[tauri::command]
+fn import_name_fix(file_path: String, name: String) -> Result<String, String> {
+    name_fix::import_name_fix(file_path, name)
+}
+
+#[tauri::command]
+fn install_name_fix_by_id(name_fix_id: String) -> Result<String, String> {
+    name_fix::install_name_fix(name_fix_id)
+}
+
+#[tauri::command]
+fn delete_name_fix(name_fix_id: String) -> Result<String, String> {
+    name_fix::delete_name_fix(name_fix_id)
+}
+
+#[tauri::command]
+fn get_active_name_fix() -> Result<Option<String>, String> {
+    name_fix::get_active_name_fix()
 }
 
 // Helper function for recursive directory copy
@@ -500,6 +526,11 @@ fn main() {
             check_name_fix_installed,
             install_name_fix,
             uninstall_name_fix,
+            list_name_fixes,
+            import_name_fix,
+            install_name_fix_by_id,
+            delete_name_fix,
+            get_active_name_fix,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
