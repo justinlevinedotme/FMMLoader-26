@@ -89,6 +89,42 @@ export interface NameFixSource {
   imported_date: string;
 }
 
+export interface ExtractionProgress {
+  current: number;
+  total: number;
+  current_file: string;
+  bytes_processed: number;
+  phase: string;
+}
+
+export interface GraphicsPackMetadata {
+  id: string;
+  name: string;
+  install_date: string;
+  file_count: number;
+  source_filename: string;
+  pack_type: string;
+  installed_to: string;
+}
+
+export type GraphicsPackType =
+  | "Faces"
+  | "Logos"
+  | "Kits"
+  | { Mixed: GraphicsPackType[] }
+  | "Unknown";
+
+export interface GraphicsPackAnalysis {
+  pack_type: GraphicsPackType;
+  confidence: number;
+  suggested_paths: string[];
+  file_count: number;
+  total_size_bytes: number;
+  has_config_xml: boolean;
+  subdirectory_breakdown: Record<string, number>;
+  is_flat_pack: boolean;
+}
+
 export const tauriCommands = {
   initApp: () => safeInvoke<void>("init_app"),
 
@@ -182,4 +218,53 @@ export const tauriCommands = {
     safeInvoke<string>("delete_name_fix", { nameFixId }),
 
   getActiveNameFix: () => safeInvoke<string | null>("get_active_name_fix"),
+
+  // Graphics pack import
+  importGraphicsPack: (sourcePath: string) =>
+    safeInvoke<string>("import_graphics_pack", { sourcePath }),
+
+  importGraphicsPackWithType: (
+    sourcePath: string,
+    targetPath: string,
+    shouldSplit: boolean,
+    force: boolean
+  ) =>
+    safeInvoke<string>("import_graphics_pack_with_type", {
+      sourcePath,
+      targetPath,
+      shouldSplit,
+      force,
+    }),
+
+  checkGraphicsConflicts: (targetPath: string, packName: string, isFlatPack: boolean) =>
+    safeInvoke<GraphicsConflictInfo | null>("check_graphics_conflicts", {
+      targetPath,
+      packName,
+      isFlatPack,
+    }),
+
+  listGraphicsPacks: () => safeInvoke<GraphicsPackMetadata[]>("list_graphics_packs"),
+
+  analyzeGraphicsPack: (sourcePath: string) =>
+    safeInvoke<GraphicsPackAnalysis>("analyze_graphics_pack", { sourcePath }),
+
+  validateGraphics: () =>
+    safeInvoke<GraphicsPackIssue[]>("validate_graphics"),
+
+  migrateGraphicsPack: (packName: string, targetSubdir: string) =>
+    safeInvoke<string>("migrate_graphics_pack", { packName, targetSubdir }),
 };
+
+export interface GraphicsPackIssue {
+  pack_name: string;
+  current_path: string;
+  suggested_path: string;
+  reason: string;
+  pack_type: string;
+}
+
+export interface GraphicsConflictInfo {
+  target_directory: string;
+  existing_file_count: number;
+  pack_name: string;
+}
