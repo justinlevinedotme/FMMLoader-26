@@ -99,3 +99,43 @@ pub struct ConflictInfo {
     pub file_path: String,
     pub conflicting_mods: Vec<String>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExtractionProgress {
+    pub current: usize,
+    pub total: usize,
+    pub current_file: String,
+    pub bytes_processed: u64,
+    pub phase: String, // "extracting" or "installing"
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstallProgress {
+    pub current: usize,
+    pub total: usize,
+    pub current_file: String,
+    pub operation: String, // "copying", "validating", etc.
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphicsPackMetadata {
+    pub id: String,
+    pub name: String,
+    pub install_date: String,
+    pub file_count: usize,
+    pub source_filename: String,
+    pub pack_type: String, // "faces", "logos", "kits", "mixed"
+    pub installed_to: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct GraphicsPacksRegistry {
+    pub graphics_packs: Vec<GraphicsPackMetadata>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphicsConflictInfo {
+    pub target_directory: String,
+    pub existing_file_count: usize,
+    pub pack_name: String,
+}

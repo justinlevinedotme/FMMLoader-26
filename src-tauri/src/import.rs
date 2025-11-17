@@ -2,6 +2,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use zip::ZipArchive;
+use crate::types::ExtractionProgress;
 
 pub fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<PathBuf, String> {
     let file = fs::File::open(zip_path)
@@ -47,6 +48,81 @@ pub fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<PathBuf, String> 
     }
 
     Ok(dest_dir.to_path_buf())
+}
+
+/// Async version of extract_zip that emits progress events
+pub async fn extract_zip_async<F>(
+    zip_path: PathBuf,
+    dest_dir: PathBuf,
+    mut progress_callback: F,
+) -> Result<PathBuf, String>
+where
+    F: FnMut(ExtractionProgress) + Send + 'static,
+{
+    tokio::task::spawn_blocking(move || {
+        let file = fs::File::open(&zip_path)
+            .map_err(|e| format!("Failed to open zip file: {}", e))?;
+
+        let mut archive = ZipArchive::new(file)
+            .map_err(|e| format!("Failed to read zip archive: {}", e))?;
+
+        fs::create_dir_all(&dest_dir)
+            .map_err(|e| format!("Failed to create destination directory: {}", e))?;
+
+        let total = archive.len();
+        let mut bytes_processed = 0u64;
+
+        for i in 0..total {
+            let mut file = archive.by_index(i)
+                .map_err(|e| format!("Failed to read file from archive: {}", e))?;
+
+            let outpath = match file.enclosed_name() {
+                Some(path) => dest_dir.join(path),
+                None => continue,
+            };
+
+            let file_name = file.name().to_string();
+
+            if file.name().ends_with('/') {
+                fs::create_dir_all(&outpath)
+                    .map_err(|e| format!("Failed to create directory: {}", e))?;
+            } else {
+                if let Some(p) = outpath.parent() {
+                    fs::create_dir_all(p)
+                        .map_err(|e| format!("Failed to create parent directory: {}", e))?;
+                }
+                let mut outfile = fs::File::create(&outpath)
+                    .map_err(|e| format!("Failed to create output file: {}", e))?;
+                let bytes_copied = io::copy(&mut file, &mut outfile)
+                    .map_err(|e| format!("Failed to extract file: {}", e))?;
+                bytes_processed += bytes_copied;
+            }
+
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                if let Some(mode) = file.unix_mode() {
+                    fs::set_permissions(&outpath, fs::Permissions::from_mode(mode))
+                        .ok();
+                }
+            }
+
+            // Emit progress every 50 files or on last file
+            if i % 50 == 0 || i == total - 1 {
+                progress_callback(ExtractionProgress {
+                    current: i + 1,
+                    total,
+                    current_file: file_name,
+                    bytes_processed,
+                    phase: "extracting".to_string(),
+                });
+            }
+        }
+
+        Ok(dest_dir)
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
 }
 
 pub fn has_manifest(dir: &Path) -> bool {
