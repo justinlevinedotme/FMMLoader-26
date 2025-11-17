@@ -291,7 +291,12 @@ Categories=Game;Utility;
 - **Custom Install Paths**: Override default installation locations per mod
 - **Platform-Specific Mods**: Support for mods that work on specific platforms only
 - **Dependency Management**: Manifest support for mod dependencies and conflicts
-- **Graphics Pack Support**: Smart handling of kits, faces, and logo packs with subfolder detection
+- **Graphics Pack Support**:
+  - Intelligent pack type detection (faces, logos, kits, mixed)
+  - Handles large packs (5GB+) with async processing and progress tracking
+  - Confidence scoring for pack classification
+  - Support for both flat and structured pack layouts
+  - Automatic conflict detection before installation
 - **Restore Point Management**: Automatic cleanup of old backups (keeps last 10)
 - **Manifest Generator**: Automatically creates manifests for mods that don't have one
 - **Multi-Format Archives**: Support for nested .zip structures and various mod packaging formats

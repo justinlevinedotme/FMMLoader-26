@@ -1,4 +1,4 @@
-use crate::types::Config;
+use crate::types::{Config, GraphicsPackMetadata, GraphicsPacksRegistry};
 use std::fs;
 use std::path::PathBuf;
 use tauri::Manager;
@@ -108,4 +108,41 @@ pub fn get_logs_dir() -> PathBuf {
 
 pub fn get_name_fixes_dir() -> PathBuf {
     get_app_data_dir().join("name_fixes")
+}
+
+pub fn get_graphics_packs_path() -> PathBuf {
+    get_app_data_dir().join("graphics_packs.json")
+}
+
+pub fn load_graphics_packs() -> Result<GraphicsPacksRegistry, String> {
+    let path = get_graphics_packs_path();
+
+    if !path.exists() {
+        return Ok(GraphicsPacksRegistry::default());
+    }
+
+    let contents = fs::read_to_string(&path)
+        .map_err(|e| format!("Failed to read graphics packs registry: {}", e))?;
+
+    serde_json::from_str(&contents)
+        .map_err(|e| format!("Failed to parse graphics packs registry: {}", e))
+}
+
+pub fn save_graphics_packs(registry: &GraphicsPacksRegistry) -> Result<(), String> {
+    let path = get_graphics_packs_path();
+
+    let json = serde_json::to_string_pretty(registry)
+        .map_err(|e| format!("Failed to serialize graphics packs registry: {}", e))?;
+
+    fs::write(&path, json)
+        .map_err(|e| format!("Failed to write graphics packs registry: {}", e))?;
+
+    Ok(())
+}
+
+pub fn add_graphics_pack(metadata: GraphicsPackMetadata) -> Result<(), String> {
+    let mut registry = load_graphics_packs()?;
+    registry.graphics_packs.push(metadata);
+    save_graphics_packs(&registry)?;
+    Ok(())
 }

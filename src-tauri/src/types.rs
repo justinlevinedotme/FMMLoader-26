@@ -1,3 +1,8 @@
+//! Type Definitions
+//!
+//! This module contains all shared type definitions used across the application.
+//! Types are organized by domain: mod management, configuration, graphics packs, and progress tracking.
+
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -98,4 +103,53 @@ pub struct RestorePoint {
 pub struct ConflictInfo {
     pub file_path: String,
     pub conflicting_mods: Vec<String>,
+}
+
+/// Progress tracking for archive extraction operations.
+/// Emitted via Tauri events during async extraction of graphics packs.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExtractionProgress {
+    pub current: usize,
+    pub total: usize,
+    pub current_file: String,
+    pub bytes_processed: u64,
+    pub phase: String, // "extracting" or "installing"
+}
+
+/// Progress tracking for file installation operations.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstallProgress {
+    pub current: usize,
+    pub total: usize,
+    pub current_file: String,
+    pub operation: String, // "copying", "validating", etc.
+}
+
+/// Metadata for an installed graphics pack.
+/// Persisted to config.json as part of GraphicsPacksRegistry.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphicsPackMetadata {
+    pub id: String,
+    pub name: String,
+    pub install_date: String,
+    pub file_count: usize,
+    pub source_filename: String,
+    pub pack_type: String, // "faces", "logos", "kits", "mixed"
+    pub installed_to: String,
+}
+
+/// Registry of all installed graphics packs.
+/// Stored in config.json to persist across application sessions.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct GraphicsPacksRegistry {
+    pub graphics_packs: Vec<GraphicsPackMetadata>,
+}
+
+/// Information about graphics pack installation conflicts.
+/// Used to warn users when installing to directories with existing content.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphicsConflictInfo {
+    pub target_directory: String,
+    pub existing_file_count: usize,
+    pub pack_name: String,
 }

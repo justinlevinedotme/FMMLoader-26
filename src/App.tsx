@@ -51,6 +51,11 @@ import {
   type ModManifest,
   type ModMetadata,
   type NameFixSource,
+  type ExtractionProgress,
+  type GraphicsPackMetadata,
+  type GraphicsPackAnalysis,
+  type GraphicsPackIssue,
+  type GraphicsConflictInfo,
 } from "@/hooks/useTauri";
 import {
   FolderOpen,
@@ -70,6 +75,7 @@ import { SiKofi } from "react-icons/si";
 import { ModMetadataDialog } from "@/components/ModMetadataDialog";
 import { ConflictsDialog } from "@/components/ConflictsDialog";
 import { RestorePointsDialog } from "@/components/RestorePointsDialog";
+import { GraphicsPackConfirmDialog } from "@/components/GraphicsPackConfirmDialog";
 import { TitleBar } from "@/components/TitleBar";
 import { Toaster } from "@/components/ui/sonner";
 import { UpdateBanner } from "@/components/UpdateBanner";
@@ -131,6 +137,22 @@ function App() {
   const [activeNameFixId, setActiveNameFixId] = useState<string | null>(null);
   const [selectedNameFixId, setSelectedNameFixId] = useState<string>("");
 
+  // Graphics pack states
+  const [graphicsProgress, setGraphicsProgress] = useState<ExtractionProgress | null>(null);
+  const [importingGraphics, setImportingGraphics] = useState(false);
+  const [graphicsPacks, setGraphicsPacks] = useState<GraphicsPackMetadata[]>([]);
+  const [graphicsIssues, setGraphicsIssues] = useState<GraphicsPackIssue[]>([]);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [validatingGraphics, setValidatingGraphics] = useState(false);
+  const [showGraphicsConfirmDialog, setShowGraphicsConfirmDialog] = useState(false);
+  const [pendingGraphicsAnalysis, setPendingGraphicsAnalysis] = useState<GraphicsPackAnalysis | null>(null);
+  const [pendingGraphicsPath, setPendingGraphicsPath] = useState<string | null>(null);
+  const [migrationProgress, setMigrationProgress] = useState<ExtractionProgress | null>(null);
+  const [migratingPack, setMigratingPack] = useState(false);
+  const [graphicsConflict, setGraphicsConflict] = useState<GraphicsConflictInfo | null>(null);
+  const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const [pendingInstall, setPendingInstall] = useState<{path: string, shouldSplit: boolean} | null>(null);
+
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs((prev) => [`[${timestamp}] ${message}`, ...prev].slice(0, 100));
@@ -183,6 +205,18 @@ function App() {
       addLog(`Error loading mods: ${formatError(error)}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadGraphicsPacks = async () => {
+    try {
+      const packs = await tauriCommands.listGraphicsPacks();
+      setGraphicsPacks(packs);
+      if (packs.length > 0) {
+        addLog(`Loaded ${packs.length} graphics packs`);
+      }
+    } catch (error) {
+      addLog(`Error loading graphics packs: ${formatError(error)}`);
     }
   };
 
@@ -373,6 +407,37 @@ function App() {
 
   const handleImport = async (sourcePath: string) => {
     try {
+      // Check if this is a graphics pack (large ZIP file)
+      const isZip = sourcePath.toLowerCase().endsWith('.zip');
+      const fileName = sourcePath.split('/').pop()?.toLowerCase() || '';
+
+      // Heuristic: if filename contains graphics-related keywords, treat as graphics pack
+      const graphicsKeywords = ['faces', 'logos', 'kits', 'graphics', 'megapack', 'facepack'];
+      const isLikelyGraphicsPack = graphicsKeywords.some(keyword => fileName.includes(keyword));
+
+      if (isZip && isLikelyGraphicsPack) {
+        // Route to graphics pack analysis and confirmation
+        addLog(`Detected graphics pack: ${sourcePath}`);
+        toast.loading("Analyzing graphics pack (this may take a few minutes)...", { id: "analyze-graphics" });
+
+        try {
+          const analysis = await tauriCommands.analyzeGraphicsPack(sourcePath);
+          addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
+          toast.success("Analysis complete!", { id: "analyze-graphics" });
+
+          // Store the analysis and path, then show confirmation dialog
+          setPendingGraphicsAnalysis(analysis);
+          setPendingGraphicsPath(sourcePath);
+          setShowGraphicsConfirmDialog(true);
+        } catch (error) {
+          const errorMsg = formatError(error);
+          addLog(`Error analyzing graphics pack: ${errorMsg}`);
+          toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: "analyze-graphics" });
+        }
+        return;
+      }
+
+      // Otherwise, import as regular mod
       addLog(`Importing from: ${sourcePath}`);
       const result = await tauriCommands.importMod(sourcePath);
       addLog(`Successfully imported: ${result}`);
@@ -604,6 +669,225 @@ function App() {
     }
   };
 
+  const handleImportGraphicsPackDirect = async (sourcePath: string) => {
+    try {
+      setImportingGraphics(true);
+      addLog(`Importing graphics pack from: ${sourcePath}`);
+      toast.loading("Starting graphics pack import...", { id: "graphics-import" });
+
+      const result = await tauriCommands.importGraphicsPack(sourcePath);
+
+      addLog(result);
+      // Success toast is now shown immediately via the "complete" phase event
+      // No need to show it again here
+
+      // Reload graphics packs list
+      await loadGraphicsPacks();
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error importing graphics pack: ${errorMsg}`);
+      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: "graphics-import" });
+      setGraphicsProgress(null);
+    } finally {
+      setImportingGraphics(false);
+    }
+  };
+
+  const handleImportGraphicsPack = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        directory: false,
+        filters: [
+          {
+            name: "Graphics Pack Archives",
+            extensions: ["zip"],
+          },
+        ],
+      });
+
+      if (!selected) {
+        return;
+      }
+
+      // Analyze the pack first
+      addLog("Analyzing graphics pack...");
+      toast.loading("Analyzing graphics pack (this may take a few minutes)...", { id: "analyze-graphics" });
+
+      const analysis = await tauriCommands.analyzeGraphicsPack(selected);
+
+      addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
+      toast.success("Analysis complete!", { id: "analyze-graphics" });
+
+      // Store the analysis and path, then show confirmation dialog
+      setPendingGraphicsAnalysis(analysis);
+      setPendingGraphicsPath(selected);
+      setShowGraphicsConfirmDialog(true);
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error analyzing graphics pack: ${errorMsg}`);
+      toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: "analyze-graphics" });
+    }
+  };
+
+  const handleGraphicsConfirm = async (installPath: string, shouldSplit: boolean) => {
+    if (!pendingGraphicsPath || !pendingGraphicsAnalysis) return;
+
+    try {
+      setShowGraphicsConfirmDialog(false);
+
+      // Check for conflicts before installing
+      const packName = pendingGraphicsPath.split('/').pop()?.replace('.zip', '') || 'Unknown';
+      const conflict = await tauriCommands.checkGraphicsConflicts(
+        installPath,
+        packName,
+        pendingGraphicsAnalysis.is_flat_pack
+      );
+
+      if (conflict) {
+        // Show conflict dialog
+        setGraphicsConflict(conflict);
+        setPendingInstall({ path: installPath, shouldSplit });
+        setShowConflictDialog(true);
+        return;
+      }
+
+      // No conflict, proceed with installation
+      await performGraphicsInstall(installPath, shouldSplit, false);
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error checking conflicts: ${errorMsg}`);
+      toast.error(`Failed to check conflicts: ${errorMsg}`);
+    }
+  };
+
+  const performGraphicsInstall = async (installPath: string, shouldSplit: boolean, force: boolean) => {
+    if (!pendingGraphicsPath) return;
+
+    try {
+      setImportingGraphics(true);
+      addLog(`Installing graphics pack to: ${installPath}`);
+      toast.loading("Installing graphics pack...", { id: "graphics-import" });
+
+      const result = await tauriCommands.importGraphicsPackWithType(
+        pendingGraphicsPath,
+        installPath,
+        shouldSplit,
+        force
+      );
+
+      addLog(result);
+      await loadGraphicsPacks();
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error importing graphics pack: ${errorMsg}`);
+      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: "graphics-import" });
+      setGraphicsProgress(null);
+    } finally {
+      setImportingGraphics(false);
+      setPendingGraphicsAnalysis(null);
+      setPendingGraphicsPath(null);
+    }
+  };
+
+  const handleConflictConfirm = async () => {
+    if (!pendingInstall) return;
+
+    setShowConflictDialog(false);
+    await performGraphicsInstall(pendingInstall.path, pendingInstall.shouldSplit, true);
+    setGraphicsConflict(null);
+    setPendingInstall(null);
+  };
+
+  const handleConflictCancel = () => {
+    setShowConflictDialog(false);
+    setGraphicsConflict(null);
+    setPendingInstall(null);
+    setPendingGraphicsAnalysis(null);
+    setPendingGraphicsPath(null);
+    addLog("Graphics pack installation cancelled due to conflicts");
+  };
+
+  const handleGraphicsCancel = () => {
+    setShowGraphicsConfirmDialog(false);
+    setPendingGraphicsAnalysis(null);
+    setPendingGraphicsPath(null);
+    addLog("Graphics pack import cancelled");
+  };
+
+  const handleValidateGraphics = async () => {
+    try {
+      setValidatingGraphics(true);
+      addLog("Validating installed graphics packs...");
+      toast.loading("Validating graphics...", { id: "validate-graphics" });
+
+      const issues = await tauriCommands.validateGraphics();
+      setGraphicsIssues(issues);
+
+      if (issues.length === 0) {
+        addLog("No issues found - all graphics packs are correctly placed");
+        toast.success("All graphics packs are correctly placed!", { id: "validate-graphics" });
+      } else {
+        addLog(`Found ${issues.length} graphics pack issue(s)`);
+        toast.info(`Found ${issues.length} issue(s). Click to review.`, { id: "validate-graphics" });
+        setShowValidationDialog(true);
+      }
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error validating graphics: ${errorMsg}`);
+      toast.error(`Failed to validate graphics: ${errorMsg}`, { id: "validate-graphics" });
+    } finally {
+      setValidatingGraphics(false);
+    }
+  };
+
+  const handleMigrateGraphicsPack = async (packName: string, targetSubdir: string) => {
+    try {
+      setMigratingPack(true);
+      addLog(`Migrating ${packName} to ${targetSubdir}/...`);
+      toast.loading(`Moving ${packName}...`, { id: "migrate-graphics" });
+
+      const result = await tauriCommands.migrateGraphicsPack(packName, targetSubdir);
+      addLog(result);
+      toast.success("Graphics pack moved successfully!", { id: "migrate-graphics" });
+
+      // Clear progress and reload validation
+      setMigrationProgress(null);
+      await handleValidateGraphics();
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error migrating graphics pack: ${errorMsg}`);
+      toast.error(`Failed to migrate pack: ${errorMsg}`, { id: "migrate-graphics" });
+      setMigrationProgress(null);
+    } finally {
+      setMigratingPack(false);
+    }
+  };
+
+  const handleMigrateAll = async () => {
+    if (graphicsIssues.length === 0) return;
+
+    try {
+      addLog(`Migrating ${graphicsIssues.length} graphics pack(s)...`);
+      toast.loading("Migrating all packs...", { id: "migrate-all" });
+
+      for (const issue of graphicsIssues) {
+        await tauriCommands.migrateGraphicsPack(issue.pack_name, issue.pack_type);
+        addLog(`Migrated ${issue.pack_name}`);
+      }
+
+      toast.success("All packs migrated successfully!", { id: "migrate-all" });
+      setShowValidationDialog(false);
+
+      // Reload validation
+      await handleValidateGraphics();
+    } catch (error) {
+      const errorMsg = formatError(error);
+      addLog(`Error migrating packs: ${errorMsg}`);
+      toast.error(`Failed to migrate packs: ${errorMsg}`, { id: "migrate-all" });
+    }
+  };
+
   const handleDeleteNameFix = async (nameFixId: string) => {
     const source = nameFixSources.find((s) => s.id === nameFixId);
     if (!source) return;
@@ -663,6 +947,7 @@ function App() {
         setAppVersion(version);
         await loadConfig();
         await loadMods();
+        await loadGraphicsPacks();
         addLog("FMMLoader26 initialized");
 
         // Set up Tauri drag and drop event listeners
@@ -697,6 +982,52 @@ function App() {
           setIsDragging(false);
         });
 
+        // Listen for graphics pack extraction progress
+        const unlistenGraphicsProgress = await listen<ExtractionProgress>(
+          "graphics-extraction-progress",
+          (event) => {
+            setGraphicsProgress(event.payload);
+
+            // Check if installation is complete
+            if (event.payload.phase === "complete") {
+              toast.success("Graphics pack installed successfully!", { id: "graphics-import" });
+              setGraphicsProgress(null);
+            } else if (event.payload.phase === "indexing") {
+              // Show indexing phase
+              toast.loading("Indexing files...", { id: "graphics-import" });
+            } else {
+              // Update toast with progress (copying or extracting)
+              const percent = Math.round((event.payload.current / event.payload.total) * 100);
+              const phaseText = event.payload.phase === "copying" ? "Installing" : "Extracting";
+              toast.loading(
+                `${phaseText} graphics: ${event.payload.current}/${event.payload.total} files (${percent}%)`,
+                { id: "graphics-import" }
+              );
+            }
+          }
+        );
+
+        // Listen for migration progress
+        const unlistenMigrationProgress = await listen<ExtractionProgress>(
+          "migration-progress",
+          (event) => {
+            setMigrationProgress(event.payload);
+
+            // Check if migration is complete
+            if (event.payload.phase === "complete") {
+              setMigrationProgress(null);
+              setMigratingPack(false);
+            } else {
+              // Update progress state
+              const percent = Math.round((event.payload.current / event.payload.total) * 100);
+              toast.loading(
+                `Migrating: ${event.payload.current}/${event.payload.total} files (${percent}%)`,
+                { id: "migrate-graphics" }
+              );
+            }
+          }
+        );
+
         // Check FM Name Fix installation status and load sources
         try {
           const isInstalled = await tauriCommands.checkNameFixInstalled();
@@ -716,6 +1047,7 @@ function App() {
           unlistenDragOver();
           unlistenDragDrop();
           unlistenDragLeave();
+          unlistenGraphicsProgress();
         };
       } catch (error) {
         addLog(`Initialization error: ${formatError(error)}`);
@@ -732,6 +1064,46 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
+
+  // Debug function to preview graphics pack dialog
+  useEffect(() => {
+    (window as any).previewGraphicsDialog = (confidenceLevel: 'high' | 'low' | 'mixed' = 'high') => {
+      const mockData = {
+        high: {
+          pack_type: "Logos",
+          confidence: 0.95,
+          suggested_paths: ["logos", "faces", "kits"],
+          file_count: 15420,
+          total_size_bytes: 2147483648,
+          has_config_xml: true,
+          subdirectory_breakdown: {},
+          is_flat_pack: false
+        },
+        low: {
+          pack_type: "Unknown",
+          confidence: 0.35,
+          suggested_paths: ["logos", "faces", "kits"],
+          file_count: 8500,
+          total_size_bytes: 1073741824,
+          has_config_xml: false,
+          subdirectory_breakdown: {},
+          is_flat_pack: true
+        },
+        mixed: {
+          pack_type: { Mixed: ["Faces", "Logos", "Kits"] },
+          confidence: 0.85,
+          suggested_paths: ["faces", "logos", "kits"],
+          file_count: 25000,
+          total_size_bytes: 3221225472,
+          has_config_xml: true,
+          subdirectory_breakdown: { faces: 12000, logos: 8000, kits: 5000 },
+          is_flat_pack: false
+        }
+      };
+      setPendingGraphicsAnalysis(mockData[confidenceLevel] as any);
+      setShowGraphicsConfirmDialog(true);
+    };
+  }, []);
 
   return (
     <TooltipProvider>
@@ -1039,6 +1411,33 @@ function App() {
                             </TableCell>
                           </TableRow>
                         ))}
+                        {graphicsPacks.map((pack) => (
+                          <TableRow
+                            key={pack.id}
+                            className="hover:bg-muted/50"
+                          >
+                            <TableCell>
+                              <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {pack.name}
+                            </TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
+                                {pack.pack_type}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-xs">
+                              {pack.file_count} files
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-xs">
+                              {new Date(pack.install_date).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-xs text-muted-foreground">Always Active</span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                       </TableBody>
                     </Table>
                   </CardContent>
@@ -1241,6 +1640,88 @@ function App() {
                       </p>
                     </CardContent>
                   </Card>
+
+                  {/* Graphics Packs */}
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">Graphics Packs</CardTitle>
+                          <CardDescription className="mt-1">
+                            Import large graphics packs including faces, logos, and kits
+                          </CardDescription>
+                        </div>
+                        {importingGraphics && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                            Importing...
+                          </div>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-sm text-muted-foreground space-y-2">
+                        <p>
+                          <strong>What it does:</strong>
+                        </p>
+                        <ul className="list-disc list-inside space-y-1 ml-2">
+                          <li>Imports player faces, club logos, and team kits</li>
+                          <li>Supports large packs (5GB+)</li>
+                          <li>Shows real-time progress during import</li>
+                          <li>Automatically routes files to correct directories</li>
+                        </ul>
+                      </div>
+
+                      {graphicsProgress && (
+                        <div className="text-sm bg-muted p-3 rounded-md space-y-2">
+                          <div className="flex justify-between">
+                            <strong>Progress:</strong>
+                            <span>{Math.round((graphicsProgress.current / graphicsProgress.total) * 100)}%</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {graphicsProgress.current} / {graphicsProgress.total} files
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all"
+                              style={{
+                                width: `${(graphicsProgress.current / graphicsProgress.total) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          onClick={() => void handleImportGraphicsPack()}
+                          disabled={importingGraphics || !config?.user_dir_path}
+                        >
+                          <Upload className="mr-2 h-4 w-4" />
+                          Import Graphics Pack
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => void handleValidateGraphics()}
+                          disabled={validatingGraphics || !config?.user_dir_path}
+                        >
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
+                          Validate Graphics
+                        </Button>
+                      </div>
+
+                      {!config?.user_dir_path && (
+                        <p className="text-sm text-amber-600 dark:text-amber-400">
+                          User directory is required for graphics pack installation
+                        </p>
+                      )}
+
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Graphics packs are installed to your FM user directory and require
+                        a full game restart to take effect
+                      </p>
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1324,6 +1805,154 @@ function App() {
             addLog("Restored from backup");
           }}
         />
+
+        {/* Graphics Pack Confirmation Dialog */}
+        <GraphicsPackConfirmDialog
+          analysis={pendingGraphicsAnalysis}
+          onConfirm={handleGraphicsConfirm}
+          onCancel={handleGraphicsCancel}
+          userDirPath={config?.user_dir_path}
+        />
+
+        {/* Graphics Conflict Confirmation Dialog */}
+        <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
+                Confirm Overwrite
+              </DialogTitle>
+              <DialogDescription>
+                Files exist in the target directory. This action may overwrite existing graphics.
+              </DialogDescription>
+            </DialogHeader>
+
+            {graphicsConflict && (
+              <div className="space-y-3 my-4">
+                <div className="text-sm">
+                  <p className="mb-2">
+                    There are currently <strong>{graphicsConflict.existing_file_count}</strong> file(s) in:
+                  </p>
+                  <div className="bg-muted p-2 rounded text-muted-foreground font-mono text-xs">
+                    {graphicsConflict.target_directory}
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    Installing <strong>{graphicsConflict.pack_name}</strong> may replace or merge with existing graphics files.
+                  </p>
+                </div>
+
+                <p className="text-sm text-muted-foreground">
+                  Are you sure you want to continue?
+                </p>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={handleConflictCancel}>
+                Cancel
+              </Button>
+              <Button onClick={handleConflictConfirm} variant="default">
+                Continue Installation
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Graphics Validation Dialog */}
+        <Dialog open={showValidationDialog} onOpenChange={setShowValidationDialog}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Graphics Pack Validation Results</DialogTitle>
+              <DialogDescription>
+                Found {graphicsIssues.length} pack(s) that may need to be moved
+              </DialogDescription>
+            </DialogHeader>
+
+            {migrationProgress && (
+              <div className="text-sm bg-muted p-3 rounded-md space-y-2 mb-4">
+                <div className="flex justify-between">
+                  <strong>Migration Progress:</strong>
+                  <span>{Math.round((migrationProgress.current / migrationProgress.total) * 100)}%</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {migrationProgress.current} / {migrationProgress.total} files
+                </div>
+                <div className="w-full bg-secondary rounded-full h-2">
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all"
+                    style={{
+                      width: `${(migrationProgress.current / migrationProgress.total) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4 my-4">
+              {graphicsIssues.map((issue, index) => (
+                <Card key={index} className="border-amber-200 dark:border-amber-800">
+                  <CardContent className="pt-4">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+                        <div className="flex-1">
+                          <div className="font-semibold">{issue.pack_name}</div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            {issue.reason}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-sm bg-muted p-3 rounded">
+                        <div>
+                          <div className="font-medium">Current:</div>
+                          <div className="text-muted-foreground">{issue.current_path}</div>
+                        </div>
+                        <div>
+                          <div className="font-medium">Suggested:</div>
+                          <div className="text-green-600 dark:text-green-400">
+                            {issue.suggested_path}
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void handleMigrateGraphicsPack(issue.pack_name, issue.pack_type)}
+                        disabled={migratingPack}
+                        className="w-full"
+                      >
+                        {migratingPack ? (
+                          <>
+                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                            Moving...
+                          </>
+                        ) : (
+                          "Move to Correct Location"
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowValidationDialog(false)} disabled={migratingPack}>
+                Close
+              </Button>
+              {graphicsIssues.length > 0 && (
+                <Button onClick={() => void handleMigrateAll()} disabled={migratingPack}>
+                  Fix All ({graphicsIssues.length})
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Mod Details Sheet */}
         <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
