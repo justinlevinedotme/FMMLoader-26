@@ -1,6 +1,6 @@
 [package]
 name = "fmmloader26"
-version = "1.0.4"
+version = "1.0.5"
 description = "A mod manager for Football Manager 2026"
 authors = ["Justin Levine"]
 license = "CC-BY-NC-SA-4.0"
