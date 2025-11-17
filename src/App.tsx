@@ -129,7 +129,6 @@ function App() {
   const [graphicsIssues, setGraphicsIssues] = useState<GraphicsPackIssue[]>([]);
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validatingGraphics, setValidatingGraphics] = useState(false);
-  const [_showGraphicsConfirmDialog, _setShowGraphicsConfirmDialog] = useState(false);
   const [pendingGraphicsAnalysis, setPendingGraphicsAnalysis] =
     useState<GraphicsPackAnalysis | null>(null);
   const [pendingGraphicsPath, setPendingGraphicsPath] = useState<string | null>(null);
@@ -419,7 +418,6 @@ function App() {
           // Store the analysis and path, then show confirmation dialog
           setPendingGraphicsAnalysis(analysis);
           setPendingGraphicsPath(sourcePath);
-          setShowGraphicsConfirmDialog(true);
         } catch (error) {
           const errorMsg = formatError(error);
           addLog(`Error analyzing graphics pack: ${errorMsg}`);
@@ -655,30 +653,6 @@ function App() {
     }
   };
 
-  const _handleImportGraphicsPackDirect = async (sourcePath: string) => {
-    try {
-      setImportingGraphics(true);
-      addLog(`Importing graphics pack from: ${sourcePath}`);
-      toast.loading('Starting graphics pack import...', { id: 'graphics-import' });
-
-      const result = await tauriCommands.importGraphicsPack(sourcePath);
-
-      addLog(result);
-      // Success toast is now shown immediately via the "complete" phase event
-      // No need to show it again here
-
-      // Reload graphics packs list
-      await loadGraphicsPacks();
-    } catch (error) {
-      const errorMsg = formatError(error);
-      addLog(`Error importing graphics pack: ${errorMsg}`);
-      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: 'graphics-import' });
-      setGraphicsProgress(null);
-    } finally {
-      setImportingGraphics(false);
-    }
-  };
-
   const handleImportGraphicsPack = async () => {
     try {
       const selected = await open({
@@ -710,7 +684,6 @@ function App() {
       // Store the analysis and path, then show confirmation dialog
       setPendingGraphicsAnalysis(analysis);
       setPendingGraphicsPath(selected);
-      setShowGraphicsConfirmDialog(true);
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error analyzing graphics pack: ${errorMsg}`);
@@ -722,8 +695,6 @@ function App() {
     if (!pendingGraphicsPath || !pendingGraphicsAnalysis) return;
 
     try {
-      setShowGraphicsConfirmDialog(false);
-
       // Check for conflicts before installing
       const packName = pendingGraphicsPath.split('/').pop()?.replace('.zip', '') || 'Unknown';
       const conflict = await tauriCommands.checkGraphicsConflicts(
@@ -801,7 +772,6 @@ function App() {
   };
 
   const handleGraphicsCancel = () => {
-    setShowGraphicsConfirmDialog(false);
     setPendingGraphicsAnalysis(null);
     setPendingGraphicsPath(null);
     addLog('Graphics pack import cancelled');
@@ -996,7 +966,7 @@ function App() {
         );
 
         // Listen for migration progress
-        const _unlistenMigrationProgress = await listen<ExtractionProgress>(
+        const unlistenMigrationProgress = await listen<ExtractionProgress>(
           'migration-progress',
           (event) => {
             setMigrationProgress(event.payload);
@@ -1036,6 +1006,7 @@ function App() {
           unlistenDragDrop();
           unlistenDragLeave();
           unlistenGraphicsProgress();
+          unlistenMigrationProgress();
         };
       } catch (error) {
         addLog(`Initialization error: ${formatError(error)}`);
@@ -1056,7 +1027,7 @@ function App() {
   // Debug function to preview graphics pack dialog
   useEffect(() => {
     (
-      window as Window & {
+      window as unknown as Window & {
         previewGraphicsDialog: (confidenceLevel?: 'high' | 'low' | 'mixed') => void;
       }
     ).previewGraphicsDialog = (confidenceLevel: 'high' | 'low' | 'mixed' = 'high') => {
@@ -1093,7 +1064,6 @@ function App() {
         },
       };
       setPendingGraphicsAnalysis(mockData[confidenceLevel]);
-      _setShowGraphicsConfirmDialog(true);
     };
   }, []);
 

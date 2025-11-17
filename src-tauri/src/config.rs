@@ -8,11 +8,13 @@ pub fn get_app_data_dir() -> PathBuf {
 
     #[cfg(target_os = "windows")]
     {
-        let appdata = std::env::var("APPDATA")
-            .unwrap_or_else(|_| {
-                let home = dirs::home_dir().unwrap();
-                home.join("AppData").join("Roaming").to_string_lossy().to_string()
-            });
+        let appdata = std::env::var("APPDATA").unwrap_or_else(|_| {
+            let home = dirs::home_dir().unwrap();
+            home.join("AppData")
+                .join("Roaming")
+                .to_string_lossy()
+                .to_string()
+        });
         PathBuf::from(appdata).join(app_name)
     }
 
@@ -71,11 +73,10 @@ pub fn load_config() -> Result<Config, String> {
         });
     }
 
-    let contents = fs::read_to_string(&config_path)
-        .map_err(|e| format!("Failed to read config: {}", e))?;
+    let contents =
+        fs::read_to_string(&config_path).map_err(|e| format!("Failed to read config: {}", e))?;
 
-    serde_json::from_str(&contents)
-        .map_err(|e| format!("Failed to parse config: {}", e))
+    serde_json::from_str(&contents).map_err(|e| format!("Failed to parse config: {}", e))
 }
 
 pub fn save_config(config: &Config) -> Result<(), String> {
@@ -84,8 +85,7 @@ pub fn save_config(config: &Config) -> Result<(), String> {
     let json = serde_json::to_string_pretty(config)
         .map_err(|e| format!("Failed to serialize config: {}", e))?;
 
-    fs::write(&config_path, json)
-        .map_err(|e| format!("Failed to write config: {}", e))?;
+    fs::write(&config_path, json).map_err(|e| format!("Failed to write config: {}", e))?;
 
     Ok(())
 }

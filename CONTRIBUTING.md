@@ -126,8 +126,11 @@ npm run build:release
 
 ## Branch Naming Conventions
 
-All branches must follow these naming conventions. The pre-push hook will automatically enforce these rules:
+All branches must follow these naming conventions. The pre-push hook automatically validates branch names using the `validate-branch-name` package configured in `package.json`.
 
+**Branch name format**: `<type>/<description-with-hyphens>`
+
+**Allowed types:**
 - `feature/*` - New features (e.g., `feature/add-user-auth`)
 - `fix/*` - Bug fixes (e.g., `fix/login-error`)
 - `bugfix/*` - Bug fixes (alternative, e.g., `bugfix/null-pointer`)
@@ -136,6 +139,11 @@ All branches must follow these naming conventions. The pre-push hook will automa
 - `refactor/*` - Code refactoring (e.g., `refactor/extract-utils`)
 - `test/*` - Test additions/changes (e.g., `test/integration-suite`)
 - `chore/*` - Maintenance tasks (e.g., `chore/update-dependencies`)
+
+**Rules:**
+- Branch names must be **lowercase**
+- Use **hyphens** to separate words (not underscores or spaces)
+- The `main` branch is always allowed
 
 **Example valid branch names:**
 ```bash
@@ -146,12 +154,13 @@ git checkout -b docs/contributing-guide
 
 **Invalid branch names** (will be rejected by pre-push hook):
 ```bash
-git checkout -b add-feature      # Missing prefix
-git checkout -b my-branch        # Doesn't match pattern
-git checkout -b FEATURE/test     # Wrong case (must be lowercase)
+git checkout -b add-feature           # Missing type prefix
+git checkout -b my-branch             # Doesn't match pattern
+git checkout -b FEATURE/test          # Wrong case (must be lowercase)
+git checkout -b feature/Add_Feature   # Uppercase and underscores not allowed
 ```
 
-**Note:** The `main` branch is always allowed for direct work (though PRs are required for merging).
+**Configuration**: Branch naming rules are defined in `package.json` under the `validate-branch-name` key. To modify the rules, edit that configuration.
 
 ## Pull Request Process
 
@@ -249,11 +258,17 @@ When you run `npm install`, husky will automatically set up the git hooks via th
 - **Rust files** (`src-tauri/src/**/*.rs`): `cargo fmt`
 
 **Pre-push hook** (runs on `git push`):
-- **Branch naming validation**: Ensures your branch follows the naming conventions (see Branch Naming Conventions section above)
+- **Branch naming validation**: Ensures your branch follows the naming conventions (configured in `package.json`)
+- **Frontend build check**: Runs `npm run build` to catch TypeScript/build errors
+- **Rust build check**: Runs `cargo check` to verify Rust code compiles
 
 ### How It Works
 
-The hooks only run on **staged files**, so they're fast and won't modify uncommitted changes. If any checks fail, the commit/push will be blocked, and you'll see helpful error messages.
+**Pre-commit**: Only runs on **staged files**, so it's fast and won't modify uncommitted changes.
+
+**Pre-push**: Runs full build checks to catch errors before pushing. This takes longer but provides fast feedback before CI runs.
+
+If any checks fail, the commit/push will be blocked, and you'll see helpful error messages.
 
 ### Skipping Hooks (Not Recommended)
 

@@ -18,8 +18,8 @@ pub fn read_manifest(mod_dir: &Path) -> Result<ModManifest, String> {
     let contents = fs::read_to_string(&manifest_path)
         .map_err(|e| format!("Failed to read manifest: {}", e))?;
 
-    let mut manifest: ModManifest = serde_json::from_str(&contents)
-        .map_err(|e| format!("Failed to parse manifest: {}", e))?;
+    let mut manifest: ModManifest =
+        serde_json::from_str(&contents).map_err(|e| format!("Failed to parse manifest: {}", e))?;
 
     // Set defaults
     if manifest.name.is_empty() {
@@ -40,8 +40,8 @@ pub fn list_mods() -> Result<Vec<String>, String> {
         return Ok(Vec::new());
     }
 
-    let entries = fs::read_dir(&mods_dir)
-        .map_err(|e| format!("Failed to read mods directory: {}", e))?;
+    let entries =
+        fs::read_dir(&mods_dir).map_err(|e| format!("Failed to read mods directory: {}", e))?;
 
     let mut mods = Vec::new();
 
@@ -74,8 +74,7 @@ pub fn backup_file(target_file: &Path) -> Result<Option<PathBuf>, String> {
     }
 
     let backup_dir = get_backup_dir();
-    fs::create_dir_all(&backup_dir)
-        .map_err(|e| format!("Failed to create backup dir: {}", e))?;
+    fs::create_dir_all(&backup_dir).map_err(|e| format!("Failed to create backup dir: {}", e))?;
 
     let filename = target_file
         .file_name()
@@ -87,8 +86,7 @@ pub fn backup_file(target_file: &Path) -> Result<Option<PathBuf>, String> {
     let backup_name = format!("{}_{}.bak", filename, timestamp);
     let backup_path = backup_dir.join(&backup_name);
 
-    fs::copy(target_file, &backup_path)
-        .map_err(|e| format!("Failed to backup file: {}", e))?;
+    fs::copy(target_file, &backup_path).map_err(|e| format!("Failed to backup file: {}", e))?;
 
     Ok(Some(backup_path))
 }
@@ -128,11 +126,7 @@ fn copy_recursive(src: &Path, dst: &Path) -> io::Result<u64> {
     Ok(count)
 }
 
-pub fn get_target_for_type(
-    mod_type: &str,
-    game_target: &Path,
-    user_dir: Option<&str>,
-) -> PathBuf {
+pub fn get_target_for_type(mod_type: &str, game_target: &Path, user_dir: Option<&str>) -> PathBuf {
     let user_path = get_fm_user_dir(user_dir);
 
     match mod_type {
@@ -264,8 +258,7 @@ pub fn create_restore_point(name: &str) -> Result<PathBuf, String> {
     let point_name = format!("{}_{}", timestamp, name);
     let point_dir = restore_dir.join(&point_name);
 
-    fs::create_dir_all(&point_dir)
-        .map_err(|e| format!("Failed to create restore point: {}", e))?;
+    fs::create_dir_all(&point_dir).map_err(|e| format!("Failed to create restore point: {}", e))?;
 
     Ok(point_dir)
 }
@@ -334,20 +327,23 @@ mod tests {
     #[test]
     fn test_get_current_platform() {
         let platform = get_current_platform();
-        
+
         // Verify it returns one of the expected values
         assert!(
-            platform == "windows" || platform == "macos" || platform == "linux" || platform == "unknown",
+            platform == "windows"
+                || platform == "macos"
+                || platform == "linux"
+                || platform == "unknown",
             "Platform should be one of: windows, macos, linux, unknown"
         );
 
         // Verify it matches the current OS
         #[cfg(target_os = "windows")]
         assert_eq!(platform, "windows");
-        
+
         #[cfg(target_os = "macos")]
         assert_eq!(platform, "macos");
-        
+
         #[cfg(target_os = "linux")]
         assert_eq!(platform, "linux");
     }
@@ -356,9 +352,9 @@ mod tests {
     fn test_get_target_for_type_skins() {
         let game_target = PathBuf::from("/test/game/path");
         let user_dir = None;
-        
+
         let target = get_target_for_type("skins", &game_target, user_dir);
-        
+
         // Verify skins go to game target (bundle folder), not user skins folder
         assert_eq!(target, game_target);
     }
@@ -367,7 +363,7 @@ mod tests {
     fn test_get_target_for_type_ui() {
         let game_target = PathBuf::from("/test/game/path");
         let user_dir = None;
-        
+
         let target = get_target_for_type("ui", &game_target, user_dir);
         assert_eq!(target, game_target);
     }
@@ -376,7 +372,7 @@ mod tests {
     fn test_get_target_for_type_bundle() {
         let game_target = PathBuf::from("/test/game/path");
         let user_dir = None;
-        
+
         let target = get_target_for_type("bundle", &game_target, user_dir);
         assert_eq!(target, game_target);
     }
@@ -385,9 +381,9 @@ mod tests {
     fn test_get_target_for_type_tactics() {
         let game_target = PathBuf::from("/test/game/path");
         let user_dir = None;
-        
+
         let target = get_target_for_type("tactics", &game_target, user_dir);
-        
+
         // Tactics should go to user tactics folder, not game target
         assert_ne!(target, game_target);
         assert!(target.ends_with("tactics"));
@@ -397,9 +393,9 @@ mod tests {
     fn test_get_target_for_type_graphics() {
         let game_target = PathBuf::from("/test/game/path");
         let user_dir = None;
-        
+
         let target = get_target_for_type("graphics", &game_target, user_dir);
-        
+
         // Graphics should go to user graphics folder
         assert_ne!(target, game_target);
         assert!(target.ends_with("graphics"));
@@ -409,9 +405,9 @@ mod tests {
     fn test_get_target_for_type_editor_data() {
         let game_target = PathBuf::from("/test/game/path");
         let user_dir = None;
-        
+
         let target = get_target_for_type("editor-data", &game_target, user_dir);
-        
+
         // Editor data should go to user editor data folder
         assert_ne!(target, game_target);
         assert!(target.ends_with("editor data"));

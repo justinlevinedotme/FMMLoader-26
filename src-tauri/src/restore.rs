@@ -15,8 +15,7 @@ pub fn create_restore_point(name: &str, source_paths: &[PathBuf]) -> Result<Path
     let point_name = format!("{}_{}", timestamp, name);
     let point_dir = restore_dir.join(&point_name);
 
-    fs::create_dir_all(&point_dir)
-        .map_err(|e| format!("Failed to create restore point: {}", e))?;
+    fs::create_dir_all(&point_dir).map_err(|e| format!("Failed to create restore point: {}", e))?;
 
     // Copy all source paths to restore point
     for (i, source_path) in source_paths.iter().enumerate() {
@@ -34,8 +33,7 @@ pub fn create_restore_point(name: &str, source_paths: &[PathBuf]) -> Result<Path
                 fs::create_dir_all(parent)
                     .map_err(|e| format!("Failed to create parent dir: {}", e))?;
             }
-            fs::copy(source_path, &dest_path)
-                .map_err(|e| format!("Failed to copy file: {}", e))?;
+            fs::copy(source_path, &dest_path).map_err(|e| format!("Failed to copy file: {}", e))?;
         }
 
         // Save metadata about original location
@@ -72,17 +70,12 @@ pub fn list_restore_points() -> Result<Vec<RestorePoint>, String> {
                         t.duration_since(UNIX_EPOCH).ok()
                     })
                     .map(|d| {
-                        let datetime = chrono::DateTime::<chrono::Utc>::from(
-                            UNIX_EPOCH + d
-                        );
+                        let datetime = chrono::DateTime::<chrono::Utc>::from(UNIX_EPOCH + d);
                         datetime.format("%Y-%m-%d %H:%M:%S").to_string()
                     })
                     .unwrap_or_else(|| "Unknown".to_string());
 
-                points.push(RestorePoint {
-                    timestamp,
-                    path,
-                });
+                points.push(RestorePoint { timestamp, path });
             }
         }
     }
@@ -98,8 +91,8 @@ pub fn rollback_to_restore_point(point_path: &PathBuf) -> Result<String, String>
         return Err("Restore point not found".to_string());
     }
 
-    let entries = fs::read_dir(point_path)
-        .map_err(|e| format!("Failed to read restore point: {}", e))?;
+    let entries =
+        fs::read_dir(point_path).map_err(|e| format!("Failed to read restore point: {}", e))?;
 
     let mut restored_count = 0;
 
@@ -149,8 +142,7 @@ pub fn rollback_to_restore_point(point_path: &PathBuf) -> Result<String, String>
 }
 
 fn copy_dir_all(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
-    fs::create_dir_all(dst)
-        .map_err(|e| format!("Failed to create directory: {}", e))?;
+    fs::create_dir_all(dst).map_err(|e| format!("Failed to create directory: {}", e))?;
 
     for entry in WalkDir::new(src) {
         let entry = entry.map_err(|e| format!("Failed to walk directory: {}", e))?;
@@ -167,8 +159,7 @@ fn copy_dir_all(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
                     fs::create_dir_all(parent)
                         .map_err(|e| format!("Failed to create parent directory: {}", e))?;
                 }
-                fs::copy(path, &target_path)
-                    .map_err(|e| format!("Failed to copy file: {}", e))?;
+                fs::copy(path, &target_path).map_err(|e| format!("Failed to copy file: {}", e))?;
             }
         }
     }

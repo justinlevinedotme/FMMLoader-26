@@ -12,15 +12,26 @@ mod name_fix;
 mod restore;
 mod types;
 
-use config::{add_graphics_pack, get_mods_dir, init_storage, load_config, load_graphics_packs, save_config, save_graphics_packs};
+use config::{
+    add_graphics_pack, get_mods_dir, init_storage, load_config, load_graphics_packs, save_config,
+    save_graphics_packs,
+};
 use conflicts::find_conflicts;
 use game_detection::get_default_candidates;
-use import::{auto_detect_mod_type, extract_zip, extract_zip_async, find_mod_root, generate_manifest, has_manifest};
-use mod_manager::{cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods};
+use import::{
+    auto_detect_mod_type, extract_zip, extract_zip_async, find_mod_root, generate_manifest,
+    has_manifest,
+};
+use mod_manager::{
+    cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods,
+};
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
-use types::{Config, ConflictInfo, ExtractionProgress, GraphicsConflictInfo, GraphicsPackMetadata, ModManifest, RestorePoint};
 use std::path::PathBuf;
 use tauri::{Emitter, Manager};
+use types::{
+    Config, ConflictInfo, ExtractionProgress, GraphicsConflictInfo, GraphicsPackMetadata,
+    ModManifest, RestorePoint,
+};
 
 #[tauri::command]
 fn init_app() -> Result<(), String> {
@@ -50,7 +61,10 @@ fn update_config(config: Config) -> Result<(), String> {
 #[tauri::command]
 fn detect_game_path() -> Result<Vec<String>, String> {
     let candidates = get_default_candidates();
-    Ok(candidates.iter().map(|p| p.to_string_lossy().to_string()).collect())
+    Ok(candidates
+        .iter()
+        .map(|p| p.to_string_lossy().to_string())
+        .collect())
 }
 
 #[tauri::command]
@@ -103,10 +117,7 @@ fn disable_mod(mod_name: String) -> Result<(), String> {
 fn apply_mods() -> Result<String, String> {
     let config = load_config()?;
 
-    let target_path = config
-        .target_path
-        .as_ref()
-        .ok_or("Game target not set")?;
+    let target_path = config.target_path.as_ref().ok_or("Game target not set")?;
 
     let target = std::path::PathBuf::from(target_path);
 
@@ -156,7 +167,12 @@ fn import_mod(
     use std::fs;
 
     tracing::info!("Starting mod import from: {}", source_path);
-    tracing::debug!("Import params - name: {:?}, version: {:?}, type: {:?}", mod_name, version, mod_type);
+    tracing::debug!(
+        "Import params - name: {:?}, version: {:?}, type: {:?}",
+        mod_name,
+        version,
+        mod_type
+    );
 
     let source = PathBuf::from(&source_path);
     let mods_dir = get_mods_dir();
@@ -166,7 +182,12 @@ fn import_mod(
         return Err("Source path does not exist".to_string());
     }
 
-    tracing::info!("Source exists: {:?}, is_file: {}, is_dir: {}", source, source.is_file(), source.is_dir());
+    tracing::info!(
+        "Source exists: {:?}, is_file: {}, is_dir: {}",
+        source,
+        source.is_file(),
+        source.is_dir()
+    );
 
     // Handle different source types
     let mod_root = if source.is_file() {
@@ -175,7 +196,8 @@ fn import_mod(
 
         if ext == Some("zip") {
             // Extract ZIP to temp directory
-            let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+            let temp_dir =
+                std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
             tracing::info!("Extracting ZIP to: {:?}", temp_dir);
             extract_zip(&source, &temp_dir)?;
             let root = find_mod_root(&temp_dir)?;
@@ -183,24 +205,22 @@ fn import_mod(
             root
         } else {
             // Single file (.bundle, .fmf, etc) - create temp dir with just this file
-            let temp_dir = std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
+            let temp_dir =
+                std::env::temp_dir().join(format!("fmmloader_import_{}", uuid::Uuid::new_v4()));
             tracing::info!("Creating temp directory for single file: {:?}", temp_dir);
-            fs::create_dir_all(&temp_dir)
-                .map_err(|e| {
-                    tracing::error!("Failed to create temp directory: {}", e);
-                    format!("Failed to create temp directory: {}", e)
-                })?;
+            fs::create_dir_all(&temp_dir).map_err(|e| {
+                tracing::error!("Failed to create temp directory: {}", e);
+                format!("Failed to create temp directory: {}", e)
+            })?;
 
-            let file_name = source.file_name()
-                .ok_or("Invalid file name")?;
+            let file_name = source.file_name().ok_or("Invalid file name")?;
             let dest_file = temp_dir.join(file_name);
 
             tracing::info!("Copying file to: {:?}", dest_file);
-            fs::copy(&source, &dest_file)
-                .map_err(|e| {
-                    tracing::error!("Failed to copy file: {}", e);
-                    format!("Failed to copy file: {}", e)
-                })?;
+            fs::copy(&source, &dest_file).map_err(|e| {
+                tracing::error!("Failed to copy file: {}", e);
+                format!("Failed to copy file: {}", e)
+            })?;
 
             temp_dir
         }
@@ -274,14 +294,15 @@ fn detect_mod_type(path: String) -> Result<String, String> {
 fn check_conflicts() -> Result<Vec<ConflictInfo>, String> {
     let config = load_config()?;
 
-    let target_path = config
-        .target_path
-        .as_ref()
-        .ok_or("Game target not set")?;
+    let target_path = config.target_path.as_ref().ok_or("Game target not set")?;
 
     let target = PathBuf::from(target_path);
 
-    find_conflicts(&config.enabled_mods, &target, config.user_dir_path.as_deref())
+    find_conflicts(
+        &config.enabled_mods,
+        &target,
+        config.user_dir_path.as_deref(),
+    )
 }
 
 #[tauri::command]
@@ -299,10 +320,7 @@ fn restore_from_point(point_path: String) -> Result<String, String> {
 fn create_backup_point(name: String) -> Result<String, String> {
     let config = load_config()?;
 
-    let target_path = config
-        .target_path
-        .as_ref()
-        .ok_or("Game target not set")?;
+    let target_path = config.target_path.as_ref().ok_or("Game target not set")?;
 
     let target = PathBuf::from(target_path);
     let point_dir = create_restore_point(&name, &[target])?;
@@ -458,7 +476,9 @@ fn list_graphics_packs() -> Result<Vec<GraphicsPackMetadata>, String> {
 
 /// Analyzes a graphics pack (file or directory) to determine its type
 #[tauri::command]
-async fn analyze_graphics_pack(source_path: String) -> Result<graphics_analyzer::GraphicsPackAnalysis, String> {
+async fn analyze_graphics_pack(
+    source_path: String,
+) -> Result<graphics_analyzer::GraphicsPackAnalysis, String> {
     use graphics_analyzer::analyze_graphics_pack;
 
     tracing::info!("Analyzing graphics pack: {}", source_path);
@@ -467,8 +487,8 @@ async fn analyze_graphics_pack(source_path: String) -> Result<graphics_analyzer:
 
     // If it's an archive, extract it to a temp directory first
     let (analysis_path, temp_dir_to_cleanup) = if source.is_file() {
-        let temp_dir = std::env::temp_dir()
-            .join(format!("fmmloader_analysis_{}", uuid::Uuid::new_v4()));
+        let temp_dir =
+            std::env::temp_dir().join(format!("fmmloader_analysis_{}", uuid::Uuid::new_v4()));
 
         tracing::info!("Extracting to temp for analysis: {:?}", temp_dir);
 
@@ -598,8 +618,8 @@ async fn migrate_graphics_pack(
     pack_name: String,
     target_subdir: String,
 ) -> Result<String, String> {
-    use std::fs;
     use graphics_analyzer::analyze_graphics_pack;
+    use std::fs;
 
     tracing::info!("Migrating pack '{}' to '{}'", pack_name, target_subdir);
 
@@ -611,25 +631,27 @@ async fn migrate_graphics_pack(
     let current_path = graphics_dir.join(&pack_name);
 
     if !current_path.exists() {
-        return Err(format!("Pack '{}' not found in graphics directory", pack_name));
+        return Err(format!(
+            "Pack '{}' not found in graphics directory",
+            pack_name
+        ));
     }
 
     // Analyze the pack to detect if it's flat
-    let analysis = analyze_graphics_pack(&current_path)
-        .unwrap_or_else(|_| {
-            // If analysis fails, assume it's not flat (safer default)
-            tracing::warn!("Failed to analyze pack, assuming structured pack");
-            graphics_analyzer::GraphicsPackAnalysis {
-                pack_type: graphics_analyzer::GraphicsPackType::Unknown,
-                confidence: 0.0,
-                suggested_paths: Vec::new(),
-                file_count: 0,
-                total_size_bytes: 0,
-                has_config_xml: false,
-                subdirectory_breakdown: std::collections::HashMap::new(),
-                is_flat_pack: false,
-            }
-        });
+    let analysis = analyze_graphics_pack(&current_path).unwrap_or_else(|_| {
+        // If analysis fails, assume it's not flat (safer default)
+        tracing::warn!("Failed to analyze pack, assuming structured pack");
+        graphics_analyzer::GraphicsPackAnalysis {
+            pack_type: graphics_analyzer::GraphicsPackType::Unknown,
+            confidence: 0.0,
+            suggested_paths: Vec::new(),
+            file_count: 0,
+            total_size_bytes: 0,
+            has_config_xml: false,
+            subdirectory_breakdown: std::collections::HashMap::new(),
+            is_flat_pack: false,
+        }
+    });
 
     let is_flat = analysis.is_flat_pack;
     tracing::info!("Pack is flat: {}", is_flat);
@@ -658,7 +680,10 @@ async fn migrate_graphics_pack(
 
     if is_flat {
         // For flat packs, copy contents directly to target directory (e.g., graphics/faces/)
-        tracing::info!("Migrating flat pack - copying contents to: {:?}", target_dir);
+        tracing::info!(
+            "Migrating flat pack - copying contents to: {:?}",
+            target_dir
+        );
 
         // Check if target directory has existing files (conflict detection)
         if target_dir.exists() {
@@ -882,7 +907,10 @@ async fn import_graphics_pack_with_type(
 ) -> Result<String, String> {
     use graphics_analyzer::{analyze_graphics_pack, get_installation_targets, split_mixed_pack};
 
-    tracing::info!("Starting graphics pack import with type detection from: {}", source_path);
+    tracing::info!(
+        "Starting graphics pack import with type detection from: {}",
+        source_path
+    );
 
     let source = PathBuf::from(&source_path);
 
@@ -892,8 +920,9 @@ async fn import_graphics_pack_with_type(
     }
 
     // Check if it's an archive file
-    let is_archive = source.is_file() &&
-        source.extension()
+    let is_archive = source.is_file()
+        && source
+            .extension()
             .and_then(|s| s.to_str())
             .map(|ext| ext.eq_ignore_ascii_case("zip"))
             .unwrap_or(false);
@@ -921,8 +950,8 @@ async fn import_graphics_pack_with_type(
     }
 
     // Create temporary extraction directory
-    let temp_dir = std::env::temp_dir()
-        .join(format!("fmmloader_graphics_{}", uuid::Uuid::new_v4()));
+    let temp_dir =
+        std::env::temp_dir().join(format!("fmmloader_graphics_{}", uuid::Uuid::new_v4()));
 
     tracing::info!("Extracting to temporary directory: {:?}", temp_dir);
 
@@ -931,17 +960,14 @@ async fn import_graphics_pack_with_type(
     let source_clone = source.clone();
     let temp_dir_clone = temp_dir.clone();
 
-    let extracted_dir = extract_zip_async(
-        source_clone,
-        temp_dir_clone,
-        move |progress| {
-            if let Some(window) = app_clone.get_webview_window("main") {
-                if let Err(e) = window.emit("graphics-extraction-progress", &progress) {
-                    tracing::error!("Failed to emit progress event: {}", e);
-                }
+    let extracted_dir = extract_zip_async(source_clone, temp_dir_clone, move |progress| {
+        if let Some(window) = app_clone.get_webview_window("main") {
+            if let Err(e) = window.emit("graphics-extraction-progress", &progress) {
+                tracing::error!("Failed to emit progress event: {}", e);
             }
         }
-    ).await?;
+    })
+    .await?;
 
     tracing::info!("Extraction complete to: {:?}", extracted_dir);
 
@@ -962,7 +988,8 @@ async fn import_graphics_pack_with_type(
     let analysis = analyze_graphics_pack(&content_root)?;
     tracing::info!("Pack analysis: {:?}", analysis);
 
-    let pack_name = source.file_stem()
+    let pack_name = source
+        .file_stem()
         .and_then(|n| n.to_str())
         .unwrap_or("Unknown Graphics Pack")
         .to_string();
@@ -974,13 +1001,20 @@ async fn import_graphics_pack_with_type(
     let mut total_installed_files = 0;
 
     // Handle mixed packs if splitting is requested
-    if should_split && matches!(analysis.pack_type, graphics_analyzer::GraphicsPackType::Mixed(_)) {
+    if should_split
+        && matches!(
+            analysis.pack_type,
+            graphics_analyzer::GraphicsPackType::Mixed(_)
+        )
+    {
         tracing::info!("Splitting mixed pack into separate directories");
 
         let split_map = split_mixed_pack(&content_root, &analysis)?;
 
         for (pack_type, source_dir) in split_map {
-            let target_dir = graphics_dir.join(&pack_type).join(format!("{}-{}", pack_name, pack_type));
+            let target_dir = graphics_dir
+                .join(&pack_type)
+                .join(format!("{}-{}", pack_name, pack_type));
 
             std::fs::create_dir_all(&target_dir)
                 .map_err(|e| format!("Failed to create target directory: {}", e))?;
@@ -998,7 +1032,8 @@ async fn import_graphics_pack_with_type(
         let install_path = if analysis.is_flat_pack {
             // For flat packs, install directly to graphics/faces/ (or logos/kits)
             // Extract the type directory from target_path (e.g., "faces" from "faces/PackName")
-            let target_parts: Vec<&str> = final_target.to_str()
+            let target_parts: Vec<&str> = final_target
+                .to_str()
                 .unwrap_or("")
                 .split('/')
                 .filter(|s| !s.is_empty())
@@ -1015,7 +1050,11 @@ async fn import_graphics_pack_with_type(
             graphics_dir.join(&final_target)
         };
 
-        tracing::info!("Installing pack (flat={}) to: {:?}", analysis.is_flat_pack, install_path);
+        tracing::info!(
+            "Installing pack (flat={}) to: {:?}",
+            analysis.is_flat_pack,
+            install_path
+        );
 
         std::fs::create_dir_all(&install_path)
             .map_err(|e| format!("Failed to create install directory: {}", e))?;
@@ -1042,20 +1081,25 @@ async fn import_graphics_pack_with_type(
         // Copy files based on pack type
         // Both flat and structured packs now use the same approach:
         // Copy all contents from content_root to install_path recursively
-        copy_flat_pack_content(&content_root, &install_path, file_count, move |current, current_file| {
-            if let Some(window) = app_clone_copy.get_webview_window("main") {
-                let progress = ExtractionProgress {
-                    current,
-                    total: file_count,
-                    current_file,
-                    bytes_processed: 0,
-                    phase: "copying".to_string(),
-                };
-                if let Err(e) = window.emit("graphics-extraction-progress", &progress) {
-                    tracing::error!("Failed to emit copy progress event: {}", e);
+        copy_flat_pack_content(
+            &content_root,
+            &install_path,
+            file_count,
+            move |current, current_file| {
+                if let Some(window) = app_clone_copy.get_webview_window("main") {
+                    let progress = ExtractionProgress {
+                        current,
+                        total: file_count,
+                        current_file,
+                        bytes_processed: 0,
+                        phase: "copying".to_string(),
+                    };
+                    if let Err(e) = window.emit("graphics-extraction-progress", &progress) {
+                        tracing::error!("Failed to emit copy progress event: {}", e);
+                    }
                 }
-            }
-        })?;
+            },
+        )?;
 
         tracing::info!("Installed pack to: {:?}", install_path);
     }
@@ -1074,7 +1118,8 @@ async fn import_graphics_pack_with_type(
         name: pack_name.clone(),
         install_date: chrono::Utc::now().to_rfc3339(),
         file_count: total_installed_files,
-        source_filename: source.file_name()
+        source_filename: source
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("unknown.zip")
             .to_string(),
@@ -1215,7 +1260,10 @@ fn detect_graphics_pack_type(path: &PathBuf) -> String {
     }
 
     // Determine pack type
-    let types_found = [has_faces, has_logos, has_kits].iter().filter(|&&x| x).count();
+    let types_found = [has_faces, has_logos, has_kits]
+        .iter()
+        .filter(|&&x| x)
+        .count();
 
     if types_found > 1 {
         "mixed".to_string()
@@ -1260,15 +1308,21 @@ where
                     if graphics_subdirs.iter().any(|&gd| name_lower.contains(gd)) {
                         // This is a graphics subdirectory, copy it preserving structure
                         let dest_subdir = graphics_dir.join(name);
-                        tracing::info!("Copying graphics subdirectory: {} -> {:?}", name, dest_subdir);
+                        tracing::info!(
+                            "Copying graphics subdirectory: {} -> {:?}",
+                            name,
+                            dest_subdir
+                        );
 
                         // Create destination subdirectory if it doesn't exist
-                        fs::create_dir_all(&dest_subdir)
-                            .map_err(|e| format!("Failed to create destination subdirectory: {}", e))?;
+                        fs::create_dir_all(&dest_subdir).map_err(|e| {
+                            format!("Failed to create destination subdirectory: {}", e)
+                        })?;
 
                         // Copy all contents recursively
                         for walk_entry in WalkDir::new(&path) {
-                            let walk_entry = walk_entry.map_err(|e| format!("Failed to walk directory: {}", e))?;
+                            let walk_entry = walk_entry
+                                .map_err(|e| format!("Failed to walk directory: {}", e))?;
                             let entry_path = walk_entry.path();
 
                             if let Ok(rel_path) = entry_path.strip_prefix(&path) {
@@ -1276,18 +1330,26 @@ where
 
                                 if entry_path.is_dir() {
                                     // Create all subdirectories (including nested ones like logos/Clubs, logos/Nations, etc.)
-                                    fs::create_dir_all(&target_path)
-                                        .map_err(|e| format!("Failed to create directory: {}", e))?;
+                                    fs::create_dir_all(&target_path).map_err(|e| {
+                                        format!("Failed to create directory: {}", e)
+                                    })?;
                                     tracing::debug!("Created directory: {:?}", target_path);
                                 } else {
                                     if let Some(parent) = target_path.parent() {
-                                        fs::create_dir_all(parent)
-                                            .map_err(|e| format!("Failed to create parent directory: {}", e))?;
+                                        fs::create_dir_all(parent).map_err(|e| {
+                                            format!("Failed to create parent directory: {}", e)
+                                        })?;
                                     }
 
                                     // Log config.xml files specifically for verification
-                                    if entry_path.file_name().and_then(|n| n.to_str()) == Some("config.xml") {
-                                        tracing::info!("Copying config.xml: {:?} -> {:?}", entry_path, target_path);
+                                    if entry_path.file_name().and_then(|n| n.to_str())
+                                        == Some("config.xml")
+                                    {
+                                        tracing::info!(
+                                            "Copying config.xml: {:?} -> {:?}",
+                                            entry_path,
+                                            target_path
+                                        );
                                     }
 
                                     fs::copy(entry_path, &target_path)
@@ -1410,8 +1472,7 @@ fn copy_dir_recursive(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
                     fs::create_dir_all(parent)
                         .map_err(|e| format!("Failed to create parent directory: {}", e))?;
                 }
-                fs::copy(path, &target_path)
-                    .map_err(|e| format!("Failed to copy file: {}", e))?;
+                fs::copy(path, &target_path).map_err(|e| format!("Failed to copy file: {}", e))?;
             }
         }
     }
