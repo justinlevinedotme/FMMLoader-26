@@ -1,3 +1,40 @@
+//! Graphics Pack Analysis Module
+//!
+//! This module provides intelligent analysis and classification of FM graphics packs.
+//! It detects pack types (faces, logos, kits, or mixed), calculates confidence scores,
+//! and handles both flat and structured pack layouts.
+//!
+//! # Pack Type Detection
+//!
+//! The analyzer uses multiple signals to determine pack type:
+//! - **High confidence**: config.xml mappings (person portraits, team logos, team kits)
+//! - **Medium confidence**: Directory structure (faces/, logos/, kits/ subdirectories)
+//!
+//! # Supported Pack Structures
+//!
+//! **Flat Packs**: PNGs and config.xml at root with no type-specific subdirectories
+//! - Example: `megapack/12345.png`, `megapack/config.xml`
+//!
+//! **Structured Packs**: Type-specific subdirectories containing assets
+//! - Example: `megapack/faces/12345.png`, `megapack/logos/clubs/45.png`
+//!
+//! **Mixed Packs**: Contains multiple types (faces + logos + kits)
+//! - Can be split into separate directories per type
+//!
+//! # Usage
+//!
+//! ```rust,ignore
+//! use graphics_analyzer::analyze_graphics_pack;
+//!
+//! let analysis = analyze_graphics_pack(&pack_path)?;
+//! println!("Type: {:?}, Confidence: {}", analysis.pack_type, analysis.confidence);
+//! ```
+//!
+//! # Security
+//!
+//! The analyzer limits directory traversal depth to 3 levels to prevent excessive
+//! processing on malformed pack structures.
+
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};

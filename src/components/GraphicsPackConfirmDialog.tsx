@@ -1,3 +1,16 @@
+/**
+ * GraphicsPackConfirmDialog Component
+ *
+ * Confirmation dialog shown before installing a graphics pack.
+ * Displays pack analysis results including detected type, confidence score,
+ * installation path preview, and options for mixed pack splitting.
+ *
+ * Features:
+ * - Confidence color coding (green >70%, yellow >50%, red <50%)
+ * - Low confidence warnings for packs <50% confidence
+ * - Full path preview showing exact installation location
+ * - Mixed pack split option to separate types into individual directories
+ */
 import { useState, useEffect } from "react";
 import {
   Dialog,

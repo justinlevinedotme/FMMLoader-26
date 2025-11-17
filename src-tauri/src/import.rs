@@ -1,3 +1,33 @@
+//! Import Module - Archive Extraction and Mod Type Detection
+//!
+//! This module handles importing mods and graphics packs from various sources.
+//! It provides both synchronous and asynchronous archive extraction with progress tracking.
+//!
+//! # Archive Extraction
+//!
+//! **Synchronous**: `extract_zip()` - Used for small mod imports where blocking is acceptable
+//! **Asynchronous**: `extract_zip_async()` - Used for large graphics packs (5GB+) with progress events
+//!
+//! # Zip Bomb Protection
+//!
+//! The async extractor implements security limits:
+//! - Maximum 50GB total extraction size
+//! - Maximum 500,000 files per archive
+//! - Early termination when limits exceeded
+//!
+//! # Progress Tracking
+//!
+//! Progress callbacks emit every 50 files (not per file) to balance responsiveness with performance.
+//! Progress includes current file number, total files, current filename, and bytes processed.
+//!
+//! # Mod Type Detection
+//!
+//! `auto_detect_mod_type()` analyzes directory structure and file types to classify mods:
+//! - Graphics: Contains faces/, logos/, kits/ directories or PNG files
+//! - Tactics: Contains .fmf files
+//! - Editor Data: Contains .dbc, .edt, .lnc files or editor data/ directory
+//! - UI/Bundle: Default for other content
+
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -59,6 +89,10 @@ pub async fn extract_zip_async<F>(
 where
     F: FnMut(ExtractionProgress) + Send + 'static,
 {
+    // Zip bomb protection limits
+    const MAX_TOTAL_BYTES: u64 = 50 * 1024 * 1024 * 1024; // 50GB max extraction size
+    const MAX_ENTRIES: usize = 500_000; // 500k files max
+
     tokio::task::spawn_blocking(move || {
         let file = fs::File::open(&zip_path)
             .map_err(|e| format!("Failed to open zip file: {}", e))?;
@@ -70,6 +104,15 @@ where
             .map_err(|e| format!("Failed to create destination directory: {}", e))?;
 
         let total = archive.len();
+
+        // Check for excessive entry count (zip bomb indicator)
+        if total > MAX_ENTRIES {
+            return Err(format!(
+                "Archive contains too many files ({}). Maximum allowed is {}. This may be a corrupted or malicious file.",
+                total, MAX_ENTRIES
+            ));
+        }
+
         let mut bytes_processed = 0u64;
 
         for i in 0..total {
@@ -96,6 +139,15 @@ where
                 let bytes_copied = io::copy(&mut file, &mut outfile)
                     .map_err(|e| format!("Failed to extract file: {}", e))?;
                 bytes_processed += bytes_copied;
+
+                // Check for excessive extraction size (zip bomb indicator)
+                if bytes_processed > MAX_TOTAL_BYTES {
+                    return Err(format!(
+                        "Archive extraction exceeded size limit ({}GB). Extracted {}GB so far. This may be a corrupted or malicious file.",
+                        MAX_TOTAL_BYTES / 1024 / 1024 / 1024,
+                        bytes_processed / 1024 / 1024 / 1024
+                    ));
+                }
             }
 
             #[cfg(unix)]

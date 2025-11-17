@@ -466,7 +466,7 @@ async fn analyze_graphics_pack(source_path: String) -> Result<graphics_analyzer:
     let source = PathBuf::from(&source_path);
 
     // If it's an archive, extract it to a temp directory first
-    let analysis_path = if source.is_file() {
+    let (analysis_path, temp_dir_to_cleanup) = if source.is_file() {
         let temp_dir = std::env::temp_dir()
             .join(format!("fmmloader_analysis_{}", uuid::Uuid::new_v4()));
 
@@ -476,14 +476,26 @@ async fn analyze_graphics_pack(source_path: String) -> Result<graphics_analyzer:
         extract_zip(&source, &temp_dir)?;
 
         // Find the content root
-        find_graphics_content_root(&temp_dir)?
+        let content_root = find_graphics_content_root(&temp_dir)?;
+        (content_root, Some(temp_dir))
     } else {
-        source
+        (source, None)
     };
 
     // Analyze the pack
-    let analysis = analyze_graphics_pack(&analysis_path)?;
+    let analysis = analyze_graphics_pack(&analysis_path);
 
+    // Clean up temp directory if it was created
+    if let Some(temp_dir) = temp_dir_to_cleanup {
+        if let Err(e) = std::fs::remove_dir_all(&temp_dir) {
+            tracing::warn!("Failed to cleanup analysis temp directory: {}", e);
+        } else {
+            tracing::info!("Cleaned up analysis temp directory: {:?}", temp_dir);
+        }
+    }
+
+    // Return analysis result (propagate error if analysis failed)
+    let analysis = analysis?;
     tracing::info!("Analysis complete: {:?}", analysis);
 
     Ok(analysis)
@@ -888,6 +900,24 @@ async fn import_graphics_pack_with_type(
 
     if !is_archive {
         return Err("Only ZIP archives are currently supported for graphics packs".to_string());
+    }
+
+    // Check source file size and estimate extraction size
+    let source_size = std::fs::metadata(&source)
+        .map_err(|e| format!("Failed to read source file: {}", e))?
+        .len();
+
+    // Graphics packs typically decompress to 3-5x compressed size
+    let estimated_extracted_size = source_size * 5;
+    let estimated_gb = estimated_extracted_size as f64 / 1024.0 / 1024.0 / 1024.0;
+
+    // Warn if extraction will be very large (>20GB)
+    if estimated_extracted_size > 20 * 1024 * 1024 * 1024 {
+        tracing::warn!(
+            "Large graphics pack detected: {}MB compressed, estimated ~{:.1}GB extracted. Ensure sufficient disk space.",
+            source_size / 1024 / 1024,
+            estimated_gb
+        );
     }
 
     // Create temporary extraction directory
