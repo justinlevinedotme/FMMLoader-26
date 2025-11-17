@@ -1,0 +1,21 @@
+---
+index: infrastructure
+name: Infrastructure & DevOps
+description: Tasks related to CI/CD, build systems, deployment, testing infrastructure, linting, code quality tools, and repository configuration
+---
+
+# Infrastructure & DevOps
+
+## Active Tasks
+
+### High Priority
+
+### Medium Priority
+- `m-implement-ci-infrastructure.md` - Set up CI/CD workflows, branch protections, PR/issue templates, and linting integration
+
+### Low Priority
+
+### Investigate
+
+## Completed Tasks
+<!-- Move tasks here when completed, maintaining the format -->
