@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
-import { tauriCommands, type ConflictInfo } from "@/hooks/useTauri";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
+import { tauriCommands, type ConflictInfo } from '@/hooks/useTauri';
 
 interface ConflictsDialogProps {
   open: boolean;
@@ -16,11 +16,7 @@ interface ConflictsDialogProps {
   onDisableMod?: (modName: string) => void;
 }
 
-export function ConflictsDialog({
-  open,
-  onOpenChange,
-  onDisableMod,
-}: ConflictsDialogProps) {
+export function ConflictsDialog({ open, onOpenChange, onDisableMod }: ConflictsDialogProps) {
   const [conflicts, setConflicts] = useState<ConflictInfo[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +32,7 @@ export function ConflictsDialog({
       const result = await tauriCommands.checkConflicts();
       setConflicts(result);
     } catch (error) {
-      console.error("Failed to load conflicts:", error);
+      console.error('Failed to load conflicts:', error);
     } finally {
       setLoading(false);
     }
@@ -59,8 +55,8 @@ export function ConflictsDialog({
             Mod Conflicts Detected
           </DialogTitle>
           <DialogDescription>
-            The following files are modified by multiple mods. The last enabled
-            mod will override others.
+            The following files are modified by multiple mods. The last enabled mod will override
+            others.
           </DialogDescription>
         </DialogHeader>
 
@@ -72,17 +68,12 @@ export function ConflictsDialog({
           ) : conflicts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <p className="text-muted-foreground">No conflicts detected!</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                All enabled mods are compatible.
-              </p>
+              <p className="text-sm text-muted-foreground mt-2">All enabled mods are compatible.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {conflicts.map((conflict, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border p-4 space-y-3"
-                >
+                <div key={index} className="rounded-lg border p-4 space-y-3">
                   <div>
                     <p className="font-medium text-sm mb-1">Conflicting File:</p>
                     <p className="text-xs font-mono text-muted-foreground break-all">
@@ -123,7 +114,7 @@ export function ConflictsDialog({
 
         <div className="flex justify-between items-center pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            {conflicts.length} conflict{conflicts.length !== 1 ? "s" : ""} found
+            {conflicts.length} conflict{conflicts.length !== 1 ? 's' : ''} found
           </p>
           <Button onClick={() => onOpenChange(false)}>Close</Button>
         </div>

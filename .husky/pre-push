@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Get current branch name
+branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+# Define allowed branch name patterns
+allowed_patterns="^(feature|fix|bugfix|hotfix|docs|refactor|test|chore)\/.*|^main$"
+
+# Check if branch name matches allowed patterns
+if ! echo "$branch" | grep -qE "$allowed_patterns"; then
+  echo ""
+  echo "❌ Branch name '$branch' does not follow naming conventions!"
+  echo ""
+  echo "Allowed patterns:"
+  echo "  • feature/*   - New features"
+  echo "  • fix/*       - Bug fixes"
+  echo "  • bugfix/*    - Bug fixes (alternative)"
+  echo "  • hotfix/*    - Urgent production fixes"
+  echo "  • docs/*      - Documentation changes"
+  echo "  • refactor/*  - Code refactoring"
+  echo "  • test/*      - Test additions/changes"
+  echo "  • chore/*     - Maintenance tasks"
+  echo "  • main        - Main branch"
+  echo ""
+  echo "Example: feature/add-user-auth"
+  echo ""
+  exit 1
+fi
+
+# Branch name is valid, allow push
+exit 0

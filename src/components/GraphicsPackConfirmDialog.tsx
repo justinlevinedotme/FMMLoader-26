@@ -11,7 +11,7 @@
  * - Full path preview showing exact installation location
  * - Mixed pack split option to separate types into individual directories
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,17 +19,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { GraphicsPackAnalysis, GraphicsPackType } from "@/hooks/useTauri";
+} from '@/components/ui/select';
+import type { GraphicsPackAnalysis, GraphicsPackType } from '@/hooks/useTauri';
 
 interface GraphicsPackConfirmDialogProps {
   analysis: GraphicsPackAnalysis | null;
@@ -39,20 +39,20 @@ interface GraphicsPackConfirmDialogProps {
 }
 
 const getPackTypeLabel = (packType: GraphicsPackType): string => {
-  if (typeof packType === "string") {
+  if (typeof packType === 'string') {
     return packType;
   }
-  if (typeof packType === "object" && "Mixed" in packType) {
-    const types = packType.Mixed.map((t) => getPackTypeLabel(t)).join(", ");
+  if (typeof packType === 'object' && 'Mixed' in packType) {
+    const types = packType.Mixed.map((t) => getPackTypeLabel(t)).join(', ');
     return `Mixed (${types})`;
   }
-  return "Unknown";
+  return 'Unknown';
 };
 
 const formatBytes = (bytes: number): string => {
-  if (bytes === 0) return "0 B";
+  if (bytes === 0) return '0 B';
   const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
+  const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${Math.round((bytes / Math.pow(k, i)) * 100) / 100} ${sizes[i]}`;
 };
@@ -63,7 +63,7 @@ export function GraphicsPackConfirmDialog({
   onCancel,
   userDirPath,
 }: GraphicsPackConfirmDialogProps) {
-  const [selectedPath, setSelectedPath] = useState<string>("");
+  const [selectedPath, setSelectedPath] = useState<string>('');
   const [shouldSplit, setShouldSplit] = useState(false);
 
   const getResolvedPath = (relativePath: string): string => {
@@ -80,16 +80,15 @@ export function GraphicsPackConfirmDialog({
 
   if (!analysis) return null;
 
-  const isMixed =
-    typeof analysis.pack_type === "object" && "Mixed" in analysis.pack_type;
+  const isMixed = typeof analysis.pack_type === 'object' && 'Mixed' in analysis.pack_type;
 
   const confidencePercent = Math.round(analysis.confidence * 100);
   const confidenceColor =
     confidencePercent >= 70
-      ? "text-green-600 dark:text-green-400"
+      ? 'text-green-600 dark:text-green-400'
       : confidencePercent >= 50
-      ? "text-yellow-600 dark:text-yellow-400"
-      : "text-red-600 dark:text-red-400";
+        ? 'text-yellow-600 dark:text-yellow-400'
+        : 'text-red-600 dark:text-red-400';
 
   const open = analysis !== null;
 
@@ -99,7 +98,8 @@ export function GraphicsPackConfirmDialog({
         <DialogHeader>
           <DialogTitle>Configure Graphics Pack Installation</DialogTitle>
           <DialogDescription>
-            {getPackTypeLabel(analysis.pack_type)} - {analysis.file_count.toLocaleString()} files ({formatBytes(analysis.total_size_bytes)})
+            {getPackTypeLabel(analysis.pack_type)} - {analysis.file_count.toLocaleString()} files (
+            {formatBytes(analysis.total_size_bytes)})
           </DialogDescription>
         </DialogHeader>
 
@@ -107,11 +107,12 @@ export function GraphicsPackConfirmDialog({
           {/* Pack Info */}
           <div className="text-sm">
             <p className="mb-2">
-              Detected as <strong>{getPackTypeLabel(analysis.pack_type)}</strong> with <span className={confidenceColor}>{confidencePercent}% confidence</span>
+              Detected as <strong>{getPackTypeLabel(analysis.pack_type)}</strong> with{' '}
+              <span className={confidenceColor}>{confidencePercent}% confidence</span>
             </p>
             <div className="bg-muted p-2 rounded text-muted-foreground text-xs space-y-1">
-              <div>Structure: {analysis.is_flat_pack ? "Flat" : "Structured"}</div>
-              <div>Config XML: {analysis.has_config_xml ? "Found" : "Not found"}</div>
+              <div>Structure: {analysis.is_flat_pack ? 'Flat' : 'Structured'}</div>
+              <div>Config XML: {analysis.has_config_xml ? 'Found' : 'Not found'}</div>
             </div>
           </div>
 
@@ -119,7 +120,9 @@ export function GraphicsPackConfirmDialog({
           {confidencePercent < 50 && (
             <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
               <p className="text-sm text-amber-900 dark:text-amber-200">
-                <strong>Low confidence detection.</strong> Please verify the installation path is correct for your graphics pack type. If unsure, check the pack's documentation or contents.
+                <strong>Low confidence detection.</strong> Please verify the installation path is
+                correct for your graphics pack type. If unsure, check the pack's documentation or
+                contents.
               </p>
             </div>
           )}
@@ -169,8 +172,8 @@ export function GraphicsPackConfirmDialog({
 
           <p className="text-sm text-muted-foreground">
             {shouldSplit
-              ? "Multiple directories will be created for each type"
-              : "Pack contents will be copied to this directory"}
+              ? 'Multiple directories will be created for each type'
+              : 'Pack contents will be copied to this directory'}
           </p>
         </div>
 

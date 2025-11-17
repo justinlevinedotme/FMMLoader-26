@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Download, AlertTriangle } from "lucide-react";
-import { useUpdater } from "@/hooks/useUpdater";
+import { Button } from '@/components/ui/button';
+import { RefreshCw, Download, AlertTriangle } from 'lucide-react';
+import { useUpdater } from '@/hooks/useUpdater';
 
 export function UpdateBanner() {
   const { status, downloadAndInstall } = useUpdater();
@@ -15,21 +15,15 @@ export function UpdateBanner() {
       <div className="flex items-center gap-3 flex-1">
         <Download className="h-5 w-5 flex-shrink-0" />
         <div className="flex-1">
-          <p className="font-medium">
-            Update Available: v{status.latestVersion}
-          </p>
-          <p className="text-sm text-blue-100">
-            A new version is ready to install
-          </p>
+          <p className="font-medium">Update Available: v{status.latestVersion}</p>
+          <p className="text-sm text-blue-100">A new version is ready to install</p>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
         {status.downloading && (
           <div className="flex items-center gap-2 mr-4">
-            <div className="text-sm">
-              Downloading: {status.downloadProgress}%
-            </div>
+            <div className="text-sm">Downloading: {status.downloadProgress}%</div>
             <div className="w-32 h-2 bg-blue-800/50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white transition-all duration-300"

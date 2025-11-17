@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
-import { open } from "@tauri-apps/plugin-dialog";
-import { open as openUrl } from "@tauri-apps/plugin-shell";
-import { listen } from "@tauri-apps/api/event";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from 'react';
+import { open } from '@tauri-apps/plugin-dialog';
+import { open as openUrl } from '@tauri-apps/plugin-shell';
+import { listen } from '@tauri-apps/api/event';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -19,8 +13,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
+} from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -28,23 +22,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   tauriCommands,
   type Config,
@@ -56,7 +50,7 @@ import {
   type GraphicsPackAnalysis,
   type GraphicsPackIssue,
   type GraphicsConflictInfo,
-} from "@/hooks/useTauri";
+} from '@/hooks/useTauri';
 import {
   FolderOpen,
   RefreshCw,
@@ -69,22 +63,17 @@ import {
   Wrench,
   CheckCircle2,
   XCircle,
-} from "lucide-react";
-import { FaDiscord } from "react-icons/fa6";
-import { SiKofi } from "react-icons/si";
-import { ModMetadataDialog } from "@/components/ModMetadataDialog";
-import { ConflictsDialog } from "@/components/ConflictsDialog";
-import { RestorePointsDialog } from "@/components/RestorePointsDialog";
-import { GraphicsPackConfirmDialog } from "@/components/GraphicsPackConfirmDialog";
-import { TitleBar } from "@/components/TitleBar";
-import { Toaster } from "@/components/ui/sonner";
-import { UpdateBanner } from "@/components/UpdateBanner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from 'lucide-react';
+import { FaDiscord } from 'react-icons/fa6';
+import { SiKofi } from 'react-icons/si';
+import { ModMetadataDialog } from '@/components/ModMetadataDialog';
+import { ConflictsDialog } from '@/components/ConflictsDialog';
+import { RestorePointsDialog } from '@/components/RestorePointsDialog';
+import { GraphicsPackConfirmDialog } from '@/components/GraphicsPackConfirmDialog';
+import { TitleBar } from '@/components/TitleBar';
+import { Toaster } from '@/components/ui/sonner';
+import { UpdateBanner } from '@/components/UpdateBanner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ModWithInfo extends ModManifest {
   id: string;
@@ -105,18 +94,16 @@ function App() {
   const [selectedMod, setSelectedMod] = useState<ModWithInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
-  const [appVersion, setAppVersion] = useState("");
+  const [appVersion, setAppVersion] = useState('');
 
   // Import name fix dialog state
   const [importNameFixDialogOpen, setImportNameFixDialogOpen] = useState(false);
-  const [pendingImportFilePath, setPendingImportFilePath] = useState<
-    string | null
-  >(null);
-  const [importNameFixName, setImportNameFixName] = useState("");
+  const [pendingImportFilePath, setPendingImportFilePath] = useState<string | null>(null);
+  const [importNameFixName, setImportNameFixName] = useState('');
 
   // Editable path states
-  const [gameTargetInput, setGameTargetInput] = useState("");
-  const [userDirInput, setUserDirInput] = useState("");
+  const [gameTargetInput, setGameTargetInput] = useState('');
+  const [userDirInput, setUserDirInput] = useState('');
   const [darkMode, setDarkMode] = useState(false);
 
   // Dialog states
@@ -125,9 +112,7 @@ function App() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modDetailsOpen, setModDetailsOpen] = useState(false);
-  const [pendingImportPath, setPendingImportPath] = useState<string | null>(
-    null
-  );
+  const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
 
   // FM Name Fix states
   const [nameFixInstalled, setNameFixInstalled] = useState(false);
@@ -135,7 +120,7 @@ function App() {
   const [installingNameFix, setInstallingNameFix] = useState(false);
   const [nameFixSources, setNameFixSources] = useState<NameFixSource[]>([]);
   const [activeNameFixId, setActiveNameFixId] = useState<string | null>(null);
-  const [selectedNameFixId, setSelectedNameFixId] = useState<string>("");
+  const [selectedNameFixId, setSelectedNameFixId] = useState<string>('');
 
   // Graphics pack states
   const [graphicsProgress, setGraphicsProgress] = useState<ExtractionProgress | null>(null);
@@ -144,14 +129,18 @@ function App() {
   const [graphicsIssues, setGraphicsIssues] = useState<GraphicsPackIssue[]>([]);
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validatingGraphics, setValidatingGraphics] = useState(false);
-  const [showGraphicsConfirmDialog, setShowGraphicsConfirmDialog] = useState(false);
-  const [pendingGraphicsAnalysis, setPendingGraphicsAnalysis] = useState<GraphicsPackAnalysis | null>(null);
+  const [_showGraphicsConfirmDialog, _setShowGraphicsConfirmDialog] = useState(false);
+  const [pendingGraphicsAnalysis, setPendingGraphicsAnalysis] =
+    useState<GraphicsPackAnalysis | null>(null);
   const [pendingGraphicsPath, setPendingGraphicsPath] = useState<string | null>(null);
   const [migrationProgress, setMigrationProgress] = useState<ExtractionProgress | null>(null);
   const [migratingPack, setMigratingPack] = useState(false);
   const [graphicsConflict, setGraphicsConflict] = useState<GraphicsConflictInfo | null>(null);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
-  const [pendingInstall, setPendingInstall] = useState<{path: string, shouldSplit: boolean} | null>(null);
+  const [pendingInstall, setPendingInstall] = useState<{
+    path: string;
+    shouldSplit: boolean;
+  } | null>(null);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -162,19 +151,19 @@ function App() {
     try {
       const cfg = await tauriCommands.getConfig();
       setConfig(cfg);
-      setGameTargetInput(cfg.target_path ?? "");
-      setUserDirInput(cfg.user_dir_path ?? "");
+      setGameTargetInput(cfg.target_path ?? '');
+      setUserDirInput(cfg.user_dir_path ?? '');
 
       // Load dark mode preference
       const shouldUseDarkMode = cfg.dark_mode ?? false;
       setDarkMode(shouldUseDarkMode);
       if (shouldUseDarkMode) {
-        document.documentElement.classList.add("dark");
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.remove("dark");
+        document.documentElement.classList.remove('dark');
       }
 
-      addLog("Configuration loaded");
+      addLog('Configuration loaded');
     } catch (error) {
       addLog(`Error loading config: ${formatError(error)}`);
     }
@@ -223,7 +212,7 @@ function App() {
   const detectGamePath = async () => {
     try {
       setLoading(true);
-      addLog("Detecting game path...");
+      addLog('Detecting game path...');
       const paths = await tauriCommands.detectGamePath();
 
       if (paths.length > 0) {
@@ -231,7 +220,7 @@ function App() {
         await loadConfig();
         addLog(`Game path detected: ${paths[0]}`);
       } else {
-        addLog("No game installation found");
+        addLog('No game installation found');
       }
     } catch (error) {
       addLog(`Error detecting game path: ${formatError(error)}`);
@@ -245,7 +234,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 Game Target Folder",
+        title: 'Select FM26 Game Target Folder',
       });
 
       if (selected) {
@@ -263,7 +252,7 @@ function App() {
       const selected = await open({
         multiple: false,
         directory: true,
-        title: "Select FM26 User Directory",
+        title: 'Select FM26 User Directory',
       });
 
       if (selected) {
@@ -297,7 +286,7 @@ function App() {
       } catch (error) {
         addLog(`Error updating game target: ${formatError(error)}`);
         // Revert on error
-        setGameTargetInput(config?.target_path ?? "");
+        setGameTargetInput(config?.target_path ?? '');
       }
     }
   };
@@ -315,7 +304,7 @@ function App() {
       } catch (error) {
         addLog(`Error updating user directory: ${formatError(error)}`);
         // Revert on error
-        setUserDirInput(config?.user_dir_path ?? "");
+        setUserDirInput(config?.user_dir_path ?? '');
       }
     }
   };
@@ -338,23 +327,23 @@ function App() {
 
   const applyMods = async () => {
     if (!config?.target_path) {
-      addLog("Please set game target first");
-      toast.warning("Please set game target first");
+      addLog('Please set game target first');
+      toast.warning('Please set game target first');
       return;
     }
 
     try {
       setLoading(true);
-      addLog("Applying mods...");
-      toast.loading("Applying mods...", { id: "apply-mods" });
+      addLog('Applying mods...');
+      toast.loading('Applying mods...', { id: 'apply-mods' });
       const result = await tauriCommands.applyMods();
       addLog(result);
-      addLog("Mods applied successfully");
-      toast.success("Mods applied successfully!", { id: "apply-mods" });
+      addLog('Mods applied successfully');
+      toast.success('Mods applied successfully!', { id: 'apply-mods' });
     } catch (error) {
       addLog(`Error applying mods: ${formatError(error)}`);
       toast.error(`Failed to apply mods: ${formatError(error)}`, {
-        id: "apply-mods",
+        id: 'apply-mods',
       });
     } finally {
       setLoading(false);
@@ -391,8 +380,8 @@ function App() {
         directory: false,
         filters: [
           {
-            name: "Mod Files",
-            extensions: ["zip", "bundle", "fmf"],
+            name: 'Mod Files',
+            extensions: ['zip', 'bundle', 'fmf'],
           },
         ],
       });
@@ -413,17 +402,19 @@ function App() {
 
       // Heuristic: if filename contains graphics-related keywords, treat as graphics pack
       const graphicsKeywords = ['faces', 'logos', 'kits', 'graphics', 'megapack', 'facepack'];
-      const isLikelyGraphicsPack = graphicsKeywords.some(keyword => fileName.includes(keyword));
+      const isLikelyGraphicsPack = graphicsKeywords.some((keyword) => fileName.includes(keyword));
 
       if (isZip && isLikelyGraphicsPack) {
         // Route to graphics pack analysis and confirmation
         addLog(`Detected graphics pack: ${sourcePath}`);
-        toast.loading("Analyzing graphics pack (this may take a few minutes)...", { id: "analyze-graphics" });
+        toast.loading('Analyzing graphics pack (this may take a few minutes)...', {
+          id: 'analyze-graphics',
+        });
 
         try {
           const analysis = await tauriCommands.analyzeGraphicsPack(sourcePath);
           addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
-          toast.success("Analysis complete!", { id: "analyze-graphics" });
+          toast.success('Analysis complete!', { id: 'analyze-graphics' });
 
           // Store the analysis and path, then show confirmation dialog
           setPendingGraphicsAnalysis(analysis);
@@ -432,7 +423,7 @@ function App() {
         } catch (error) {
           const errorMsg = formatError(error);
           addLog(`Error analyzing graphics pack: ${errorMsg}`);
-          toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: "analyze-graphics" });
+          toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: 'analyze-graphics' });
         }
         return;
       }
@@ -446,11 +437,11 @@ function App() {
     } catch (error) {
       const errorStr = String(error);
 
-      if (errorStr === "NEEDS_METADATA") {
+      if (errorStr === 'NEEDS_METADATA') {
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
-        toast.info("Please provide mod metadata");
+        toast.info('Please provide mod metadata');
       } else {
         addLog(`Import failed: ${formatError(error)}`);
         toast.error(`Import failed: ${formatError(error)}`);
@@ -480,7 +471,7 @@ function App() {
   const detectUserDirectory = async () => {
     try {
       setLoading(true);
-      addLog("Detecting user directory...");
+      addLog('Detecting user directory...');
       const detectedPath = await tauriCommands.detectUserDir();
 
       // Update the config with the detected path
@@ -502,9 +493,9 @@ function App() {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     if (newDarkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
 
     // Save dark mode preference to config
@@ -513,7 +504,7 @@ function App() {
       try {
         await tauriCommands.updateConfig(updatedConfig);
         setConfig(updatedConfig);
-        addLog(`Dark mode ${newDarkMode ? "enabled" : "disabled"}`);
+        addLog(`Dark mode ${newDarkMode ? 'enabled' : 'disabled'}`);
       } catch (error) {
         addLog(`Error saving dark mode preference: ${formatError(error)}`);
       }
@@ -524,7 +515,7 @@ function App() {
   const checkNameFixStatus = async () => {
     try {
       setCheckingNameFix(true);
-      addLog("Checking FM Name Fix installation status...");
+      addLog('Checking FM Name Fix installation status...');
       const isInstalled = await tauriCommands.checkNameFixInstalled();
       setNameFixInstalled(isInstalled);
 
@@ -532,7 +523,7 @@ function App() {
       const activeId = await tauriCommands.getActiveNameFix();
       setActiveNameFixId(activeId);
 
-      addLog(`FM Name Fix is ${isInstalled ? "installed" : "not installed"}`);
+      addLog(`FM Name Fix is ${isInstalled ? 'installed' : 'not installed'}`);
     } catch (error) {
       addLog(`Error checking FM Name Fix status: ${formatError(error)}`);
     } finally {
@@ -556,19 +547,17 @@ function App() {
 
   const installSelectedNameFix = async () => {
     if (!selectedNameFixId) {
-      toast.error("Please select a name fix to install");
+      toast.error('Please select a name fix to install');
       return;
     }
 
     try {
       setInstallingNameFix(true);
-      const selectedSource = nameFixSources.find(
-        (s) => s.id === selectedNameFixId
-      );
-      addLog(`Installing ${selectedSource?.name || "name fix"}...`);
+      const selectedSource = nameFixSources.find((s) => s.id === selectedNameFixId);
+      addLog(`Installing ${selectedSource?.name || 'name fix'}...`);
       const result = await tauriCommands.installNameFixById(selectedNameFixId);
       addLog(result);
-      toast.success("Name fix installed successfully!");
+      toast.success('Name fix installed successfully!');
       setNameFixInstalled(true);
       await checkNameFixStatus();
     } catch (error) {
@@ -581,48 +570,48 @@ function App() {
   };
 
   const handleImportNameFix = async () => {
-    console.log("=== handleImportNameFix START ===");
+    console.log('=== handleImportNameFix START ===');
     try {
-      console.log("Opening file picker dialog...");
+      console.log('Opening file picker dialog...');
       const selected = await open({
         multiple: false,
         directory: false,
         filters: [
           {
-            name: "Name Fix Archives",
-            extensions: ["zip"],
+            name: 'Name Fix Archives',
+            extensions: ['zip'],
           },
         ],
       });
 
-      console.log("File picker closed. Selected file:", selected);
+      console.log('File picker closed. Selected file:', selected);
 
       if (!selected) {
-        console.log("No file selected, user cancelled file picker");
+        console.log('No file selected, user cancelled file picker');
         return;
       }
 
-      console.log("File was selected, opening name dialog...");
+      console.log('File was selected, opening name dialog...');
 
       // Open dialog for user to enter name
       setPendingImportFilePath(selected);
-      setImportNameFixName("Custom Name Fix");
+      setImportNameFixName('Custom Name Fix');
       setImportNameFixDialogOpen(true);
     } catch (error) {
-      console.error("=== ERROR in handleImportNameFix ===");
-      console.error("Error type:", typeof error);
-      console.error("Error object:", error);
+      console.error('=== ERROR in handleImportNameFix ===');
+      console.error('Error type:', typeof error);
+      console.error('Error object:', error);
       const errorMsg = formatError(error);
-      console.error("Formatted error message:", errorMsg);
+      console.error('Formatted error message:', errorMsg);
       addLog(`Error importing name fix: ${errorMsg}`);
       toast.error(`Failed to import name fix: ${errorMsg}`);
     }
-    console.log("=== handleImportNameFix END ===");
+    console.log('=== handleImportNameFix END ===');
   };
 
   const confirmImportNameFix = async () => {
     if (!pendingImportFilePath || !importNameFixName.trim()) {
-      toast.error("Please enter a name for the name fix");
+      toast.error('Please enter a name for the name fix');
       return;
     }
 
@@ -630,50 +619,47 @@ function App() {
       setImportNameFixDialogOpen(false);
       const name = importNameFixName.trim();
 
-      console.log("Name validated, proceeding with import...");
+      console.log('Name validated, proceeding with import...');
       addLog(`Importing name fix: ${name}`);
       console.log(
-        "Calling tauriCommands.importNameFix with path:",
+        'Calling tauriCommands.importNameFix with path:',
         pendingImportFilePath,
-        "and name:",
+        'and name:',
         name
       );
 
-      const result = await tauriCommands.importNameFix(
-        pendingImportFilePath,
-        name
-      );
-      console.log("Import completed successfully. Result:", result);
+      const result = await tauriCommands.importNameFix(pendingImportFilePath, name);
+      console.log('Import completed successfully. Result:', result);
 
       addLog(result);
       toast.success(result);
 
       // Reload sources
-      console.log("Reloading name fix sources...");
+      console.log('Reloading name fix sources...');
       await loadNameFixSources();
-      console.log("Sources reloaded successfully");
+      console.log('Sources reloaded successfully');
 
       // Check installation status in case the imported fix matches what's in the game
       await checkNameFixStatus();
 
       // Clear state
       setPendingImportFilePath(null);
-      setImportNameFixName("");
+      setImportNameFixName('');
     } catch (error) {
-      console.error("=== ERROR in confirmImportNameFix ===");
-      console.error("Error object:", error);
+      console.error('=== ERROR in confirmImportNameFix ===');
+      console.error('Error object:', error);
       const errorMsg = formatError(error);
-      console.error("Formatted error message:", errorMsg);
+      console.error('Formatted error message:', errorMsg);
       addLog(`Error importing name fix: ${errorMsg}`);
       toast.error(`Failed to import name fix: ${errorMsg}`);
     }
   };
 
-  const handleImportGraphicsPackDirect = async (sourcePath: string) => {
+  const _handleImportGraphicsPackDirect = async (sourcePath: string) => {
     try {
       setImportingGraphics(true);
       addLog(`Importing graphics pack from: ${sourcePath}`);
-      toast.loading("Starting graphics pack import...", { id: "graphics-import" });
+      toast.loading('Starting graphics pack import...', { id: 'graphics-import' });
 
       const result = await tauriCommands.importGraphicsPack(sourcePath);
 
@@ -686,7 +672,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error importing graphics pack: ${errorMsg}`);
-      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: "graphics-import" });
+      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: 'graphics-import' });
       setGraphicsProgress(null);
     } finally {
       setImportingGraphics(false);
@@ -700,8 +686,8 @@ function App() {
         directory: false,
         filters: [
           {
-            name: "Graphics Pack Archives",
-            extensions: ["zip"],
+            name: 'Graphics Pack Archives',
+            extensions: ['zip'],
           },
         ],
       });
@@ -711,13 +697,15 @@ function App() {
       }
 
       // Analyze the pack first
-      addLog("Analyzing graphics pack...");
-      toast.loading("Analyzing graphics pack (this may take a few minutes)...", { id: "analyze-graphics" });
+      addLog('Analyzing graphics pack...');
+      toast.loading('Analyzing graphics pack (this may take a few minutes)...', {
+        id: 'analyze-graphics',
+      });
 
       const analysis = await tauriCommands.analyzeGraphicsPack(selected);
 
       addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
-      toast.success("Analysis complete!", { id: "analyze-graphics" });
+      toast.success('Analysis complete!', { id: 'analyze-graphics' });
 
       // Store the analysis and path, then show confirmation dialog
       setPendingGraphicsAnalysis(analysis);
@@ -726,7 +714,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error analyzing graphics pack: ${errorMsg}`);
-      toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: "analyze-graphics" });
+      toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: 'analyze-graphics' });
     }
   };
 
@@ -761,13 +749,17 @@ function App() {
     }
   };
 
-  const performGraphicsInstall = async (installPath: string, shouldSplit: boolean, force: boolean) => {
+  const performGraphicsInstall = async (
+    installPath: string,
+    shouldSplit: boolean,
+    force: boolean
+  ) => {
     if (!pendingGraphicsPath) return;
 
     try {
       setImportingGraphics(true);
       addLog(`Installing graphics pack to: ${installPath}`);
-      toast.loading("Installing graphics pack...", { id: "graphics-import" });
+      toast.loading('Installing graphics pack...', { id: 'graphics-import' });
 
       const result = await tauriCommands.importGraphicsPackWithType(
         pendingGraphicsPath,
@@ -781,7 +773,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error importing graphics pack: ${errorMsg}`);
-      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: "graphics-import" });
+      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: 'graphics-import' });
       setGraphicsProgress(null);
     } finally {
       setImportingGraphics(false);
@@ -805,37 +797,39 @@ function App() {
     setPendingInstall(null);
     setPendingGraphicsAnalysis(null);
     setPendingGraphicsPath(null);
-    addLog("Graphics pack installation cancelled due to conflicts");
+    addLog('Graphics pack installation cancelled due to conflicts');
   };
 
   const handleGraphicsCancel = () => {
     setShowGraphicsConfirmDialog(false);
     setPendingGraphicsAnalysis(null);
     setPendingGraphicsPath(null);
-    addLog("Graphics pack import cancelled");
+    addLog('Graphics pack import cancelled');
   };
 
   const handleValidateGraphics = async () => {
     try {
       setValidatingGraphics(true);
-      addLog("Validating installed graphics packs...");
-      toast.loading("Validating graphics...", { id: "validate-graphics" });
+      addLog('Validating installed graphics packs...');
+      toast.loading('Validating graphics...', { id: 'validate-graphics' });
 
       const issues = await tauriCommands.validateGraphics();
       setGraphicsIssues(issues);
 
       if (issues.length === 0) {
-        addLog("No issues found - all graphics packs are correctly placed");
-        toast.success("All graphics packs are correctly placed!", { id: "validate-graphics" });
+        addLog('No issues found - all graphics packs are correctly placed');
+        toast.success('All graphics packs are correctly placed!', { id: 'validate-graphics' });
       } else {
         addLog(`Found ${issues.length} graphics pack issue(s)`);
-        toast.info(`Found ${issues.length} issue(s). Click to review.`, { id: "validate-graphics" });
+        toast.info(`Found ${issues.length} issue(s). Click to review.`, {
+          id: 'validate-graphics',
+        });
         setShowValidationDialog(true);
       }
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error validating graphics: ${errorMsg}`);
-      toast.error(`Failed to validate graphics: ${errorMsg}`, { id: "validate-graphics" });
+      toast.error(`Failed to validate graphics: ${errorMsg}`, { id: 'validate-graphics' });
     } finally {
       setValidatingGraphics(false);
     }
@@ -845,11 +839,11 @@ function App() {
     try {
       setMigratingPack(true);
       addLog(`Migrating ${packName} to ${targetSubdir}/...`);
-      toast.loading(`Moving ${packName}...`, { id: "migrate-graphics" });
+      toast.loading(`Moving ${packName}...`, { id: 'migrate-graphics' });
 
       const result = await tauriCommands.migrateGraphicsPack(packName, targetSubdir);
       addLog(result);
-      toast.success("Graphics pack moved successfully!", { id: "migrate-graphics" });
+      toast.success('Graphics pack moved successfully!', { id: 'migrate-graphics' });
 
       // Clear progress and reload validation
       setMigrationProgress(null);
@@ -857,7 +851,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error migrating graphics pack: ${errorMsg}`);
-      toast.error(`Failed to migrate pack: ${errorMsg}`, { id: "migrate-graphics" });
+      toast.error(`Failed to migrate pack: ${errorMsg}`, { id: 'migrate-graphics' });
       setMigrationProgress(null);
     } finally {
       setMigratingPack(false);
@@ -869,14 +863,14 @@ function App() {
 
     try {
       addLog(`Migrating ${graphicsIssues.length} graphics pack(s)...`);
-      toast.loading("Migrating all packs...", { id: "migrate-all" });
+      toast.loading('Migrating all packs...', { id: 'migrate-all' });
 
       for (const issue of graphicsIssues) {
         await tauriCommands.migrateGraphicsPack(issue.pack_name, issue.pack_type);
         addLog(`Migrated ${issue.pack_name}`);
       }
 
-      toast.success("All packs migrated successfully!", { id: "migrate-all" });
+      toast.success('All packs migrated successfully!', { id: 'migrate-all' });
       setShowValidationDialog(false);
 
       // Reload validation
@@ -884,7 +878,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error migrating packs: ${errorMsg}`);
-      toast.error(`Failed to migrate packs: ${errorMsg}`, { id: "migrate-all" });
+      toast.error(`Failed to migrate packs: ${errorMsg}`, { id: 'migrate-all' });
     }
   };
 
@@ -908,7 +902,7 @@ function App() {
 
       // Reset selection if deleted source was selected
       if (selectedNameFixId === nameFixId) {
-        setSelectedNameFixId(nameFixSources[0]?.id || "");
+        setSelectedNameFixId(nameFixSources[0]?.id || '');
       }
     } catch (error) {
       const errorMsg = formatError(error);
@@ -920,10 +914,10 @@ function App() {
   const uninstallNameFix = async () => {
     try {
       setInstallingNameFix(true);
-      addLog("Uninstalling FM Name Fix...");
+      addLog('Uninstalling FM Name Fix...');
       const result = await tauriCommands.uninstallNameFix();
       addLog(result);
-      toast.success("FM Name Fix uninstalled successfully!");
+      toast.success('FM Name Fix uninstalled successfully!');
       setNameFixInstalled(false);
       setActiveNameFixId(null);
       await checkNameFixStatus();
@@ -948,73 +942,67 @@ function App() {
         await loadConfig();
         await loadMods();
         await loadGraphicsPacks();
-        addLog("FMMLoader26 initialized");
+        addLog('FMMLoader26 initialized');
 
         // Set up Tauri drag and drop event listeners
-        const unlistenDrop = await listen<string[]>(
-          "tauri://file-drop",
-          (event) => {
-            const files = event.payload;
-            if (files && files.length > 0) {
-              void handleImport(files[0]);
-            }
-            setIsDragging(false);
+        const unlistenDrop = await listen<string[]>('tauri://file-drop', (event) => {
+          const files = event.payload;
+          if (files && files.length > 0) {
+            void handleImport(files[0]);
           }
-        );
+          setIsDragging(false);
+        });
 
-        const unlistenDragOver = await listen("tauri://drag-over", () => {
+        const unlistenDragOver = await listen('tauri://drag-over', () => {
           setIsDragging(true);
         });
 
-        const unlistenDragDrop = await listen<{ paths: string[] }>(
-          "tauri://drag-drop",
-          (event) => {
-            // In Tauri v2, drag-drop contains the file paths
-            const paths = event.payload?.paths;
-            if (paths && paths.length > 0) {
-              void handleImport(paths[0]);
-            }
-            setIsDragging(false);
+        const unlistenDragDrop = await listen<{ paths: string[] }>('tauri://drag-drop', (event) => {
+          // In Tauri v2, drag-drop contains the file paths
+          const paths = event.payload?.paths;
+          if (paths && paths.length > 0) {
+            void handleImport(paths[0]);
           }
-        );
+          setIsDragging(false);
+        });
 
-        const unlistenDragLeave = await listen("tauri://drag-leave", () => {
+        const unlistenDragLeave = await listen('tauri://drag-leave', () => {
           setIsDragging(false);
         });
 
         // Listen for graphics pack extraction progress
         const unlistenGraphicsProgress = await listen<ExtractionProgress>(
-          "graphics-extraction-progress",
+          'graphics-extraction-progress',
           (event) => {
             setGraphicsProgress(event.payload);
 
             // Check if installation is complete
-            if (event.payload.phase === "complete") {
-              toast.success("Graphics pack installed successfully!", { id: "graphics-import" });
+            if (event.payload.phase === 'complete') {
+              toast.success('Graphics pack installed successfully!', { id: 'graphics-import' });
               setGraphicsProgress(null);
-            } else if (event.payload.phase === "indexing") {
+            } else if (event.payload.phase === 'indexing') {
               // Show indexing phase
-              toast.loading("Indexing files...", { id: "graphics-import" });
+              toast.loading('Indexing files...', { id: 'graphics-import' });
             } else {
               // Update toast with progress (copying or extracting)
               const percent = Math.round((event.payload.current / event.payload.total) * 100);
-              const phaseText = event.payload.phase === "copying" ? "Installing" : "Extracting";
+              const phaseText = event.payload.phase === 'copying' ? 'Installing' : 'Extracting';
               toast.loading(
                 `${phaseText} graphics: ${event.payload.current}/${event.payload.total} files (${percent}%)`,
-                { id: "graphics-import" }
+                { id: 'graphics-import' }
               );
             }
           }
         );
 
         // Listen for migration progress
-        const unlistenMigrationProgress = await listen<ExtractionProgress>(
-          "migration-progress",
+        const _unlistenMigrationProgress = await listen<ExtractionProgress>(
+          'migration-progress',
           (event) => {
             setMigrationProgress(event.payload);
 
             // Check if migration is complete
-            if (event.payload.phase === "complete") {
+            if (event.payload.phase === 'complete') {
               setMigrationProgress(null);
               setMigratingPack(false);
             } else {
@@ -1022,7 +1010,7 @@ function App() {
               const percent = Math.round((event.payload.current / event.payload.total) * 100);
               toast.loading(
                 `Migrating: ${event.payload.current}/${event.payload.total} files (${percent}%)`,
-                { id: "migrate-graphics" }
+                { id: 'migrate-graphics' }
               );
             }
           }
@@ -1039,7 +1027,7 @@ function App() {
           await loadNameFixSources();
         } catch (error) {
           // Silently fail - not critical
-          console.error("Failed to check FM Name Fix status:", error);
+          console.error('Failed to check FM Name Fix status:', error);
         }
 
         return () => {
@@ -1067,41 +1055,45 @@ function App() {
 
   // Debug function to preview graphics pack dialog
   useEffect(() => {
-    (window as any).previewGraphicsDialog = (confidenceLevel: 'high' | 'low' | 'mixed' = 'high') => {
-      const mockData = {
+    (
+      window as Window & {
+        previewGraphicsDialog: (confidenceLevel?: 'high' | 'low' | 'mixed') => void;
+      }
+    ).previewGraphicsDialog = (confidenceLevel: 'high' | 'low' | 'mixed' = 'high') => {
+      const mockData: Record<string, GraphicsPackAnalysis> = {
         high: {
-          pack_type: "Logos",
+          pack_type: 'Logos',
           confidence: 0.95,
-          suggested_paths: ["logos", "faces", "kits"],
+          suggested_paths: ['logos', 'faces', 'kits'],
           file_count: 15420,
           total_size_bytes: 2147483648,
           has_config_xml: true,
           subdirectory_breakdown: {},
-          is_flat_pack: false
+          is_flat_pack: false,
         },
         low: {
-          pack_type: "Unknown",
+          pack_type: 'Unknown',
           confidence: 0.35,
-          suggested_paths: ["logos", "faces", "kits"],
+          suggested_paths: ['logos', 'faces', 'kits'],
           file_count: 8500,
           total_size_bytes: 1073741824,
           has_config_xml: false,
           subdirectory_breakdown: {},
-          is_flat_pack: true
+          is_flat_pack: true,
         },
         mixed: {
-          pack_type: { Mixed: ["Faces", "Logos", "Kits"] },
+          pack_type: { Mixed: ['Faces', 'Logos', 'Kits'] },
           confidence: 0.85,
-          suggested_paths: ["faces", "logos", "kits"],
+          suggested_paths: ['faces', 'logos', 'kits'],
           file_count: 25000,
           total_size_bytes: 3221225472,
           has_config_xml: true,
           subdirectory_breakdown: { faces: 12000, logos: 8000, kits: 5000 },
-          is_flat_pack: false
-        }
+          is_flat_pack: false,
+        },
       };
-      setPendingGraphicsAnalysis(mockData[confidenceLevel] as any);
-      setShowGraphicsConfirmDialog(true);
+      setPendingGraphicsAnalysis(mockData[confidenceLevel]);
+      _setShowGraphicsConfirmDialog(true);
     };
   }, []);
 
@@ -1198,22 +1190,11 @@ function App() {
                 </TooltipContent>
               </Tooltip>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={loadMods}
-                disabled={loading}
-              >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-                />
+              <Button variant="outline" size="sm" onClick={loadMods} disabled={loading}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSettingsOpen(true)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
@@ -1230,9 +1211,7 @@ function App() {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      The FM26 installation folder containing the .bundle files
-                    </p>
+                    <p>The FM26 installation folder containing the .bundle files</p>
                   </TooltipContent>
                 </Tooltip>
                 <input
@@ -1240,26 +1219,16 @@ function App() {
                   value={gameTargetInput}
                   onChange={(e) => handleGameTargetChange(e.target.value)}
                   onBlur={saveGameTarget}
-                  onKeyDown={(e) => e.key === "Enter" && saveGameTarget()}
+                  onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
                   className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   placeholder="Not set - click 'Select' or 'Detect Game'"
                   disabled={loading}
                 />
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={detectGamePath}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={detectGamePath} disabled={loading}>
                 Detect
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={selectGamePath}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={selectGamePath} disabled={loading}>
                 <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
               </Button>
             </div>
@@ -1273,10 +1242,7 @@ function App() {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      The FM26 User Directory where saves and settings are
-                      stored
-                    </p>
+                    <p>The FM26 User Directory where saves and settings are stored</p>
                   </TooltipContent>
                 </Tooltip>
                 <input
@@ -1284,26 +1250,16 @@ function App() {
                   value={userDirInput}
                   onChange={(e) => handleUserDirChange(e.target.value)}
                   onBlur={saveUserDirectory}
-                  onKeyDown={(e) => e.key === "Enter" && saveUserDirectory()}
+                  onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
                   className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   placeholder="Auto-detected from system"
                   disabled={loading}
                 />
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={detectUserDirectory}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={detectUserDirectory} disabled={loading}>
                 Detect
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={selectUserDirectory}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={selectUserDirectory} disabled={loading}>
                 <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
               </Button>
             </div>
@@ -1319,10 +1275,7 @@ function App() {
               <TabsTrigger value="logs">Logs</TabsTrigger>
             </TabsList>
 
-            <TabsContent
-              value="mods"
-              className="flex-1 overflow-hidden m-4 mt-2"
-            >
+            <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
               <div className="h-full">
                 {/* Mods List */}
                 <Card className="flex flex-col h-full">
@@ -1330,16 +1283,11 @@ function App() {
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle>Installed Mods</CardTitle>
-                        <CardDescription>
-                          {mods.length} mods installed
-                        </CardDescription>
+                        <CardDescription>{mods.length} mods installed</CardDescription>
                       </div>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            onClick={applyMods}
-                            disabled={loading || !config?.target_path}
-                          >
+                          <Button onClick={applyMods} disabled={loading || !config?.target_path}>
                             <Download className="mr-2 h-4 w-4" />
                             Apply Mods
                           </Button>
@@ -1378,25 +1326,17 @@ function App() {
                                 onCheckedChange={(checked: boolean) => {
                                   void toggleMod(mod.id, checked);
                                 }}
-                                onClick={(e: React.MouseEvent) =>
-                                  e.stopPropagation()
-                                }
+                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
                               />
                             </TableCell>
-                            <TableCell className="font-medium">
-                              {mod.name}
-                            </TableCell>
+                            <TableCell className="font-medium">{mod.name}</TableCell>
                             <TableCell>
                               <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                 {mod.mod_type}
                               </span>
                             </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {mod.version}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {mod.author}
-                            </TableCell>
+                            <TableCell className="text-muted-foreground">{mod.version}</TableCell>
+                            <TableCell className="text-muted-foreground">{mod.author}</TableCell>
                             <TableCell>
                               <Button
                                 variant="ghost"
@@ -1412,16 +1352,11 @@ function App() {
                           </TableRow>
                         ))}
                         {graphicsPacks.map((pack) => (
-                          <TableRow
-                            key={pack.id}
-                            className="hover:bg-muted/50"
-                          >
+                          <TableRow key={pack.id} className="hover:bg-muted/50">
                             <TableCell>
                               <CheckCircle2 className="h-5 w-5 text-green-600" />
                             </TableCell>
-                            <TableCell className="font-medium">
-                              {pack.name}
-                            </TableCell>
+                            <TableCell className="font-medium">{pack.name}</TableCell>
                             <TableCell>
                               <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
                                 {pack.pack_type}
@@ -1445,10 +1380,7 @@ function App() {
               </div>
             </TabsContent>
 
-            <TabsContent
-              value="utilities"
-              className="flex-1 overflow-hidden m-4 mt-2"
-            >
+            <TabsContent value="utilities" className="flex-1 overflow-hidden m-4 mt-2">
               <Card className="h-full flex flex-col">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -1467,8 +1399,8 @@ function App() {
                         <div className="flex-1">
                           <CardTitle className="text-lg">FM Name Fix</CardTitle>
                           <CardDescription className="mt-1">
-                            Fixes licensing issues and unlocks real names for
-                            clubs, players, and competitions
+                            Fixes licensing issues and unlocks real names for clubs, players, and
+                            competitions
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
@@ -1497,10 +1429,7 @@ function App() {
                           <strong>What it does:</strong>
                         </p>
                         <ul className="list-disc list-inside space-y-1 ml-2">
-                          <li>
-                            Unlocks real names for clubs like AC Milan, Inter,
-                            and Lazio
-                          </li>
+                          <li>Unlocks real names for clubs like AC Milan, Inter, and Lazio</li>
                           <li>Fixes Japanese player names</li>
                           <li>Removes fake/unlicensed content</li>
                           <li>Works with all leagues and competitions</li>
@@ -1510,18 +1439,15 @@ function App() {
                       {/* Show active name fix */}
                       {activeNameFixId && (
                         <div className="text-sm bg-muted p-3 rounded-md">
-                          <strong>Currently Active:</strong>{" "}
-                          {nameFixSources.find((s) => s.id === activeNameFixId)
-                            ?.name || "Unknown"}
+                          <strong>Currently Active:</strong>{' '}
+                          {nameFixSources.find((s) => s.id === activeNameFixId)?.name || 'Unknown'}
                         </div>
                       )}
 
                       {/* Name Fix Sources Selection */}
                       {nameFixSources.length > 0 ? (
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">
-                            Select Name Fix Source:
-                          </label>
+                          <label className="text-sm font-medium">Select Name Fix Source:</label>
                           <Select
                             value={selectedNameFixId}
                             onValueChange={setSelectedNameFixId}
@@ -1534,26 +1460,20 @@ function App() {
                               {nameFixSources.map((source) => (
                                 <SelectItem key={source.id} value={source.id}>
                                   {source.name}
-                                  {source.id === activeNameFixId
-                                    ? " - Active"
-                                    : ""}
+                                  {source.id === activeNameFixId ? ' - Active' : ''}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                           <p className="text-xs text-muted-foreground">
-                            {
-                              nameFixSources.find(
-                                (s) => s.id === selectedNameFixId
-                              )?.description
-                            }
+                            {nameFixSources.find((s) => s.id === selectedNameFixId)?.description}
                           </p>
                         </div>
                       ) : (
                         <div className="text-sm bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
                           <p className="text-amber-800 dark:text-amber-200">
-                            No name fix sources available. Import a name fix ZIP
-                            file to get started.
+                            No name fix sources available. Import a name fix ZIP file to get
+                            started.
                           </p>
                         </div>
                       )}
@@ -1577,7 +1497,7 @@ function App() {
                           ) : (
                             <>
                               <Download className="mr-2 h-4 w-4" />
-                              {nameFixInstalled ? "Reinstall" : "Install"}
+                              {nameFixInstalled ? 'Reinstall' : 'Install'}
                             </>
                           )}
                         </Button>
@@ -1614,13 +1534,8 @@ function App() {
                         {selectedNameFixId && nameFixSources.length > 0 && (
                           <Button
                             variant="outline"
-                            onClick={() =>
-                              void handleDeleteNameFix(selectedNameFixId)
-                            }
-                            disabled={
-                              installingNameFix ||
-                              selectedNameFixId === activeNameFixId
-                            }
+                            onClick={() => void handleDeleteNameFix(selectedNameFixId)}
+                            disabled={installingNameFix || selectedNameFixId === activeNameFixId}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Source
@@ -1634,9 +1549,8 @@ function App() {
                       )}
 
                       <p className="text-xs text-muted-foreground mt-2">
-                        You can download name fixes from the community or create
-                        your own. We reccomend fixes from our friends at
-                        SortItOutSI or FMScout
+                        You can download name fixes from the community or create your own. We
+                        reccomend fixes from our friends at SortItOutSI or FMScout
                       </p>
                     </CardContent>
                   </Card>
@@ -1676,7 +1590,12 @@ function App() {
                         <div className="text-sm bg-muted p-3 rounded-md space-y-2">
                           <div className="flex justify-between">
                             <strong>Progress:</strong>
-                            <span>{Math.round((graphicsProgress.current / graphicsProgress.total) * 100)}%</span>
+                            <span>
+                              {Math.round(
+                                (graphicsProgress.current / graphicsProgress.total) * 100
+                              )}
+                              %
+                            </span>
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {graphicsProgress.current} / {graphicsProgress.total} files
@@ -1717,8 +1636,8 @@ function App() {
                       )}
 
                       <p className="text-xs text-muted-foreground mt-2">
-                        Graphics packs are installed to your FM user directory and require
-                        a full game restart to take effect
+                        Graphics packs are installed to your FM user directory and require a full
+                        game restart to take effect
                       </p>
                     </CardContent>
                   </Card>
@@ -1726,16 +1645,11 @@ function App() {
               </Card>
             </TabsContent>
 
-            <TabsContent
-              value="logs"
-              className="flex-1 overflow-hidden m-4 mt-2"
-            >
+            <TabsContent value="logs" className="flex-1 overflow-hidden m-4 mt-2">
               <Card className="h-full flex flex-col">
                 <CardHeader>
                   <CardTitle>Activity Logs</CardTitle>
-                  <CardDescription>
-                    Recent activity and operations
-                  </CardDescription>
+                  <CardDescription>Recent activity and operations</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto">
                   <div className="font-mono text-xs space-y-1">
@@ -1745,9 +1659,7 @@ function App() {
                       </div>
                     ))}
                     {logs.length === 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        No logs yet
-                      </p>
+                      <p className="text-sm text-muted-foreground">No logs yet</p>
                     )}
                   </div>
                 </CardContent>
@@ -1765,7 +1677,7 @@ function App() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => openUrl("https://ko-fi.com/jalco")}
+              onClick={() => openUrl('https://ko-fi.com/jalco')}
               className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
             >
               <SiKofi className="mr-2 h-4 w-4" />
@@ -1774,7 +1686,7 @@ function App() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => openUrl("https://discord.gg/AspRvTTAch")}
+              onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
               className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
             >
               <FaDiscord className="mr-2 h-4 w-4" />
@@ -1787,7 +1699,7 @@ function App() {
         <ModMetadataDialog
           open={metadataDialogOpen}
           onOpenChange={setMetadataDialogOpen}
-          sourcePath={pendingImportPath ?? ""}
+          sourcePath={pendingImportPath ?? ''}
           onSubmit={handleMetadataSubmit}
         />
 
@@ -1802,7 +1714,7 @@ function App() {
           onOpenChange={setRestoreDialogOpen}
           onRestore={() => {
             void loadMods();
-            addLog("Restored from backup");
+            addLog('Restored from backup');
           }}
         />
 
@@ -1831,7 +1743,8 @@ function App() {
               <div className="space-y-3 my-4">
                 <div className="text-sm">
                   <p className="mb-2">
-                    There are currently <strong>{graphicsConflict.existing_file_count}</strong> file(s) in:
+                    There are currently <strong>{graphicsConflict.existing_file_count}</strong>{' '}
+                    file(s) in:
                   </p>
                   <div className="bg-muted p-2 rounded text-muted-foreground font-mono text-xs">
                     {graphicsConflict.target_directory}
@@ -1840,13 +1753,12 @@ function App() {
 
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
                   <p className="text-sm text-amber-900 dark:text-amber-200">
-                    Installing <strong>{graphicsConflict.pack_name}</strong> may replace or merge with existing graphics files.
+                    Installing <strong>{graphicsConflict.pack_name}</strong> may replace or merge
+                    with existing graphics files.
                   </p>
                 </div>
 
-                <p className="text-sm text-muted-foreground">
-                  Are you sure you want to continue?
-                </p>
+                <p className="text-sm text-muted-foreground">Are you sure you want to continue?</p>
               </div>
             )}
 
@@ -1875,7 +1787,9 @@ function App() {
               <div className="text-sm bg-muted p-3 rounded-md space-y-2 mb-4">
                 <div className="flex justify-between">
                   <strong>Migration Progress:</strong>
-                  <span>{Math.round((migrationProgress.current / migrationProgress.total) * 100)}%</span>
+                  <span>
+                    {Math.round((migrationProgress.current / migrationProgress.total) * 100)}%
+                  </span>
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {migrationProgress.current} / {migrationProgress.total} files
@@ -1900,9 +1814,7 @@ function App() {
                         <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
                         <div className="flex-1">
                           <div className="font-semibold">{issue.pack_name}</div>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            {issue.reason}
-                          </div>
+                          <div className="text-sm text-muted-foreground mt-1">{issue.reason}</div>
                         </div>
                       </div>
 
@@ -1922,7 +1834,9 @@ function App() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => void handleMigrateGraphicsPack(issue.pack_name, issue.pack_type)}
+                        onClick={() =>
+                          void handleMigrateGraphicsPack(issue.pack_name, issue.pack_type)
+                        }
                         disabled={migratingPack}
                         className="w-full"
                       >
@@ -1932,7 +1846,7 @@ function App() {
                             Moving...
                           </>
                         ) : (
-                          "Move to Correct Location"
+                          'Move to Correct Location'
                         )}
                       </Button>
                     </div>
@@ -1942,7 +1856,11 @@ function App() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowValidationDialog(false)} disabled={migratingPack}>
+              <Button
+                variant="outline"
+                onClick={() => setShowValidationDialog(false)}
+                disabled={migratingPack}
+              >
                 Close
               </Button>
               {graphicsIssues.length > 0 && (
@@ -1958,11 +1876,9 @@ function App() {
         <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
           <SheetContent className="w-[400px] sm:w-[540px]">
             <SheetHeader>
-              <SheetTitle>{selectedMod?.name ?? "Mod Details"}</SheetTitle>
+              <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
               <SheetDescription>
-                {selectedMod
-                  ? `Version ${selectedMod.version}`
-                  : "Select a mod to view details"}
+                {selectedMod ? `Version ${selectedMod.version}` : 'Select a mod to view details'}
               </SheetDescription>
             </SheetHeader>
             {selectedMod && (
@@ -1971,30 +1887,26 @@ function App() {
                   <div>
                     <span className="text-sm font-medium">Author:</span>
                     <p className="text-sm text-muted-foreground">
-                      {selectedMod.author || "Unknown"}
+                      {selectedMod.author || 'Unknown'}
                     </p>
                   </div>
 
                   <div>
                     <span className="text-sm font-medium">Type:</span>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedMod.mod_type}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
                   </div>
 
                   <div>
                     <span className="text-sm font-medium">Description:</span>
                     <p className="text-sm text-muted-foreground">
-                      {selectedMod.description || "No description available"}
+                      {selectedMod.description || 'No description available'}
                     </p>
                   </div>
 
                   {selectedMod.license && (
                     <div>
                       <span className="text-sm font-medium">License:</span>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedMod.license}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
                     </div>
                   )}
 
@@ -2017,12 +1929,10 @@ function App() {
                 <div className="pt-4 space-y-2">
                   <Button
                     className="w-full"
-                    variant={selectedMod.enabled ? "destructive" : "default"}
-                    onClick={() =>
-                      toggleMod(selectedMod.id, !selectedMod.enabled)
-                    }
+                    variant={selectedMod.enabled ? 'destructive' : 'default'}
+                    onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
                   >
-                    {selectedMod.enabled ? "Disable Mod" : "Enable Mod"}
+                    {selectedMod.enabled ? 'Disable Mod' : 'Enable Mod'}
                   </Button>
                   <Button
                     className="w-full"
@@ -2043,17 +1953,13 @@ function App() {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Settings</SheetTitle>
-              <SheetDescription>
-                Configure FMMLoader26 preferences
-              </SheetDescription>
+              <SheetDescription>Configure FMMLoader26 preferences</SheetDescription>
             </SheetHeader>
             <div className="mt-6 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-sm font-medium">Dark Mode</div>
-                  <div className="text-sm text-muted-foreground">
-                    Toggle dark mode theme
-                  </div>
+                  <div className="text-sm text-muted-foreground">Toggle dark mode theme</div>
                 </div>
                 <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
               </div>
@@ -2062,8 +1968,8 @@ function App() {
                 <div className="space-y-2">
                   <div className="text-sm font-medium">Application Logs</div>
                   <div className="text-sm text-muted-foreground">
-                    View application logs for troubleshooting. Logs from the
-                    last 10 sessions are kept.
+                    View application logs for troubleshooting. Logs from the last 10 sessions are
+                    kept.
                   </div>
                   <Button
                     variant="outline"
@@ -2071,11 +1977,9 @@ function App() {
                     onClick={async () => {
                       try {
                         await tauriCommands.openLogsFolder();
-                        addLog("Opened logs folder");
+                        addLog('Opened logs folder');
                       } catch (error) {
-                        addLog(
-                          `Failed to open logs folder: ${formatError(error)}`
-                        );
+                        addLog(`Failed to open logs folder: ${formatError(error)}`);
                       }
                     }}
                   >
@@ -2089,8 +1993,8 @@ function App() {
                 <div className="space-y-2">
                   <div className="text-sm font-medium">Mods Storage</div>
                   <div className="text-sm text-muted-foreground">
-                    View the folder where imported mods are stored. This is
-                    where mods are placed after import.
+                    View the folder where imported mods are stored. This is where mods are placed
+                    after import.
                   </div>
                   <Button
                     variant="outline"
@@ -2098,11 +2002,9 @@ function App() {
                     onClick={async () => {
                       try {
                         await tauriCommands.openModsFolder();
-                        addLog("Opened mods folder");
+                        addLog('Opened mods folder');
                       } catch (error) {
-                        addLog(
-                          `Failed to open mods folder: ${formatError(error)}`
-                        );
+                        addLog(`Failed to open mods folder: ${formatError(error)}`);
                       }
                     }}
                   >
@@ -2117,16 +2019,11 @@ function App() {
         <Toaster />
 
         {/* Import Name Fix Dialog */}
-        <Dialog
-          open={importNameFixDialogOpen}
-          onOpenChange={setImportNameFixDialogOpen}
-        >
+        <Dialog open={importNameFixDialogOpen} onOpenChange={setImportNameFixDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Import Name Fix</DialogTitle>
-              <DialogDescription>
-                Enter a name for this name fix package
-              </DialogDescription>
+              <DialogDescription>Enter a name for this name fix package</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
@@ -2136,7 +2033,7 @@ function App() {
                   value={importNameFixName}
                   onChange={(e) => setImportNameFixName(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === 'Enter') {
                       void confirmImportNameFix();
                     }
                   }}
@@ -2146,15 +2043,10 @@ function App() {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setImportNameFixDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setImportNameFixDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => void confirmImportNameFix()}>
-                Import
-              </Button>
+              <Button onClick={() => void confirmImportNameFix()}>Import</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
