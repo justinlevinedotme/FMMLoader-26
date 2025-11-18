@@ -4,7 +4,7 @@
 
 **What to read:** Full task file especially Sections 3-5; TASKS_INDEX.
 
-**Tools to use:** GitMCP diff/read/write; sync command for TASKS_INDEX; context7 if external verification is needed.
+**Tools to use:** Repo diff/read/write via editor/CLI; sync command for TASKS_INDEX; context7 if external verification is needed.
 
 **Responsibilities:**
 - Check work against approved criteria.

@@ -1,0 +1,129 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Semver bump type"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Read current version from package.json
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Compute next version
+        id: bump_version
+        run: |
+          CURRENT="${{ steps.get_version.outputs.current_version }}"
+          TYPE="${{ github.event.inputs.release_type }}"
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          if [ "$TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEXT="${MAJOR}.${MINOR}.${PATCH}"
+          echo "next_version=$NEXT" >> $GITHUB_OUTPUT
+          echo "Bumping $CURRENT -> $NEXT"
+
+      - name: Update package.json version
+        run: |
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+          node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          pkg.version = '${VERSION}';
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+      - name: Update src-tauri/Cargo.toml version
+        run: |
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+          # Replace the first occurrence of version = "..." in [package] section
+          sed -i '0,/^version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/s//version = "'"$VERSION"'"/' src-tauri/Cargo.toml
+
+      - name: Update src-tauri/tauri.conf.json version
+        run: |
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+          node -e "
+          const fs = require('fs');
+          const path = 'src-tauri/tauri.conf.json';
+          const conf = JSON.parse(fs.readFileSync(path, 'utf8'));
+          conf.version = '${VERSION}';
+          fs.writeFileSync(path, JSON.stringify(conf, null, 2) + '\n');
+          "
+
+      - name: Show updated versions (sanity check)
+        run: |
+          echo "package.json:"
+          node -p "require('./package.json').version"
+          echo
+          echo "Cargo.toml:"
+          grep '^version = ' src-tauri/Cargo.toml || true
+          echo
+          echo "tauri.conf.json:"
+          node -e "console.log(JSON.parse(require('fs').readFileSync('src-tauri/tauri.conf.json')).version)"
+
+      - name: Commit changes with [skip ci]
+        run: |
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add package.json src-tauri/Cargo.toml src-tauri/tauri.conf.json
+
+          # Commit may be empty if nothing changed; that's fine.
+          git commit -m "chore: bump version to ${VERSION} [skip ci]" || echo "No changes to commit"
+
+      - name: Push to main
+        run: |
+          git push origin HEAD:main
+
+      - name: Create and push tag
+        run: |
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+          TAG="v${VERSION}"
+
+          # Only create tag if it doesn't already exist
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists, skipping."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
