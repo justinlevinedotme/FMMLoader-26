@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +6,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -17,9 +17,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { History, Undo2 } from "lucide-react";
-import { tauriCommands, type RestorePoint } from "@/hooks/useTauri";
+} from '@/components/ui/table';
+import { History, Undo2 } from 'lucide-react';
+import { tauriCommands, type RestorePoint } from '@/hooks/useTauri';
 
 interface RestorePointsDialogProps {
   open: boolean;
@@ -27,15 +27,11 @@ interface RestorePointsDialogProps {
   onRestore?: () => void;
 }
 
-export function RestorePointsDialog({
-  open,
-  onOpenChange,
-  onRestore,
-}: RestorePointsDialogProps) {
+export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePointsDialogProps) {
   const [restorePoints, setRestorePoints] = useState<RestorePoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [newPointName, setNewPointName] = useState("");
+  const [newPointName, setNewPointName] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
@@ -50,7 +46,7 @@ export function RestorePointsDialog({
       const points = await tauriCommands.getRestorePoints();
       setRestorePoints(points);
     } catch (error) {
-      console.error("Failed to load restore points:", error);
+      console.error('Failed to load restore points:', error);
     } finally {
       setLoading(false);
     }
@@ -69,9 +65,7 @@ export function RestorePointsDialog({
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to restore:', error);
-      alert(
-        `Failed to restore: ${error instanceof Error ? error.message : String(error)}`
-      );
+      alert(`Failed to restore: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -83,7 +77,7 @@ export function RestorePointsDialog({
     setCreating(true);
     try {
       await tauriCommands.createBackupPoint(newPointName);
-      setNewPointName("");
+      setNewPointName('');
       setShowCreateForm(false);
       await loadRestorePoints();
     } catch (error) {
@@ -112,11 +106,7 @@ export function RestorePointsDialog({
         {!showCreateForm ? (
           <div className="space-y-4">
             <div className="flex justify-end">
-              <Button
-                onClick={() => setShowCreateForm(true)}
-                size="sm"
-                variant="outline"
-              >
+              <Button onClick={() => setShowCreateForm(true)} size="sm" variant="outline">
                 <History className="mr-2 h-4 w-4" />
                 Create Restore Point
               </Button>
@@ -146,15 +136,9 @@ export function RestorePointsDialog({
                   <TableBody>
                     {restorePoints.map((point, index) => (
                       <TableRow key={index}>
-                        <TableCell className="font-mono text-sm">
-                          {point.timestamp}
-                        </TableCell>
+                        <TableCell className="font-mono text-sm">{point.timestamp}</TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRestore(point)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleRestore(point)}>
                             <Undo2 className="mr-2 h-4 w-4" />
                             Restore
                           </Button>
@@ -188,17 +172,14 @@ export function RestorePointsDialog({
                 variant="outline"
                 onClick={() => {
                   setShowCreateForm(false);
-                  setNewPointName("");
+                  setNewPointName('');
                 }}
                 disabled={creating}
               >
                 Cancel
               </Button>
-              <Button
-                onClick={handleCreate}
-                disabled={!newPointName.trim() || creating}
-              >
-                {creating ? "Creating..." : "Create"}
+              <Button onClick={handleCreate} disabled={!newPointName.trim() || creating}>
+                {creating ? 'Creating...' : 'Create'}
               </Button>
             </DialogFooter>
           </div>

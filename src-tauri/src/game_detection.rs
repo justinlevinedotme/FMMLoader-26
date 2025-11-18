@@ -7,8 +7,8 @@ pub fn get_default_candidates() -> Vec<PathBuf> {
     {
         let program_files_x86 = std::env::var("PROGRAMFILES(X86)")
             .unwrap_or_else(|_| "C:/Program Files (x86)".to_string());
-        let program_files = std::env::var("PROGRAMFILES")
-            .unwrap_or_else(|_| "C:/Program Files".to_string());
+        let program_files =
+            std::env::var("PROGRAMFILES").unwrap_or_else(|_| "C:/Program Files".to_string());
 
         // Steam
         let steam_base = PathBuf::from(&program_files_x86)

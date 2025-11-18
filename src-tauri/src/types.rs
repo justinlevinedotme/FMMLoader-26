@@ -73,17 +73,18 @@ pub struct NameFixSource {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum NameFixSourceType {
-    GitHub,    // Built-in GitHub download
-    Imported,  // User-imported ZIP/RAR
+    GitHub,   // Built-in GitHub download
+    Imported, // User-imported ZIP/RAR
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum NameFixInstallType {
-    Files,     // FMScout style: Add specific .lnc/.edt/.dbc files
-    Folders,   // Sortitoutsi style: Replace entire dbc/edt/lnc folders + editor data
+    Files,   // FMScout style: Add specific .lnc/.edt/.dbc files
+    Folders, // Sortitoutsi style: Replace entire dbc/edt/lnc folders + editor data
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct ModInfo {
     pub name: String,
     pub version: String,
@@ -118,6 +119,7 @@ pub struct ExtractionProgress {
 
 /// Progress tracking for file installation operations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct InstallProgress {
     pub current: usize,
     pub total: usize,

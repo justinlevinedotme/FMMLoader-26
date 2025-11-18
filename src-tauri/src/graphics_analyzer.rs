@@ -35,10 +35,10 @@
 //! The analyzer limits directory traversal depth to 3 levels to prevent excessive
 //! processing on malformed pack structures.
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
-use serde::{Deserialize, Serialize};
 use walkdir::WalkDir;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -53,7 +53,7 @@ pub enum GraphicsPackType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GraphicsPackAnalysis {
     pub pack_type: GraphicsPackType,
-    pub confidence: f32, // 0.0 to 1.0
+    pub confidence: f32,              // 0.0 to 1.0
     pub suggested_paths: Vec<String>, // e.g., ["graphics/faces/PackName"]
     pub file_count: usize,
     pub total_size_bytes: u64,
@@ -69,6 +69,7 @@ struct PackContents {
     has_kits_dir: bool,
     png_files: Vec<PathBuf>,
     xml_files: Vec<PathBuf>,
+    #[allow(dead_code)]
     subdirs: Vec<PathBuf>,
     total_size: u64,
 }
@@ -117,7 +118,8 @@ fn detect_flat_pack(contents: &PackContents) -> bool {
     // 3. Usually has config.xml at root
 
     let has_images_at_root = !contents.png_files.is_empty();
-    let has_type_subdirs = contents.has_faces_dir || contents.has_logos_dir || contents.has_kits_dir;
+    let has_type_subdirs =
+        contents.has_faces_dir || contents.has_logos_dir || contents.has_kits_dir;
 
     has_images_at_root && !has_type_subdirs
 }
@@ -142,7 +144,10 @@ fn scan_pack_contents(pack_path: &Path) -> Result<PackContents, String> {
                 if name_lower == "faces" || name_lower.contains("face") {
                     has_faces_dir = true;
                 }
-                if name_lower == "logos" || name_lower.contains("logo") || name_lower.contains("badge") {
+                if name_lower == "logos"
+                    || name_lower.contains("logo")
+                    || name_lower.contains("badge")
+                {
                     has_logos_dir = true;
                 }
                 if name_lower == "kits" || name_lower.contains("kit") {
@@ -219,7 +224,10 @@ fn analyze_config_xml(pack_path: &Path) -> ConfigAnalysis {
     analysis
 }
 
-fn determine_pack_type(contents: &PackContents, config: &ConfigAnalysis) -> (GraphicsPackType, f32) {
+fn determine_pack_type(
+    contents: &PackContents,
+    config: &ConfigAnalysis,
+) -> (GraphicsPackType, f32) {
     let mut type_scores: HashMap<GraphicsPackType, f32> = HashMap::new();
 
     // High confidence signals from config.xml
@@ -257,9 +265,10 @@ fn determine_pack_type(contents: &PackContents, config: &ConfigAnalysis) -> (Gra
     }
 
     // Single type pack
-    if let Some((pack_type, &score)) = type_scores.iter().max_by(|a, b| {
-        a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal)
-    }) {
+    if let Some((pack_type, &score)) = type_scores
+        .iter()
+        .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+    {
         if score >= 0.5 {
             return (pack_type.clone(), score);
         }
@@ -299,7 +308,9 @@ fn generate_suggested_paths(pack_type: &GraphicsPackType, _pack_path: &Path) -> 
             }
             paths
         }
-        GraphicsPackType::Unknown => vec!["logos".to_string(), "faces".to_string(), "kits".to_string()],
+        GraphicsPackType::Unknown => {
+            vec!["logos".to_string(), "faces".to_string(), "kits".to_string()]
+        }
     }
 }
 
@@ -405,7 +416,10 @@ pub fn split_mixed_pack(
                 };
 
                 // Check if directory name matches this type
-                if type_patterns.iter().any(|pattern| name_lower.contains(pattern)) {
+                if type_patterns
+                    .iter()
+                    .any(|pattern| name_lower.contains(pattern))
+                {
                     split_map.insert(type_key.to_string(), path.to_path_buf());
                 }
             }
@@ -432,11 +446,13 @@ pub fn split_mixed_pack(
 }
 
 /// Checks if a pack can be split based on its structure
+#[allow(dead_code)]
 pub fn can_split_pack(analysis: &GraphicsPackAnalysis) -> bool {
     matches!(analysis.pack_type, GraphicsPackType::Mixed(_))
 }
 
 /// Gets installation targets for a graphics pack based on its type
+#[allow(dead_code)]
 pub fn get_installation_targets(
     pack_name: &str,
     analysis: &GraphicsPackAnalysis,
@@ -469,19 +485,25 @@ pub fn get_installation_targets(
                     GraphicsPackType::Faces => {
                         targets.push((
                             "faces".to_string(),
-                            graphics_base_dir.join("faces").join(format!("{}-Faces", pack_name)),
+                            graphics_base_dir
+                                .join("faces")
+                                .join(format!("{}-Faces", pack_name)),
                         ));
                     }
                     GraphicsPackType::Logos => {
                         targets.push((
                             "logos".to_string(),
-                            graphics_base_dir.join("logos").join(format!("{}-Logos", pack_name)),
+                            graphics_base_dir
+                                .join("logos")
+                                .join(format!("{}-Logos", pack_name)),
                         ));
                     }
                     GraphicsPackType::Kits => {
                         targets.push((
                             "kits".to_string(),
-                            graphics_base_dir.join("kits").join(format!("{}-Kits", pack_name)),
+                            graphics_base_dir
+                                .join("kits")
+                                .join(format!("{}-Kits", pack_name)),
                         ));
                     }
                     _ => {}
@@ -489,10 +511,7 @@ pub fn get_installation_targets(
             }
         }
         GraphicsPackType::Unknown => {
-            targets.push((
-                "unknown".to_string(),
-                graphics_base_dir.join(pack_name),
-            ));
+            targets.push(("unknown".to_string(), graphics_base_dir.join(pack_name)));
         }
     }
 
@@ -505,10 +524,7 @@ mod tests {
 
     #[test]
     fn test_pack_type_serialization() {
-        let mixed = GraphicsPackType::Mixed(vec![
-            GraphicsPackType::Faces,
-            GraphicsPackType::Logos,
-        ]);
+        let mixed = GraphicsPackType::Mixed(vec![GraphicsPackType::Faces, GraphicsPackType::Logos]);
 
         let json = serde_json::to_string(&mixed).unwrap();
         let deserialized: GraphicsPackType = serde_json::from_str(&json).unwrap();

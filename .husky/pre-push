@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Validate branch name
+npx validate-branch-name
+
+# Run frontend build check
+echo "🔨 Building frontend..."
+npm run build
+
+# Run Rust build check
+echo "🦀 Checking Rust code..."
+cd src-tauri && cargo check
+
+echo "✅ All pre-push checks passed!"

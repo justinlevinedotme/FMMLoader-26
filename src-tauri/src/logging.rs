@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use tracing_appender::rolling;
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 pub fn get_logs_dir() -> PathBuf {
     let app_dir = dirs::data_local_dir()
@@ -23,8 +23,7 @@ pub fn init_logging() -> Result<(), String> {
     let file_appender = rolling::daily(&logs_dir, "fmmloader");
 
     // Set up the tracing subscriber with both file and stdout
-    let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("info"));
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
     tracing_subscriber::registry()
         .with(env_filter)
@@ -61,8 +60,7 @@ fn cleanup_old_logs(logs_dir: &PathBuf, keep_count: usize) -> Result<(), String>
         .map_err(|e| format!("Failed to read logs directory: {}", e))?
         .filter_map(|entry| entry.ok())
         .filter(|entry| {
-            entry.path().is_file() &&
-            entry.file_name().to_string_lossy().starts_with("fmmloader")
+            entry.path().is_file() && entry.file_name().to_string_lossy().starts_with("fmmloader")
         })
         .collect();
 

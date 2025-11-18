@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,18 +6,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { tauriCommands, type ModMetadata } from "@/hooks/useTauri";
+} from '@/components/ui/select';
+import { tauriCommands, type ModMetadata } from '@/hooks/useTauri';
 
 interface ModMetadataDialogProps {
   open: boolean;
@@ -27,13 +27,13 @@ interface ModMetadataDialogProps {
 }
 
 const MOD_TYPES = [
-  { value: "ui", label: "UI" },
-  { value: "bundle", label: "Bundle" },
-  { value: "tactics", label: "Tactics" },
-  { value: "graphics", label: "Graphics" },
-  { value: "skins", label: "Skins" },
-  { value: "editor-data", label: "Editor Data" },
-  { value: "misc", label: "Miscellaneous" },
+  { value: 'ui', label: 'UI' },
+  { value: 'bundle', label: 'Bundle' },
+  { value: 'tactics', label: 'Tactics' },
+  { value: 'graphics', label: 'Graphics' },
+  { value: 'skins', label: 'Skins' },
+  { value: 'editor-data', label: 'Editor Data' },
+  { value: 'misc', label: 'Miscellaneous' },
 ];
 
 export function ModMetadataDialog({
@@ -42,11 +42,11 @@ export function ModMetadataDialog({
   sourcePath,
   onSubmit,
 }: ModMetadataDialogProps) {
-  const [name, setName] = useState("");
-  const [version, setVersion] = useState("1.0.0");
-  const [modType, setModType] = useState("misc");
-  const [author, setAuthor] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState('');
+  const [version, setVersion] = useState('1.0.0');
+  const [modType, setModType] = useState('misc');
+  const [author, setAuthor] = useState('');
+  const [description, setDescription] = useState('');
   const [detecting, setDetecting] = useState(false);
 
   // Auto-detect mod type when dialog opens
@@ -88,11 +88,11 @@ export function ModMetadataDialog({
     });
 
     // Reset form
-    setName("");
-    setVersion("1.0.0");
-    setModType("misc");
-    setAuthor("");
-    setDescription("");
+    setName('');
+    setVersion('1.0.0');
+    setModType('misc');
+    setAuthor('');
+    setDescription('');
   };
 
   return (
@@ -101,8 +101,8 @@ export function ModMetadataDialog({
         <DialogHeader>
           <DialogTitle>Mod Information Required</DialogTitle>
           <DialogDescription>
-            This mod doesn&apos;t have a manifest.json file. Please provide some
-            information about it.
+            This mod doesn&apos;t have a manifest.json file. Please provide some information about
+            it.
           </DialogDescription>
         </DialogHeader>
 
@@ -147,11 +147,7 @@ export function ModMetadataDialog({
                 ))}
               </SelectContent>
             </Select>
-            {detecting && (
-              <p className="text-xs text-muted-foreground">
-                Auto-detecting type...
-              </p>
-            )}
+            {detecting && <p className="text-xs text-muted-foreground">Auto-detecting type...</p>}
           </div>
 
           <div className="grid gap-2">

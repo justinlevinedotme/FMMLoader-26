@@ -28,24 +28,24 @@
 //! - Editor Data: Contains .dbc, .edt, .lnc files or editor data/ directory
 //! - UI/Bundle: Default for other content
 
+use crate::types::ExtractionProgress;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use zip::ZipArchive;
-use crate::types::ExtractionProgress;
 
 pub fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<PathBuf, String> {
-    let file = fs::File::open(zip_path)
-        .map_err(|e| format!("Failed to open zip file: {}", e))?;
+    let file = fs::File::open(zip_path).map_err(|e| format!("Failed to open zip file: {}", e))?;
 
-    let mut archive = ZipArchive::new(file)
-        .map_err(|e| format!("Failed to read zip archive: {}", e))?;
+    let mut archive =
+        ZipArchive::new(file).map_err(|e| format!("Failed to read zip archive: {}", e))?;
 
     fs::create_dir_all(dest_dir)
         .map_err(|e| format!("Failed to create destination directory: {}", e))?;
 
     for i in 0..archive.len() {
-        let mut file = archive.by_index(i)
+        let mut file = archive
+            .by_index(i)
             .map_err(|e| format!("Failed to read file from archive: {}", e))?;
 
         let outpath = match file.enclosed_name() {
@@ -71,8 +71,7 @@ pub fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<PathBuf, String> 
         {
             use std::os::unix::fs::PermissionsExt;
             if let Some(mode) = file.unix_mode() {
-                fs::set_permissions(&outpath, fs::Permissions::from_mode(mode))
-                    .ok();
+                fs::set_permissions(&outpath, fs::Permissions::from_mode(mode)).ok();
             }
         }
     }
@@ -208,9 +207,7 @@ pub fn find_mod_root(path: &Path) -> Result<PathBuf, String> {
     }
 
     // If it's a file, return its parent directory
-    Ok(path.parent()
-        .ok_or("Invalid path")?
-        .to_path_buf())
+    Ok(path.parent().ok_or("Invalid path")?.to_path_buf())
 }
 
 pub fn auto_detect_mod_type(path: &Path) -> String {
@@ -218,7 +215,8 @@ pub fn auto_detect_mod_type(path: &Path) -> String {
     if path.is_file() {
         if let Some(ext) = path.extension() {
             let ext_lower = ext.to_string_lossy().to_lowercase();
-            let name_lower = path.file_name()
+            let name_lower = path
+                .file_name()
                 .map(|n| n.to_string_lossy().to_lowercase())
                 .unwrap_or_default();
 
@@ -243,7 +241,10 @@ pub fn auto_detect_mod_type(path: &Path) -> String {
     let mut has_graphics = false;
     let mut has_editor_data = false;
 
-    if let Ok(entries) = walkdir::WalkDir::new(path).into_iter().collect::<Result<Vec<_>, _>>() {
+    if let Ok(entries) = walkdir::WalkDir::new(path)
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()
+    {
         for entry in entries {
             let entry_path = entry.path();
 
@@ -263,10 +264,12 @@ pub fn auto_detect_mod_type(path: &Path) -> String {
             if entry_path.is_dir() {
                 if let Some(name) = entry_path.file_name() {
                     let name_lower = name.to_string_lossy().to_lowercase();
-                    let name_normalized = name_lower.replace(' ', "").replace('_', "");
+                    let name_normalized = name_lower.replace([' ', '_'], "");
 
                     // Check for graphics directories
-                    if ["kits", "faces", "logos", "graphics", "badges"].contains(&name_lower.as_str()) {
+                    if ["kits", "faces", "logos", "graphics", "badges"]
+                        .contains(&name_lower.as_str())
+                    {
                         has_graphics = true;
                     }
 
@@ -318,7 +321,10 @@ pub fn generate_manifest(
         tracing::warn!("Manifest for '{}' is missing 'description' field", name);
     }
     // Note: fm_version will be empty by default, warn about it
-    tracing::warn!("Manifest for '{}' is missing 'compatibility.fm_version' field", name);
+    tracing::warn!(
+        "Manifest for '{}' is missing 'compatibility.fm_version' field",
+        name
+    );
 
     // Collect all files in the mod directory with platform detection
     let mut files = Vec::new();
@@ -333,7 +339,9 @@ pub fn generate_manifest(
                 if let Some(folder_name) = entry_path.file_name() {
                     let folder_str = folder_name.to_string_lossy().to_lowercase();
                     // Check for platform folder variants
-                    if ["windows", "win", "macos", "mac", "osx", "linux"].contains(&folder_str.as_str()) {
+                    if ["windows", "win", "macos", "mac", "osx", "linux"]
+                        .contains(&folder_str.as_str())
+                    {
                         has_platform_folders = true;
                     }
                 }
@@ -342,7 +350,10 @@ pub fn generate_manifest(
     }
 
     // Check if mod contains bundle files (indicates platform-specific content)
-    if let Ok(entries) = walkdir::WalkDir::new(dir).into_iter().collect::<Result<Vec<_>, _>>() {
+    if let Ok(entries) = walkdir::WalkDir::new(dir)
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()
+    {
         for entry in &entries {
             if entry.path().is_file() {
                 if let Some(ext) = entry.path().extension() {
@@ -359,17 +370,20 @@ pub fn generate_manifest(
     // Only use platform detection if:
     // 1. Platform folders exist AND
     // 2. The mod type is UI/bundle-based (has .bundle files) OR mod_type is "ui" or "bundle"
-    let use_platform_detection = has_platform_folders && 
-        (has_bundle_files || mod_type == "ui" || mod_type == "bundle");
+    let use_platform_detection =
+        has_platform_folders && (has_bundle_files || mod_type == "ui" || mod_type == "bundle");
 
     // Second pass: Collect files with appropriate platform tags
-    if let Ok(entries) = walkdir::WalkDir::new(dir).into_iter().collect::<Result<Vec<_>, _>>() {
+    if let Ok(entries) = walkdir::WalkDir::new(dir)
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()
+    {
         for entry in entries {
             let path = entry.path();
             if path.is_file() {
                 if let Ok(rel_path) = path.strip_prefix(dir) {
                     let rel_str = rel_path.to_string_lossy().to_string();
-                    
+
                     // Determine platform based on path
                     let platform = if use_platform_detection {
                         detect_platform_from_path(&rel_str)
@@ -416,8 +430,7 @@ pub fn generate_manifest(
     let json = serde_json::to_string_pretty(&manifest)
         .map_err(|e| format!("Failed to serialize manifest: {}", e))?;
 
-    fs::write(&manifest_path, json)
-        .map_err(|e| format!("Failed to write manifest: {}", e))?;
+    fs::write(&manifest_path, json).map_err(|e| format!("Failed to write manifest: {}", e))?;
 
     Ok(())
 }
@@ -426,7 +439,7 @@ pub fn generate_manifest(
 /// Supports common variations: windows/win, macos/mac/osx, linux
 fn detect_platform_from_path(path: &str) -> Option<String> {
     let components: Vec<&str> = path.split('/').collect();
-    
+
     for component in components {
         let comp_lower = component.to_lowercase();
         match comp_lower.as_str() {
@@ -439,7 +452,7 @@ fn detect_platform_from_path(path: &str) -> Option<String> {
             _ => continue,
         }
     }
-    
+
     None
 }
 
@@ -447,7 +460,7 @@ fn detect_platform_from_path(path: &str) -> Option<String> {
 /// Handles common platform name variations
 fn remove_platform_prefix(path: &str, platform: &str) -> String {
     let parts: Vec<&str> = path.split('/').collect();
-    
+
     // Build a list of platform folder names to remove based on the detected platform
     let platform_variants: Vec<&str> = match platform {
         "windows" => vec!["windows", "win"],
@@ -455,15 +468,16 @@ fn remove_platform_prefix(path: &str, platform: &str) -> String {
         "linux" => vec!["linux"],
         _ => vec![],
     };
-    
+
     // Find and remove any platform folder variant from the path
-    let filtered_parts: Vec<&str> = parts.into_iter()
+    let filtered_parts: Vec<&str> = parts
+        .into_iter()
         .filter(|&part| {
             let part_lower = part.to_lowercase();
             !platform_variants.contains(&part_lower.as_str())
         })
         .collect();
-    
+
     filtered_parts.join("/")
 }
 
@@ -474,23 +488,50 @@ mod tests {
 
     #[test]
     fn test_detect_platform_from_path_windows() {
-        assert_eq!(detect_platform_from_path("windows/test.bundle"), Some("windows".to_string()));
-        assert_eq!(detect_platform_from_path("Windows/test.bundle"), Some("windows".to_string()));
-        assert_eq!(detect_platform_from_path("win/test.bundle"), Some("windows".to_string()));
+        assert_eq!(
+            detect_platform_from_path("windows/test.bundle"),
+            Some("windows".to_string())
+        );
+        assert_eq!(
+            detect_platform_from_path("Windows/test.bundle"),
+            Some("windows".to_string())
+        );
+        assert_eq!(
+            detect_platform_from_path("win/test.bundle"),
+            Some("windows".to_string())
+        );
     }
 
     #[test]
     fn test_detect_platform_from_path_macos() {
-        assert_eq!(detect_platform_from_path("macos/test.bundle"), Some("macos".to_string()));
-        assert_eq!(detect_platform_from_path("macOS/test.bundle"), Some("macos".to_string()));
-        assert_eq!(detect_platform_from_path("mac/test.bundle"), Some("macos".to_string()));
-        assert_eq!(detect_platform_from_path("osx/test.bundle"), Some("macos".to_string()));
+        assert_eq!(
+            detect_platform_from_path("macos/test.bundle"),
+            Some("macos".to_string())
+        );
+        assert_eq!(
+            detect_platform_from_path("macOS/test.bundle"),
+            Some("macos".to_string())
+        );
+        assert_eq!(
+            detect_platform_from_path("mac/test.bundle"),
+            Some("macos".to_string())
+        );
+        assert_eq!(
+            detect_platform_from_path("osx/test.bundle"),
+            Some("macos".to_string())
+        );
     }
 
     #[test]
     fn test_detect_platform_from_path_linux() {
-        assert_eq!(detect_platform_from_path("linux/test.bundle"), Some("linux".to_string()));
-        assert_eq!(detect_platform_from_path("Linux/ui/test.bundle"), Some("linux".to_string()));
+        assert_eq!(
+            detect_platform_from_path("linux/test.bundle"),
+            Some("linux".to_string())
+        );
+        assert_eq!(
+            detect_platform_from_path("Linux/ui/test.bundle"),
+            Some("linux".to_string())
+        );
     }
 
     #[test]
@@ -501,34 +542,60 @@ mod tests {
 
     #[test]
     fn test_remove_platform_prefix_windows() {
-        assert_eq!(remove_platform_prefix("windows/test.bundle", "windows"), "test.bundle");
-        assert_eq!(remove_platform_prefix("Windows/ui/test.bundle", "windows"), "ui/test.bundle");
-        assert_eq!(remove_platform_prefix("win/test.bundle", "windows"), "test.bundle");
+        assert_eq!(
+            remove_platform_prefix("windows/test.bundle", "windows"),
+            "test.bundle"
+        );
+        assert_eq!(
+            remove_platform_prefix("Windows/ui/test.bundle", "windows"),
+            "ui/test.bundle"
+        );
+        assert_eq!(
+            remove_platform_prefix("win/test.bundle", "windows"),
+            "test.bundle"
+        );
     }
 
     #[test]
     fn test_remove_platform_prefix_macos() {
-        assert_eq!(remove_platform_prefix("macos/test.bundle", "macos"), "test.bundle");
-        assert_eq!(remove_platform_prefix("macOS/graphics/test.png", "macos"), "graphics/test.png");
-        assert_eq!(remove_platform_prefix("mac/test.bundle", "macos"), "test.bundle");
-        assert_eq!(remove_platform_prefix("osx/ui/test.bundle", "macos"), "ui/test.bundle");
+        assert_eq!(
+            remove_platform_prefix("macos/test.bundle", "macos"),
+            "test.bundle"
+        );
+        assert_eq!(
+            remove_platform_prefix("macOS/graphics/test.png", "macos"),
+            "graphics/test.png"
+        );
+        assert_eq!(
+            remove_platform_prefix("mac/test.bundle", "macos"),
+            "test.bundle"
+        );
+        assert_eq!(
+            remove_platform_prefix("osx/ui/test.bundle", "macos"),
+            "ui/test.bundle"
+        );
     }
 
     #[test]
     fn test_remove_platform_prefix_linux() {
-        assert_eq!(remove_platform_prefix("linux/test.bundle", "linux"), "test.bundle");
+        assert_eq!(
+            remove_platform_prefix("linux/test.bundle", "linux"),
+            "test.bundle"
+        );
     }
 
     #[test]
     fn test_generate_manifest_with_platform_folders() {
         let temp_dir = std::env::temp_dir().join(format!("test_manifest_{}", uuid::Uuid::new_v4()));
-        
+
         // Create test structure with platform folders
         let windows_dir = temp_dir.join("windows");
         fs::create_dir_all(&windows_dir).expect("Failed to create windows dir");
-        
-        let mut file = fs::File::create(windows_dir.join("test.bundle")).expect("Failed to create file");
-        file.write_all(b"test content").expect("Failed to write content");
+
+        let mut file =
+            fs::File::create(windows_dir.join("test.bundle")).expect("Failed to create file");
+        file.write_all(b"test content")
+            .expect("Failed to write content");
         drop(file);
 
         // Generate manifest
@@ -548,17 +615,28 @@ mod tests {
         assert!(manifest_path.exists(), "manifest.json should be created");
 
         let manifest_content = fs::read_to_string(&manifest_path).expect("Failed to read manifest");
-        let manifest: crate::types::ModManifest = serde_json::from_str(&manifest_content).expect("Failed to parse manifest");
+        let manifest: crate::types::ModManifest =
+            serde_json::from_str(&manifest_content).expect("Failed to parse manifest");
 
         // Verify platform-specific file entry
         assert!(!manifest.files.is_empty(), "Manifest should have files");
-        
+
         let windows_file = manifest.files.iter().find(|f| f.source.contains("windows"));
-        assert!(windows_file.is_some(), "Should have a file from windows folder");
-        
+        assert!(
+            windows_file.is_some(),
+            "Should have a file from windows folder"
+        );
+
         if let Some(file) = windows_file {
-            assert_eq!(file.platform, Some("windows".to_string()), "File should have windows platform tag");
-            assert!(!file.target_subpath.contains("windows"), "Target path should not contain 'windows' folder");
+            assert_eq!(
+                file.platform,
+                Some("windows".to_string()),
+                "File should have windows platform tag"
+            );
+            assert!(
+                !file.target_subpath.contains("windows"),
+                "Target path should not contain 'windows' folder"
+            );
         }
 
         // Cleanup
@@ -569,10 +647,12 @@ mod tests {
     fn test_generate_manifest_without_platform_folders() {
         let temp_dir = std::env::temp_dir().join(format!("test_manifest_{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
-        
+
         // Create a regular file without platform folder
-        let mut file = fs::File::create(temp_dir.join("test.bundle")).expect("Failed to create file");
-        file.write_all(b"test content").expect("Failed to write content");
+        let mut file =
+            fs::File::create(temp_dir.join("test.bundle")).expect("Failed to create file");
+        file.write_all(b"test content")
+            .expect("Failed to write content");
         drop(file);
 
         // Generate manifest
@@ -590,11 +670,15 @@ mod tests {
         // Read the generated manifest
         let manifest_path = temp_dir.join("manifest.json");
         let manifest_content = fs::read_to_string(&manifest_path).expect("Failed to read manifest");
-        let manifest: crate::types::ModManifest = serde_json::from_str(&manifest_content).expect("Failed to parse manifest");
+        let manifest: crate::types::ModManifest =
+            serde_json::from_str(&manifest_content).expect("Failed to parse manifest");
 
         // Verify no platform tags
         for file in &manifest.files {
-            assert_eq!(file.platform, None, "Files should not have platform tags when no platform folders exist");
+            assert_eq!(
+                file.platform, None,
+                "Files should not have platform tags when no platform folders exist"
+            );
         }
 
         // Cleanup
@@ -605,7 +689,7 @@ mod tests {
     fn test_auto_detect_mod_type_bundle() {
         let temp_dir = std::env::temp_dir().join(format!("test_detect_{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
-        
+
         let bundle_path = temp_dir.join("ui-test.bundle");
         fs::File::create(&bundle_path).expect("Failed to create bundle file");
 
@@ -620,7 +704,7 @@ mod tests {
     fn test_auto_detect_mod_type_tactics() {
         let temp_dir = std::env::temp_dir().join(format!("test_detect_{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
-        
+
         let fmf_path = temp_dir.join("tactic.fmf");
         fs::File::create(&fmf_path).expect("Failed to create fmf file");
 
