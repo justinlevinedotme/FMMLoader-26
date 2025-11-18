@@ -264,7 +264,7 @@ pub fn auto_detect_mod_type(path: &Path) -> String {
             if entry_path.is_dir() {
                 if let Some(name) = entry_path.file_name() {
                     let name_lower = name.to_string_lossy().to_lowercase();
-                    let name_normalized = name_lower.replace(' ', "").replace('_', "");
+                    let name_normalized = name_lower.replace([' ', '_'], "");
 
                     // Check for graphics directories
                     if ["kits", "faces", "logos", "graphics", "badges"]

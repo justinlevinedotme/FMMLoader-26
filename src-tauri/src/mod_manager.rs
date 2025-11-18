@@ -1,8 +1,7 @@
 use crate::config::{get_backup_dir, get_mods_dir, get_restore_points_dir};
 use crate::game_detection::get_fm_user_dir;
-use crate::types::{FileEntry, ModManifest};
+use crate::types::ModManifest;
 use chrono::Local;
-use std::collections::HashMap;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -45,12 +44,10 @@ pub fn list_mods() -> Result<Vec<String>, String> {
 
     let mut mods = Vec::new();
 
-    for entry in entries {
-        if let Ok(entry) = entry {
-            if entry.path().is_dir() {
-                if let Some(name) = entry.file_name().to_str() {
-                    mods.push(name.to_string());
-                }
+    for entry in entries.flatten() {
+        if entry.path().is_dir() {
+            if let Some(name) = entry.file_name().to_str() {
+                mods.push(name.to_string());
             }
         }
     }
@@ -213,6 +210,7 @@ fn get_current_platform() -> String {
     }
 }
 
+#[allow(dead_code)]
 pub fn uninstall_mod(
     mod_name: &str,
     game_target: &Path,
@@ -249,6 +247,7 @@ pub fn uninstall_mod(
     ))
 }
 
+#[allow(dead_code)]
 pub fn create_restore_point(name: &str) -> Result<PathBuf, String> {
     let restore_dir = get_restore_points_dir();
     fs::create_dir_all(&restore_dir)

@@ -6,8 +6,10 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use zip::ZipArchive;
 
+#[allow(dead_code)]
 const NAME_FIX_RELEASE_URL: &str =
     "https://github.com/jo13310/NameFixFM26/archive/refs/tags/v1.0.zip";
+#[allow(dead_code)]
 const NAME_FIX_FILE: &str = "FM26-open-names.lnc";
 pub const GITHUB_NAME_FIX_ID: &str = "github-namefix";
 
@@ -174,13 +176,14 @@ fn get_db_dir(target_path: Option<&str>) -> Result<PathBuf, String> {
 
 /// Check if FM Name Fix is installed
 /// Returns true if there's an active name fix in the config
-pub fn check_installed(target_path: Option<&str>) -> Result<bool, String> {
+pub fn check_installed(_target_path: Option<&str>) -> Result<bool, String> {
     // Check if there's an active name fix in the config
     let config = load_config()?;
     Ok(config.active_name_fix.is_some())
 }
 
 /// Download the FM Name Fix archive from GitHub
+#[allow(dead_code)]
 fn download_name_fix() -> Result<Vec<u8>, String> {
     tracing::info!("Downloading FM Name Fix from {}", NAME_FIX_RELEASE_URL);
 
@@ -210,6 +213,7 @@ fn download_name_fix() -> Result<Vec<u8>, String> {
 }
 
 /// Extract the FM26-open-names.lnc file from the zip archive
+#[allow(dead_code)]
 fn extract_lnc_file(zip_data: &[u8]) -> Result<Vec<u8>, String> {
     let cursor = std::io::Cursor::new(zip_data);
     let mut archive =
@@ -553,6 +557,7 @@ fn delete_licensing_files(db_dir: &Path) -> Result<(), String> {
 }
 
 /// Install FM Name Fix
+#[allow(dead_code)]
 pub fn install() -> Result<String, String> {
     let config = load_config()?;
     let db_dir = get_db_dir(config.target_path.as_deref())?;
@@ -886,10 +891,8 @@ fn extract_folders_type(zip_path: &Path, dest_dir: &Path) -> Result<usize, Strin
             Some(&file_name[idx..])
         } else if let Some(idx) = file_name.find("lnc/") {
             Some(&file_name[idx..])
-        } else if let Some(idx) = file_name.find("editor data/") {
-            Some(&file_name[idx..])
         } else {
-            None
+            file_name.find("editor data/").map(|idx| &file_name[idx..])
         };
 
         if let Some(rel_path) = relevant_path {
@@ -924,6 +927,7 @@ fn extract_folders_type(zip_path: &Path, dest_dir: &Path) -> Result<usize, Strin
 }
 
 /// Extract .lnc file from a ZIP archive
+#[allow(dead_code)]
 fn extract_lnc_from_file(zip_path: &Path) -> Result<Vec<u8>, String> {
     let file = fs::File::open(zip_path).map_err(|e| format!("Failed to open file: {}", e))?;
 

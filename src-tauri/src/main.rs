@@ -13,8 +13,7 @@ mod restore;
 mod types;
 
 use config::{
-    add_graphics_pack, get_mods_dir, init_storage, load_config, load_graphics_packs, save_config,
-    save_graphics_packs,
+    get_mods_dir, init_storage, load_config, load_graphics_packs, save_config, save_graphics_packs,
 };
 use conflicts::find_conflicts;
 use game_detection::get_default_candidates;
@@ -26,7 +25,7 @@ use mod_manager::{
     cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods,
 };
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tauri::{Emitter, Manager};
 use types::{
     Config, ConflictInfo, ExtractionProgress, GraphicsConflictInfo, GraphicsPackMetadata,
@@ -903,9 +902,9 @@ async fn import_graphics_pack_with_type(
     source_path: String,
     target_path: String,
     should_split: bool,
-    force: bool,
+    _force: bool,
 ) -> Result<String, String> {
-    use graphics_analyzer::{analyze_graphics_pack, get_installation_targets, split_mixed_pack};
+    use graphics_analyzer::{analyze_graphics_pack, split_mixed_pack};
 
     tracing::info!(
         "Starting graphics pack import with type detection from: {}",
@@ -1152,7 +1151,7 @@ async fn import_graphics_pack_with_type(
     }
 
     tracing::info!("Graphics pack imported successfully");
-    Ok(format!("Graphics pack installed successfully"))
+    Ok("Graphics pack installed successfully".to_string())
 }
 
 fn count_files_in_dir(dir: &PathBuf) -> Result<usize, String> {
@@ -1179,7 +1178,7 @@ fn find_graphics_content_root(extracted_dir: &PathBuf) -> Result<PathBuf, String
     use std::fs;
 
     // Graphics subdirectory names to look for
-    let graphics_dirs = ["faces", "logos", "kits", "badges", "graphics"];
+    let _graphics_dirs = ["faces", "logos", "kits", "badges", "graphics"];
 
     // Check if current directory contains any graphics subdirectories
     fn has_graphics_subdirs(path: &PathBuf) -> bool {
@@ -1232,6 +1231,7 @@ fn find_graphics_content_root(extracted_dir: &PathBuf) -> Result<PathBuf, String
 }
 
 // Helper function to detect graphics pack type
+#[allow(dead_code)]
 fn detect_graphics_pack_type(path: &PathBuf) -> String {
     use std::fs;
 
@@ -1281,8 +1281,8 @@ fn detect_graphics_pack_type(path: &PathBuf) -> String {
 // Helper function to copy graphics content, preserving subdirectories
 // Copies each graphics subdirectory (faces/, logos/, kits/) to the FM graphics directory
 fn copy_graphics_content<F>(
-    content_root: &PathBuf,
-    graphics_dir: &PathBuf,
+    content_root: &Path,
+    graphics_dir: &Path,
     total_files: usize,
     mut progress_callback: F,
 ) -> Result<(), String>
@@ -1385,8 +1385,8 @@ where
 
 /// Copy flat pack contents directly to destination (for packs with PNGs/config.xml at root)
 fn copy_flat_pack_content<F>(
-    content_root: &PathBuf,
-    install_dir: &PathBuf,
+    content_root: &Path,
+    install_dir: &Path,
     total_files: usize,
     mut progress_callback: F,
 ) -> Result<(), String>

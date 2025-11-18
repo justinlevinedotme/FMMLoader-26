@@ -69,6 +69,7 @@ struct PackContents {
     has_kits_dir: bool,
     png_files: Vec<PathBuf>,
     xml_files: Vec<PathBuf>,
+    #[allow(dead_code)]
     subdirs: Vec<PathBuf>,
     total_size: u64,
 }
@@ -445,11 +446,13 @@ pub fn split_mixed_pack(
 }
 
 /// Checks if a pack can be split based on its structure
+#[allow(dead_code)]
 pub fn can_split_pack(analysis: &GraphicsPackAnalysis) -> bool {
     matches!(analysis.pack_type, GraphicsPackType::Mixed(_))
 }
 
 /// Gets installation targets for a graphics pack based on its type
+#[allow(dead_code)]
 pub fn get_installation_targets(
     pack_name: &str,
     analysis: &GraphicsPackAnalysis,

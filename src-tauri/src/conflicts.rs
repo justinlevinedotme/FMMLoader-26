@@ -1,13 +1,12 @@
 use crate::config::get_mods_dir;
-use crate::game_detection::get_fm_user_dir;
 use crate::mod_manager::{get_target_for_type, read_manifest};
 use crate::types::ConflictInfo;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::Path;
 
 pub fn find_conflicts(
     enabled_mods: &[String],
-    game_target: &PathBuf,
+    game_target: &Path,
     user_dir: Option<&str>,
 ) -> Result<Vec<ConflictInfo>, String> {
     let mods_dir = get_mods_dir();
@@ -34,7 +33,7 @@ pub fn find_conflicts(
 
             file_to_mods
                 .entry(target_str)
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(mod_name.clone());
         }
     }
@@ -54,6 +53,7 @@ pub fn find_conflicts(
     Ok(conflicts)
 }
 
+#[allow(dead_code)]
 pub fn build_mod_index(mod_name: &str) -> Result<Vec<String>, String> {
     let mod_dir = get_mods_dir().join(mod_name);
 

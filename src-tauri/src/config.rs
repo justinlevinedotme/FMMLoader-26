@@ -1,7 +1,6 @@
 use crate::types::{Config, GraphicsPackMetadata, GraphicsPacksRegistry};
 use std::fs;
 use std::path::PathBuf;
-use tauri::Manager;
 
 pub fn get_app_data_dir() -> PathBuf {
     let app_name = "FMMLoader26";
@@ -102,6 +101,7 @@ pub fn get_restore_points_dir() -> PathBuf {
     get_app_data_dir().join("restore_points")
 }
 
+#[allow(dead_code)]
 pub fn get_logs_dir() -> PathBuf {
     get_app_data_dir().join("logs")
 }
@@ -140,6 +140,7 @@ pub fn save_graphics_packs(registry: &GraphicsPacksRegistry) -> Result<(), Strin
     Ok(())
 }
 
+#[allow(dead_code)]
 pub fn add_graphics_pack(metadata: GraphicsPackMetadata) -> Result<(), String> {
     let mut registry = load_graphics_packs()?;
     registry.graphics_packs.push(metadata);

@@ -84,6 +84,7 @@ pub enum NameFixInstallType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct ModInfo {
     pub name: String,
     pub version: String,
@@ -118,6 +119,7 @@ pub struct ExtractionProgress {
 
 /// Progress tracking for file installation operations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct InstallProgress {
     pub current: usize,
     pub total: usize,

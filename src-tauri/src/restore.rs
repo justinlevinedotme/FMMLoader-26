@@ -60,7 +60,7 @@ pub fn list_restore_points() -> Result<Vec<RestorePoint>, String> {
     for entry in entries.flatten() {
         let path = entry.path();
         if path.is_dir() {
-            if let Some(name) = path.file_name() {
+            if let Some(_name) = path.file_name() {
                 let timestamp = entry
                     .metadata()
                     .and_then(|m| m.modified())
