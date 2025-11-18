@@ -333,16 +333,30 @@ pub fn generate_manifest(
 
     // First pass: Check if we have platform-specific folders and bundle files
     if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            let entry_path = entry.path();
-            if entry_path.is_dir() {
-                if let Some(folder_name) = entry_path.file_name() {
-                    let folder_str = folder_name.to_string_lossy().to_lowercase();
-                    // Check for platform folder variants
-                    if ["windows", "win", "macos", "mac", "osx", "linux"]
-                        .contains(&folder_str.as_str())
-                    {
-                        has_platform_folders = true;
+        let child_dirs: Vec<_> = entries.flatten().filter(|e| e.path().is_dir()).collect();
+
+        // Check immediate children for platform folders
+        for entry in &child_dirs {
+            if let Some(folder_name) = entry.path().file_name() {
+                let folder_str = folder_name.to_string_lossy().to_lowercase();
+                if is_platform_component(&folder_str) {
+                    has_platform_folders = true;
+                }
+            }
+        }
+
+        // If not found and there's exactly one non-platform folder, check one level deeper
+        if !has_platform_folders && child_dirs.len() == 1 {
+            if let Some(sole_child) = child_dirs.first() {
+                if let Ok(nested) = fs::read_dir(sole_child.path()) {
+                    for entry in nested.flatten() {
+                        if let Some(folder_name) = entry.path().file_name() {
+                            let folder_str = folder_name.to_string_lossy().to_lowercase();
+                            if is_platform_component(&folder_str) {
+                                has_platform_folders = true;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -382,25 +396,38 @@ pub fn generate_manifest(
             let path = entry.path();
             if path.is_file() {
                 if let Ok(rel_path) = path.strip_prefix(dir) {
-                    let rel_str = rel_path.to_string_lossy().to_string();
+                    // Normalize by removing any leading non-platform folder (common top-level zip folder)
+                    let mut parts: Vec<String> = rel_path
+                        .components()
+                        .map(|c| c.as_os_str().to_string_lossy().into_owned())
+                        .collect();
+
+                    while parts.len() > 1 {
+                        let first_lower = parts[0].to_lowercase();
+                        if is_platform_component(&first_lower) {
+                            break;
+                        }
+                        parts.remove(0);
+                    }
+
+                    let rel_joined = parts.join("/");
 
                     // Determine platform based on path
                     let platform = if use_platform_detection {
-                        detect_platform_from_path(&rel_str)
+                        detect_platform_from_parts(&parts)
                     } else {
                         None
                     };
 
                     // For platform-specific files, adjust target_subpath to remove platform folder
                     let target_subpath = if let Some(ref plat) = platform {
-                        // Remove the platform folder prefix from target path
-                        remove_platform_prefix(&rel_str, plat)
+                        remove_platform_parts(&parts, plat)
                     } else {
-                        rel_str.clone()
+                        rel_joined.clone()
                     };
 
                     files.push(FileEntry {
-                        source: rel_str,
+                        source: rel_joined,
                         target_subpath,
                         platform,
                     });
@@ -435,32 +462,34 @@ pub fn generate_manifest(
     Ok(())
 }
 
-/// Detect platform from file path based on platform-specific folder names
+/// Detect platform from path parts based on platform-specific folder names
 /// Supports common variations: windows/win, macos/mac/osx, linux
-fn detect_platform_from_path(path: &str) -> Option<String> {
-    let components: Vec<&str> = path.split('/').collect();
-
-    for component in components {
-        let comp_lower = component.to_lowercase();
-        match comp_lower.as_str() {
-            // Windows variants
-            "windows" | "win" => return Some("windows".to_string()),
-            // macOS variants
-            "macos" | "mac" | "osx" => return Some("macos".to_string()),
-            // Linux variants
-            "linux" => return Some("linux".to_string()),
-            _ => continue,
+fn detect_platform_from_parts(parts: &[String]) -> Option<String> {
+    for component in parts {
+        if let Some(platform) = platform_from_component(&component.to_lowercase()) {
+            return Some(platform.to_string());
         }
     }
 
     None
 }
 
+fn platform_from_component(component: &str) -> Option<&'static str> {
+    match component {
+        "windows" | "win" => Some("windows"),
+        "macos" | "mac" | "osx" => Some("macos"),
+        "linux" => Some("linux"),
+        _ => None,
+    }
+}
+
+fn is_platform_component(component: &str) -> bool {
+    platform_from_component(component).is_some()
+}
+
 /// Remove platform folder prefix from target path
 /// Handles common platform name variations
-fn remove_platform_prefix(path: &str, platform: &str) -> String {
-    let parts: Vec<&str> = path.split('/').collect();
-
+fn remove_platform_parts(parts: &[String], platform: &str) -> String {
     // Build a list of platform folder names to remove based on the detected platform
     let platform_variants: Vec<&str> = match platform {
         "windows" => vec!["windows", "win"],
@@ -470,15 +499,19 @@ fn remove_platform_prefix(path: &str, platform: &str) -> String {
     };
 
     // Find and remove any platform folder variant from the path
-    let filtered_parts: Vec<&str> = parts
-        .into_iter()
-        .filter(|&part| {
+    let filtered_parts: Vec<&String> = parts
+        .iter()
+        .filter(|part| {
             let part_lower = part.to_lowercase();
             !platform_variants.contains(&part_lower.as_str())
         })
         .collect();
 
-    filtered_parts.join("/")
+    filtered_parts
+        .iter()
+        .map(|s| s.as_str())
+        .collect::<Vec<_>>()
+        .join("/")
 }
 
 #[cfg(test)]
@@ -489,15 +522,15 @@ mod tests {
     #[test]
     fn test_detect_platform_from_path_windows() {
         assert_eq!(
-            detect_platform_from_path("windows/test.bundle"),
+            detect_platform_from_parts(&vec!["windows".into(), "test.bundle".into()]),
             Some("windows".to_string())
         );
         assert_eq!(
-            detect_platform_from_path("Windows/test.bundle"),
+            detect_platform_from_parts(&vec!["Windows".into(), "test.bundle".into()]),
             Some("windows".to_string())
         );
         assert_eq!(
-            detect_platform_from_path("win/test.bundle"),
+            detect_platform_from_parts(&vec!["win".into(), "test.bundle".into()]),
             Some("windows".to_string())
         );
     }
@@ -505,19 +538,19 @@ mod tests {
     #[test]
     fn test_detect_platform_from_path_macos() {
         assert_eq!(
-            detect_platform_from_path("macos/test.bundle"),
+            detect_platform_from_parts(&vec!["macos".into(), "test.bundle".into()]),
             Some("macos".to_string())
         );
         assert_eq!(
-            detect_platform_from_path("macOS/test.bundle"),
+            detect_platform_from_parts(&vec!["macOS".into(), "test.bundle".into()]),
             Some("macos".to_string())
         );
         assert_eq!(
-            detect_platform_from_path("mac/test.bundle"),
+            detect_platform_from_parts(&vec!["mac".into(), "test.bundle".into()]),
             Some("macos".to_string())
         );
         assert_eq!(
-            detect_platform_from_path("osx/test.bundle"),
+            detect_platform_from_parts(&vec!["osx".into(), "test.bundle".into()]),
             Some("macos".to_string())
         );
     }
@@ -525,33 +558,42 @@ mod tests {
     #[test]
     fn test_detect_platform_from_path_linux() {
         assert_eq!(
-            detect_platform_from_path("linux/test.bundle"),
+            detect_platform_from_parts(&vec!["linux".into(), "test.bundle".into()]),
             Some("linux".to_string())
         );
         assert_eq!(
-            detect_platform_from_path("Linux/ui/test.bundle"),
+            detect_platform_from_parts(&vec!["Linux".into(), "ui".into(), "test.bundle".into()]),
             Some("linux".to_string())
         );
     }
 
     #[test]
     fn test_detect_platform_from_path_no_platform() {
-        assert_eq!(detect_platform_from_path("test.bundle"), None);
-        assert_eq!(detect_platform_from_path("ui/test.bundle"), None);
+        assert_eq!(
+            detect_platform_from_parts(&vec!["test.bundle".into()]),
+            None
+        );
+        assert_eq!(
+            detect_platform_from_parts(&vec!["ui".into(), "test.bundle".into()]),
+            None
+        );
     }
 
     #[test]
     fn test_remove_platform_prefix_windows() {
         assert_eq!(
-            remove_platform_prefix("windows/test.bundle", "windows"),
+            remove_platform_parts(&vec!["windows".into(), "test.bundle".into()], "windows"),
             "test.bundle"
         );
         assert_eq!(
-            remove_platform_prefix("Windows/ui/test.bundle", "windows"),
+            remove_platform_parts(
+                &vec!["Windows".into(), "ui".into(), "test.bundle".into()],
+                "windows"
+            ),
             "ui/test.bundle"
         );
         assert_eq!(
-            remove_platform_prefix("win/test.bundle", "windows"),
+            remove_platform_parts(&vec!["win".into(), "test.bundle".into()], "windows"),
             "test.bundle"
         );
     }
@@ -559,19 +601,25 @@ mod tests {
     #[test]
     fn test_remove_platform_prefix_macos() {
         assert_eq!(
-            remove_platform_prefix("macos/test.bundle", "macos"),
+            remove_platform_parts(&vec!["macos".into(), "test.bundle".into()], "macos"),
             "test.bundle"
         );
         assert_eq!(
-            remove_platform_prefix("macOS/graphics/test.png", "macos"),
+            remove_platform_parts(
+                &vec!["macOS".into(), "graphics".into(), "test.png".into()],
+                "macos"
+            ),
             "graphics/test.png"
         );
         assert_eq!(
-            remove_platform_prefix("mac/test.bundle", "macos"),
+            remove_platform_parts(&vec!["mac".into(), "test.bundle".into()], "macos"),
             "test.bundle"
         );
         assert_eq!(
-            remove_platform_prefix("osx/ui/test.bundle", "macos"),
+            remove_platform_parts(
+                &vec!["osx".into(), "ui".into(), "test.bundle".into()],
+                "macos"
+            ),
             "ui/test.bundle"
         );
     }
@@ -579,9 +627,53 @@ mod tests {
     #[test]
     fn test_remove_platform_prefix_linux() {
         assert_eq!(
-            remove_platform_prefix("linux/test.bundle", "linux"),
+            remove_platform_parts(&vec!["linux".into(), "test.bundle".into()], "linux"),
             "test.bundle"
         );
+    }
+
+    #[test]
+    fn test_generate_manifest_removes_top_level_folder_and_platform() {
+        let temp_dir = std::env::temp_dir().join(format!("test_manifest_{}", uuid::Uuid::new_v4()));
+        let nested_root = temp_dir.join("tinyhips-darkmode-v4.5_fm26.0.5");
+        let mac_dir = nested_root.join("MacOS");
+        fs::create_dir_all(&mac_dir).expect("Failed to create MacOS dir");
+
+        let mut file =
+            fs::File::create(mac_dir.join("ui-styles_assets_common.bundle")).expect("create file");
+        file.write_all(b"test content").expect("write content");
+        drop(file);
+
+        let result = generate_manifest(
+            &temp_dir,
+            "Nested Mod".to_string(),
+            "1.0.0".to_string(),
+            "ui".to_string(),
+            "Author".to_string(),
+            "Desc".to_string(),
+        );
+
+        assert!(result.is_ok(), "generate_manifest should succeed");
+
+        let manifest_path = temp_dir.join("manifest.json");
+        let manifest_content = fs::read_to_string(&manifest_path).expect("read manifest");
+        let manifest: crate::types::ModManifest =
+            serde_json::from_str(&manifest_content).expect("parse manifest");
+
+        let mac_file = manifest
+            .files
+            .iter()
+            .find(|f| f.source.contains("MacOS/ui-styles_assets_common.bundle"));
+
+        assert!(mac_file.is_some(), "Mac file should be present");
+
+        if let Some(file) = mac_file {
+            assert_eq!(file.source, "MacOS/ui-styles_assets_common.bundle");
+            assert_eq!(file.target_subpath, "ui-styles_assets_common.bundle");
+            assert_eq!(file.platform, Some("macos".to_string()));
+        }
+
+        let _ = fs::remove_dir_all(&temp_dir);
     }
 
     #[test]
@@ -645,12 +737,17 @@ mod tests {
 
     #[test]
     fn test_generate_manifest_without_platform_folders() {
-        let temp_dir = std::env::temp_dir().join(format!("test_manifest_{}", uuid::Uuid::new_v4()));
-        fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
+        let temp_dir = std::env::temp_dir().join(format!(
+            "test_manifest_no_platform_{}",
+            uuid::Uuid::new_v4()
+        ));
+        // Create a nested top-level folder to mimic extracted ZIP root
+        let nested_root = temp_dir.join("my_mod_root");
+        fs::create_dir_all(&nested_root).expect("Failed to create temp dir");
 
         // Create a regular file without platform folder
         let mut file =
-            fs::File::create(temp_dir.join("test.bundle")).expect("Failed to create file");
+            fs::File::create(nested_root.join("test.bundle")).expect("Failed to create file");
         file.write_all(b"test content")
             .expect("Failed to write content");
         drop(file);
