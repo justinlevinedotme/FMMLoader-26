@@ -51,24 +51,42 @@ jobs:
       - name: install frontend dependencies
         run: npm ci
 
+      - name: Extract clean version
+        id: extract_version
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == v* ]]; then
+            echo "CLEAN_VERSION=${GITHUB_REF_NAME:1}" >> $GITHUB_OUTPUT
+          else
+            echo "CLEAN_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build & publish (tauri-action)
+        id: tauri
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          CLEAN_VERSION: ${{ steps.extract_version.outputs.CLEAN_VERSION }}
         with:
           # ⬇️ Use the tag that triggered the workflow
           tagName: ${{ github.ref_name }}               # e.g., v1.0.2
           releaseName: "FMMLoader26 ${{ github.ref_name }}"
           releaseBody: |
-            **Pick your installer:**
-            - macOS (Apple Silicon): `FMMLoader26_<ver>_aarch64.dmg`
-            - macOS (Intel): `FMMLoader26_<ver>_x86_64.dmg`
-            - Windows: `FMMLoader26_<ver>_setup.exe`
-            - Linux (AppImage): `FMMLoader26_<ver>.AppImage`
+            **Pick your installer (version ${{ env.CLEAN_VERSION }}):**
+            - macOS (Apple Silicon): `FMMLoader26_${{ env.CLEAN_VERSION }}_aarch64.dmg`
+            - macOS (Intel): `FMMLoader26_${{ env.CLEAN_VERSION }}_x86_64.dmg`
+            - Windows: `FMMLoader26_${{ env.CLEAN_VERSION }}_setup.exe`
+            - Linux (AppImage): `FMMLoader26_${{ env.CLEAN_VERSION }}.AppImage`
 
             _Ignore the `*.tar.gz` / `*.sig` — used by the auto-updater._
           releaseDraft: false          # set true if you want it to stay draft until you publish
           prerelease: false
           args: ${{ matrix.args }}
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-bundles-${{ matrix.platform }}-${{ github.ref_name }}
+          path: ${{ steps.tauri.outputs.artifactPaths }}

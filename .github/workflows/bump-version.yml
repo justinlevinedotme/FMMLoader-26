@@ -16,9 +16,12 @@ on:
 jobs:
   bump:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout main
@@ -31,6 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+          cache: npm
 
       - name: Read current version from package.json
         id: get_version
@@ -99,6 +103,21 @@ jobs:
           echo "tauri.conf.json:"
           node -e "console.log(JSON.parse(require('fs').readFileSync('src-tauri/tauri.conf.json')).version)"
 
+      - name: "Guard: ensure only expected files changed"
+        run: |
+          CHANGES=$(git status --porcelain --ignore-submodules=all)
+          if [ -z "$CHANGES" ]; then
+            echo "No changes detected after version bump; aborting."
+            exit 1
+          fi
+
+          UNEXPECTED=$(echo "$CHANGES" | awk '{print $2}' | grep -vE '^(package.json|src-tauri/Cargo.toml|src-tauri/tauri.conf.json)$' || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "Unexpected changes present:"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+
       - name: Commit changes with [skip ci]
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
@@ -111,19 +130,31 @@ jobs:
           # Commit may be empty if nothing changed; that's fine.
           git commit -m "chore: bump version to ${VERSION} [skip ci]" || echo "No changes to commit"
 
-      - name: Push to main
-        run: |
-          git push origin HEAD:main
-
-      - name: Create and push tag
+      - name: Create bump branch and push
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
-          TAG="v${VERSION}"
+          BRANCH="release/v${VERSION}"
+          git checkout -b "$BRANCH"
+          git push origin "$BRANCH"
 
-          # Only create tag if it doesn't already exist
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists, skipping."
-          else
-            git tag "$TAG"
-            git push origin "$TAG"
-          fi
+      - name: Open Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/v${{ steps.bump_version.outputs.next_version }}
+          title: "chore: bump version to ${{ steps.bump_version.outputs.next_version }}"
+          body: |
+            Automated version bump to ${{ steps.bump_version.outputs.next_version }}.
+            - Updated package.json
+            - Updated src-tauri/Cargo.toml
+            - Updated src-tauri/tauri.conf.json
+          labels: "Type: Release"
+
+      - name: Enable auto-merge (squash)
+        if: ${{ steps.cpr.outputs.pull-request-number != '' && env.GH_TOKEN != '' }}
+        run: gh pr merge --squash --auto "${{ steps.cpr.outputs.pull-request-number }}"
+
+      - name: Skip auto-merge (no GH token)
+        if: ${{ steps.cpr.outputs.pull-request-number != '' && env.GH_TOKEN == '' }}
+        run: echo "GH_TOKEN not provided; skipping auto-merge setup."
