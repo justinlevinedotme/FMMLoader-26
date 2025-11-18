@@ -11,7 +11,7 @@
  * - Full path preview showing exact installation location
  * - Mixed pack split option to separate types into individual directories
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -63,7 +63,8 @@ export function GraphicsPackConfirmDialog({
   onCancel,
   userDirPath,
 }: GraphicsPackConfirmDialogProps) {
-  const [selectedPath, setSelectedPath] = useState<string>('');
+  const defaultSuggestedPath = analysis?.suggested_paths[0] ?? '';
+  const [selectedPath, setSelectedPath] = useState<string>(defaultSuggestedPath);
   const [shouldSplit, setShouldSplit] = useState(false);
 
   const getResolvedPath = (relativePath: string): string => {
@@ -71,14 +72,9 @@ export function GraphicsPackConfirmDialog({
     return `${userDirPath}/graphics/${relativePath}`;
   };
 
-  useEffect(() => {
-    if (analysis && analysis.suggested_paths.length > 0) {
-      setSelectedPath(analysis.suggested_paths[0]);
-      setShouldSplit(false);
-    }
-  }, [analysis]);
-
   if (!analysis) return null;
+
+  const resolvedSelectedPath = selectedPath || defaultSuggestedPath;
 
   const isMixed = typeof analysis.pack_type === 'object' && 'Mixed' in analysis.pack_type;
 
@@ -130,9 +126,11 @@ export function GraphicsPackConfirmDialog({
           {/* Installation Path Selection */}
           <div className="space-y-2">
             <Label htmlFor="install-path">Install to</Label>
-            <Select value={selectedPath} onValueChange={setSelectedPath}>
+            <Select value={resolvedSelectedPath} onValueChange={setSelectedPath}>
               <SelectTrigger id="install-path">
-                <SelectValue placeholder="Select installation directory" />
+                <SelectValue placeholder="Select installation directory">
+                  {resolvedSelectedPath}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {analysis.suggested_paths.map((path) => (
@@ -144,7 +142,7 @@ export function GraphicsPackConfirmDialog({
             </Select>
             {userDirPath && (
               <p className="text-xs text-muted-foreground font-mono break-all">
-                {getResolvedPath(selectedPath)}
+                {getResolvedPath(resolvedSelectedPath)}
               </p>
             )}
           </div>
@@ -181,7 +179,10 @@ export function GraphicsPackConfirmDialog({
           <Button variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={() => onConfirm(selectedPath, shouldSplit)} disabled={!selectedPath}>
+          <Button
+            onClick={() => onConfirm(resolvedSelectedPath, shouldSplit)}
+            disabled={!resolvedSelectedPath}
+          >
             Install Graphics Pack
           </Button>
         </DialogFooter>

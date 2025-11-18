@@ -127,7 +127,7 @@ export const useUpdater = () => {
         return null;
       }
     },
-    [addLog, logToBackend]
+    [addLog, logToBackend, appVersion]
   );
 
   const downloadAndInstall = useCallback(async () => {
@@ -221,13 +221,12 @@ export const useUpdater = () => {
 
   // Check for updates on mount
   useEffect(() => {
-    addLog('Updater hook initialized');
     // Delay initial check to let the app fully load
     const timer = setTimeout(() => {
       checkForUpdates(false);
     }, 3000);
     return () => clearTimeout(timer);
-  }, [checkForUpdates, addLog]);
+  }, [checkForUpdates]);
 
   return {
     status,

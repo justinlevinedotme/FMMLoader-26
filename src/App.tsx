@@ -95,6 +95,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [appVersion, setAppVersion] = useState('');
+  const [blockingMessage, setBlockingMessage] = useState<string | null>(null);
 
   // Import name fix dialog state
   const [importNameFixDialogOpen, setImportNameFixDialogOpen] = useState(false);
@@ -144,6 +145,42 @@ function App() {
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs((prev) => [`[${timestamp}] ${message}`, ...prev].slice(0, 100));
+  };
+
+  const runWithBlockingMessage = async <T,>(
+    message: string,
+    action: () => Promise<T>,
+    delayMs = 250
+  ) => {
+    let overlayShown = false;
+    let timer: number | undefined;
+
+    if (delayMs === 0) {
+      overlayShown = true;
+      setBlockingMessage(message);
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+    } else {
+      timer = window.setTimeout(() => {
+        overlayShown = true;
+        setBlockingMessage(message);
+      }, delayMs);
+    }
+
+    try {
+      // If the overlay is already visible, let it paint once more before heavy work
+      if (overlayShown) {
+        await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+      }
+      return await action();
+    } finally {
+      if (timer !== undefined) {
+        window.clearTimeout(timer);
+      }
+      if (overlayShown) {
+        await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+      }
+      setBlockingMessage(null);
+    }
   };
 
   const loadConfig = async () => {
@@ -333,12 +370,14 @@ function App() {
 
     try {
       setLoading(true);
-      addLog('Applying mods...');
-      toast.loading('Applying mods...', { id: 'apply-mods' });
-      const result = await tauriCommands.applyMods();
-      addLog(result);
-      addLog('Mods applied successfully');
-      toast.success('Mods applied successfully!', { id: 'apply-mods' });
+      await runWithBlockingMessage('Applying mods...', async () => {
+        addLog('Applying mods...');
+        toast.loading('Applying mods...', { id: 'apply-mods' });
+        const result = await tauriCommands.applyMods();
+        addLog(result);
+        addLog('Mods applied successfully');
+        toast.success('Mods applied successfully!', { id: 'apply-mods' });
+      });
     } catch (error) {
       addLog(`Error applying mods: ${formatError(error)}`);
       toast.error(`Failed to apply mods: ${formatError(error)}`, {
@@ -406,43 +445,52 @@ function App() {
       if (isZip && isLikelyGraphicsPack) {
         // Route to graphics pack analysis and confirmation
         addLog(`Detected graphics pack: ${sourcePath}`);
-        toast.loading('Analyzing graphics pack (this may take a few minutes)...', {
-          id: 'analyze-graphics',
-        });
-
-        try {
-          const analysis = await tauriCommands.analyzeGraphicsPack(sourcePath);
-          addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
-          toast.success('Analysis complete!', { id: 'analyze-graphics' });
-
-          // Store the analysis and path, then show confirmation dialog
-          setPendingGraphicsAnalysis(analysis);
-          setPendingGraphicsPath(sourcePath);
-        } catch (error) {
-          const errorMsg = formatError(error);
-          addLog(`Error analyzing graphics pack: ${errorMsg}`);
-          toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: 'analyze-graphics' });
-        }
+        await runWithBlockingMessage(
+          'Analyzing graphics pack (this may take a few minutes)...',
+          async () => {
+            try {
+              const analysis = await tauriCommands.analyzeGraphicsPack(sourcePath);
+              addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
+              setPendingGraphicsAnalysis(analysis);
+              setPendingGraphicsPath(sourcePath);
+            } catch (error) {
+              const errorMsg = formatError(error);
+              addLog(`Error analyzing graphics pack: ${errorMsg}`);
+              toast.error(`Failed to analyze graphics pack: ${errorMsg}`, {
+                id: 'analyze-graphics',
+              });
+            }
+          },
+          0
+        );
         return;
       }
 
       // Otherwise, import as regular mod
       addLog(`Importing from: ${sourcePath}`);
-      const result = await tauriCommands.importMod(sourcePath);
-      addLog(`Successfully imported: ${result}`);
-      toast.success(`Successfully imported: ${result}`);
-      await loadMods();
+      await runWithBlockingMessage(
+        'Importing mod...',
+        async () => {
+          toast.loading('Importing mod...', { id: 'import-mod' });
+          const result = await tauriCommands.importMod(sourcePath);
+          addLog(`Successfully imported: ${result}`);
+          toast.success(`Successfully imported: ${result}`, { id: 'import-mod' });
+          await loadMods();
+        },
+        0
+      );
     } catch (error) {
       const errorStr = String(error);
 
       if (errorStr === 'NEEDS_METADATA') {
+        toast.dismiss('import-mod');
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
         toast.info('Please provide mod metadata');
       } else {
         addLog(`Import failed: ${formatError(error)}`);
-        toast.error(`Import failed: ${formatError(error)}`);
+        toast.error(`Import failed: ${formatError(error)}`, { id: 'import-mod' });
       }
     }
   };
@@ -452,13 +500,22 @@ function App() {
 
     try {
       addLog(`Importing with metadata...`);
-      const result = await tauriCommands.importMod(pendingImportPath, metadata);
-      addLog(`Successfully imported: ${result}`);
-      setMetadataDialogOpen(false);
-      setPendingImportPath(null);
-      await loadMods();
+      await runWithBlockingMessage(
+        'Importing mod with metadata...',
+        async () => {
+          toast.loading('Importing mod...', { id: 'import-mod' });
+          const result = await tauriCommands.importMod(pendingImportPath, metadata);
+          addLog(`Successfully imported: ${result}`);
+          toast.success(`Successfully imported: ${result}`, { id: 'import-mod' });
+          setMetadataDialogOpen(false);
+          setPendingImportPath(null);
+          await loadMods();
+        },
+        0
+      );
     } catch (error) {
       addLog(`Import failed: ${formatError(error)}`);
+      toast.error(`Import failed: ${formatError(error)}`, { id: 'import-mod' });
     }
   };
 
@@ -672,18 +729,16 @@ function App() {
 
       // Analyze the pack first
       addLog('Analyzing graphics pack...');
-      toast.loading('Analyzing graphics pack (this may take a few minutes)...', {
-        id: 'analyze-graphics',
-      });
-
-      const analysis = await tauriCommands.analyzeGraphicsPack(selected);
-
-      addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
-      toast.success('Analysis complete!', { id: 'analyze-graphics' });
-
-      // Store the analysis and path, then show confirmation dialog
-      setPendingGraphicsAnalysis(analysis);
-      setPendingGraphicsPath(selected);
+      await runWithBlockingMessage(
+        'Analyzing graphics pack (this may take a few minutes)...',
+        async () => {
+          const analysis = await tauriCommands.analyzeGraphicsPack(selected);
+          addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
+          setPendingGraphicsAnalysis(analysis);
+          setPendingGraphicsPath(selected);
+        },
+        0
+      );
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error analyzing graphics pack: ${errorMsg}`);
@@ -695,24 +750,26 @@ function App() {
     if (!pendingGraphicsPath || !pendingGraphicsAnalysis) return;
 
     try {
-      // Check for conflicts before installing
-      const packName = pendingGraphicsPath.split('/').pop()?.replace('.zip', '') || 'Unknown';
-      const conflict = await tauriCommands.checkGraphicsConflicts(
-        installPath,
-        packName,
-        pendingGraphicsAnalysis.is_flat_pack
-      );
+      await runWithBlockingMessage('Checking graphics pack conflicts...', async () => {
+        // Check for conflicts before installing
+        const packName = pendingGraphicsPath.split('/').pop()?.replace('.zip', '') || 'Unknown';
+        const conflict = await tauriCommands.checkGraphicsConflicts(
+          installPath,
+          packName,
+          pendingGraphicsAnalysis.is_flat_pack
+        );
 
-      if (conflict) {
-        // Show conflict dialog
-        setGraphicsConflict(conflict);
-        setPendingInstall({ path: installPath, shouldSplit });
-        setShowConflictDialog(true);
-        return;
-      }
+        if (conflict) {
+          // Show conflict dialog
+          setGraphicsConflict(conflict);
+          setPendingInstall({ path: installPath, shouldSplit });
+          setShowConflictDialog(true);
+          return;
+        }
 
-      // No conflict, proceed with installation
-      await performGraphicsInstall(installPath, shouldSplit, false);
+        // No conflict, proceed with installation
+        await performGraphicsInstall(installPath, shouldSplit, false);
+      });
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error checking conflicts: ${errorMsg}`);
@@ -730,7 +787,6 @@ function App() {
     try {
       setImportingGraphics(true);
       addLog(`Installing graphics pack to: ${installPath}`);
-      toast.loading('Installing graphics pack...', { id: 'graphics-import' });
 
       const result = await tauriCommands.importGraphicsPackWithType(
         pendingGraphicsPath,
@@ -918,7 +974,7 @@ function App() {
         const unlistenDrop = await listen<string[]>('tauri://file-drop', (event) => {
           const files = event.payload;
           if (files && files.length > 0) {
-            void handleImport(files[0]);
+            void runWithBlockingMessage('Importing mod...', () => handleImport(files[0]), 0);
           }
           setIsDragging(false);
         });
@@ -931,7 +987,7 @@ function App() {
           // In Tauri v2, drag-drop contains the file paths
           const paths = event.payload?.paths;
           if (paths && paths.length > 0) {
-            void handleImport(paths[0]);
+            void runWithBlockingMessage('Importing mod...', () => handleImport(paths[0]), 0);
           }
           setIsDragging(false);
         });
@@ -946,21 +1002,8 @@ function App() {
           (event) => {
             setGraphicsProgress(event.payload);
 
-            // Check if installation is complete
             if (event.payload.phase === 'complete') {
-              toast.success('Graphics pack installed successfully!', { id: 'graphics-import' });
               setGraphicsProgress(null);
-            } else if (event.payload.phase === 'indexing') {
-              // Show indexing phase
-              toast.loading('Indexing files...', { id: 'graphics-import' });
-            } else {
-              // Update toast with progress (copying or extracting)
-              const percent = Math.round((event.payload.current / event.payload.total) * 100);
-              const phaseText = event.payload.phase === 'copying' ? 'Installing' : 'Extracting';
-              toast.loading(
-                `${phaseText} graphics: ${event.payload.current}/${event.payload.total} files (${percent}%)`,
-                { id: 'graphics-import' }
-              );
             }
           }
         );
@@ -1066,6 +1109,21 @@ function App() {
       setPendingGraphicsAnalysis(mockData[confidenceLevel]);
     };
   }, []);
+
+  const graphicsPhaseLabel = graphicsProgress
+    ? graphicsProgress.phase === 'copying'
+      ? 'Installing graphics pack'
+      : graphicsProgress.phase === 'indexing'
+        ? 'Indexing files'
+        : 'Extracting graphics pack'
+    : importingGraphics
+      ? 'Finalizing graphics install'
+      : null;
+
+  const graphicsPercent =
+    graphicsProgress && graphicsProgress.total > 0
+      ? Math.round((graphicsProgress.current / graphicsProgress.total) * 100)
+      : null;
 
   return (
     <TooltipProvider>
@@ -1690,6 +1748,11 @@ function App() {
 
         {/* Graphics Pack Confirmation Dialog */}
         <GraphicsPackConfirmDialog
+          key={
+            pendingGraphicsPath ??
+            pendingGraphicsAnalysis?.suggested_paths.join('|') ??
+            'graphics-dialog'
+          }
           analysis={pendingGraphicsAnalysis}
           onConfirm={handleGraphicsConfirm}
           onCancel={handleGraphicsCancel}
@@ -1986,6 +2049,61 @@ function App() {
             </div>
           </SheetContent>
         </Sheet>
+
+        {/* Keep graphics pack progress visible; only show blocker for mod-oriented flows */}
+        {blockingMessage && !importingGraphics && !graphicsProgress && (
+          <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/70 p-6 text-center backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-6">
+              <div
+                className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary"
+                aria-hidden="true"
+              />
+              <div className="space-y-2">
+                <p className="text-xl font-semibold">{blockingMessage}</p>
+                <p className="text-sm text-muted-foreground">
+                  Large imports can take a moment. Keep the window open until it finishes.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Graphics pack overlay with inline progress (replaces repeated toasts) */}
+        {(importingGraphics || graphicsProgress) && (
+          <div className="fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-4 bg-background/70 p-6 text-center backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-6">
+              <div
+                className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary"
+                aria-hidden="true"
+              />
+              <div className="space-y-2">
+                <p className="text-xl font-semibold">
+                  {graphicsPhaseLabel ?? 'Processing graphics pack'}
+                  {graphicsPercent !== null ? ` • ${graphicsPercent}%` : ''}
+                </p>
+                {graphicsProgress && (
+                  <p className="text-sm text-muted-foreground">
+                    {graphicsProgress.current} / {graphicsProgress.total} files
+                  </p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Large graphics packs can take a few minutes. Keep the window open until it
+                  finishes.
+                </p>
+              </div>
+            </div>
+            {graphicsPercent !== null && (
+              <div className="w-80 max-w-[90vw]">
+                <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all"
+                    style={{ width: `${graphicsPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <Toaster />
 
         {/* Import Name Fix Dialog */}
