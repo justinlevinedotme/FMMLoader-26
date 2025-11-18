@@ -1,7 +1,7 @@
 name: Bug Report
 description: Report a problem or unexpected behavior
-title: "[Bug]: "
-labels: [bug]
+title: "bug: "
+labels: ["Type: Bug"]
 body:
   - type: markdown
     attributes:

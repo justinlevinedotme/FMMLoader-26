@@ -1,7 +1,7 @@
 name: Question
 description: Ask about how to use FMMLoader26
-title: "[Question]: "
-labels: [question]
+title: "question: "
+labels: ["Type: Question"]
 body:
   - type: textarea
     id: question

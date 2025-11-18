@@ -1,7 +1,7 @@
 name: Feature Request
 description: Suggest a new feature or enhancement for FMMLoader26
-title: "[Feature]: "
-labels: ["enhancement"]
+title: "feature: "
+labels: ["Type: Enhancement"]
 body:
   - type: markdown
     attributes:
