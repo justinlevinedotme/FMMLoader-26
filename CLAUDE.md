@@ -158,6 +158,117 @@ Consult `aicontext/ASSET_ROUTING_SPEC.md` for:
 - Installation path routing
 - File type validation
 
+## CI/CD and Code Quality (Added 2025-01-17)
+
+FMMLoader has comprehensive CI/CD infrastructure to ensure code quality and consistent development workflows.
+
+### Continuous Integration
+
+**CI Pipeline** (`.github/workflows/ci.yml`):
+- Triggers on all pull requests to main and pushes to feature branches
+- Runs on Ubuntu (fastest for validation)
+- Validates both frontend and backend code
+
+**Frontend Checks:**
+- `npm run build` - TypeScript compilation and Vite build
+- `npm run lint` - ESLint validation
+- `npm run format` - Prettier formatting check
+
+**Backend Checks:**
+- `cargo check` - Fast Rust compilation check
+- `cargo test` - Runs all 19 unit tests
+- `cargo clippy -- -D warnings` - Linting (fails on warnings)
+- `cargo fmt --check` - Formatting validation
+
+**Expected CI Runtime:** 5-10 minutes on GitHub Actions runners
+
+### Code Quality Standards
+
+**ESLint Configuration** (`eslint.config.js`):
+- Modern flat config format
+- TypeScript-aware rules
+- React hooks validation
+- Unused variable detection (ignores `_` prefix)
+- Located at repository root
+
+**Prettier Configuration** (`.prettierrc`):
+- Semi-colons enabled
+- Single quotes for strings
+- 100 character print width
+- 2 space indentation
+- LF line endings
+
+**Rust Standards:**
+- `cargo fmt` with default Rust formatting
+- `cargo clippy` enforced with warnings as errors
+- All tests must pass before merge
+
+### Pre-commit Hooks
+
+**Setup:** Automatically configured via husky when running `npm install`
+
+**Pre-commit Hook** (`.husky/pre-commit`):
+- Runs `lint-staged` on staged files only
+- Auto-formats TypeScript/React with ESLint and Prettier
+- Auto-formats JSON/CSS/Markdown with Prettier
+- Auto-formats Rust with `cargo fmt`
+- Fast - only processes staged files
+
+**Pre-push Hook** (`.husky/pre-push`):
+- Validates branch naming conventions (feature/*, fix/*, etc.)
+- Builds frontend (`npm run build`)
+- Checks Rust code (`cargo check`)
+- Provides fast feedback before CI runs
+
+**Skipping Hooks:** Use `git commit --no-verify` or `git push --no-verify` only when necessary (may cause CI failures)
+
+### Branch Protection
+
+Branch protection must be configured via GitHub UI. See `.github/BRANCH_PROTECTION.md` for complete setup instructions.
+
+**Required Settings:**
+- Pull requests required before merging to main
+- At least 1 approval required
+- CI status checks must pass (test job)
+- Branches must be up to date before merging
+- Linear history enforced (no merge commits)
+- Conversation resolution required
+- Force pushes blocked
+- Direct pushes to main blocked
+
+### Running Quality Checks Locally
+
+**Before committing:**
+```bash
+# Frontend
+npm run lint          # Check ESLint
+npm run lint:fix      # Auto-fix ESLint issues
+npm run format        # Check Prettier
+npm run format:fix    # Auto-format with Prettier
+npm run build         # Verify TypeScript builds
+
+# Backend (from src-tauri/)
+cargo fmt             # Auto-format Rust
+cargo clippy          # Run linter
+cargo test            # Run tests
+cargo check           # Quick compilation check
+```
+
+**Full local validation (same as CI):**
+```bash
+npm ci && npm run build && npm run lint && npm run format
+cd src-tauri && cargo check && cargo test && cargo clippy -- -D warnings && cargo fmt --check
+```
+
+### For Contributors
+
+See `CONTRIBUTING.md` for complete contributor guidelines including:
+- Development environment setup
+- Branch naming conventions
+- Pull request process
+- Code style guidelines
+- Pre-commit hook details
+
 ## Additional Guidance
 
 @sessions/CLAUDE.sessions.md

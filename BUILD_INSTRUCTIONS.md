@@ -223,6 +223,28 @@ If port 1420 is already in use during development:
 - **Frontend**: Check browser devtools (F12 in dev mode)
 - **Backend**: Check terminal output where `npm run tauri dev` is running
 
+### Code Quality Checks
+
+Run these before committing (or use pre-commit hooks):
+
+**Frontend:**
+```bash
+npm run lint          # Check ESLint
+npm run lint:fix      # Auto-fix linting issues
+npm run format        # Check Prettier formatting
+npm run format:fix    # Auto-format code
+```
+
+**Backend:**
+```bash
+cd src-tauri
+cargo fmt             # Auto-format Rust code
+cargo clippy          # Run Rust linter
+cargo test            # Run all tests
+```
+
+**Note:** Pre-commit hooks are automatically set up via husky when you run `npm install`. They will auto-format staged files on commit and validate builds on push.
+
 ### Clear App Data
 
 Application data is stored at:

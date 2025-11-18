@@ -742,7 +742,7 @@ We welcome contributions from the community! Whether it's bug fixes, new feature
 
 ### Contribution Guidelines
 
-- Read the [Contributing Guide](.github/CONTRIBUTING.md)
+- Read the [Contributing Guide](CONTRIBUTING.md)
 - Follow the [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 - Use descriptive commit messages
 - Update documentation when adding features

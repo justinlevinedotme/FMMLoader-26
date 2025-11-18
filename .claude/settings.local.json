@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./sessions/bin/sessions config:*)",
+      "Bash(cp:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(git push:*)",
+      "Bash(./sessions/bin/sessions kickstart:*)",
+      "Bash(git reset:*)",
+      "Bash(./sessions/bin/sessions:*)",
+      "Bash(git fetch:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:release-assets.githubusercontent.com)",
+      "Bash(git tag:*)",
+      "Bash(git pull:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(mkdir:*)",
+      "Bash(sessions/bin/sessions protocol startup-load sessions/tasks/h-implement-graphics-pack-support/README.md)",
+      "Bash(cargo check:*)",
+      "Bash(sessions mode implementation)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(npm run:*)",
+      "Bash(cargo --version:*)",
+      "Bash(rustc:*)",
+      "Bash(node --version)",
+      "Bash(npm:*)",
+      "Bash(cat:*)",
+      "Bash(sessions/bin/sessions:*)",
+      "Bash(npx husky init)",
+      "Bash(chmod:*)",
+      "Bash(gh pr create:*)",
+      "WebFetch(domain:productionresultssa14.blob.core.windows.net)",
+      "Bash(cargo clippy:*)",
+      "Bash(cargo test:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
