@@ -692,17 +692,6 @@ Create a `manifest.json` file in your mod folder:
 }
 ```
 
-### Example Mods
-
-Check the **`example mods`** folder in this repository for reference:
-- **UI Speedster** - UI enhancement mod
-- **KNAP's Beta Tactics** - Tactical preset
-- **Logopack** - Graphics pack example
-
-Special thanks to **KNAP** and **bassyboy** for allowing their mods to be included!
-
----
-
 ## 🤝 Contributing
 
 We welcome contributions from the community! Whether it's bug fixes, new features, documentation, or mod submissions—your help is appreciated.
@@ -770,6 +759,7 @@ npm run tauri dev
   - **Linux**: `sudo apt install libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev`
   - **macOS**: Xcode Command Line Tools
   - **Windows**: WebView2 (pre-installed on Windows 10/11)
+- For full platform setup and troubleshooting, see [BUILD.md](BUILD.md).
 
 ```bash
 # Build for production (creates installers/executables)
