@@ -11,11 +11,10 @@ description: Tasks related to CI/CD, build systems, deployment, testing infrastr
 ### High Priority
 
 ### Medium Priority
-- `m-implement-ci-infrastructure.md` - Set up CI/CD workflows, branch protections, PR/issue templates, and linting integration
 
 ### Low Priority
 
 ### Investigate
 
 ## Completed Tasks
-<!-- Move tasks here when completed, maintaining the format -->
+- `m-implement-ci-infrastructure.md` - Set up CI/CD workflows, branch protections, PR/issue templates, and linting integration
