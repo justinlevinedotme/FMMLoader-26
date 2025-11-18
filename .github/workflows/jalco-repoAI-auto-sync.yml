@@ -28,5 +28,5 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: sync AI task index and agent templates via jalco-repoAI"
+          commit_message: "chore: sync AI task index and agent templates via repoAI"
           branch: ${{ github.ref_name }}
