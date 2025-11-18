@@ -19,6 +19,7 @@ jobs:
 
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout main
@@ -43,9 +44,7 @@ jobs:
         run: |
           CURRENT="${{ steps.get_version.outputs.current_version }}"
           TYPE="${{ github.event.inputs.release_type }}"
-
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
-
           if [ "$TYPE" = "major" ]; then
             MAJOR=$((MAJOR + 1))
             MINOR=0
@@ -56,7 +55,6 @@ jobs:
           else
             PATCH=$((PATCH + 1))
           fi
-
           NEXT="${MAJOR}.${MINOR}.${PATCH}"
           echo "next_version=$NEXT" >> $GITHUB_OUTPUT
           echo "Bumping $CURRENT -> $NEXT"
@@ -74,7 +72,6 @@ jobs:
       - name: Update src-tauri/Cargo.toml version
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
-          # Replace the first occurrence of version = "..." in [package] section
           sed -i '0,/^version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/s//version = "'"$VERSION"'"/' src-tauri/Cargo.toml
 
       - name: Update src-tauri/tauri.conf.json version
@@ -102,25 +99,37 @@ jobs:
       - name: Commit changes with [skip ci]
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add package.json src-tauri/Cargo.toml src-tauri/tauri.conf.json
-
-          # Commit may be empty if nothing changed; that's fine.
           git commit -m "chore: bump version to ${VERSION} [skip ci]" || echo "No changes to commit"
 
-      - name: Push to main
+      - name: Create bump branch
         run: |
-          git push origin HEAD:main
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+          BRANCH="release/v${VERSION}"
+          git checkout -b "$BRANCH"
+          git push origin "$BRANCH"
+
+      - name: Open Pull Request (with auto-merge)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/v${{ steps.bump_version.outputs.next_version }}
+          title: "chore: bump version to ${{ steps.bump_version.outputs.next_version }}"
+          body: |
+            Automated version bump to ${{ steps.bump_version.outputs.next_version }}.
+
+            - Updated package.json
+            - Updated src-tauri/Cargo.toml
+            - Updated src-tauri/tauri.conf.json
+          labels: "release,version-bump"
+          auto-merge-method: squash
 
       - name: Create and push tag
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
           TAG="v${VERSION}"
-
-          # Only create tag if it doesn't already exist
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag $TAG already exists, skipping."
           else
