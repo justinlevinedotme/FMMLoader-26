@@ -78,7 +78,6 @@ jobs:
       - name: Update src-tauri/Cargo.toml version
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
-          # Replace the first occurrence of version = "..." in [package] section
           sed -i '0,/^version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/s//version = "'"$VERSION"'"/' src-tauri/Cargo.toml
 
       - name: Update src-tauri/tauri.conf.json version
@@ -107,8 +106,8 @@ jobs:
         run: |
           CHANGES=$(git status --porcelain --ignore-submodules=all)
           if [ -z "$CHANGES" ]; then
-            echo "No changes detected after version bump; aborting."
-            exit 1
+            echo "No changes detected after version bump; skipping."
+            exit 0
           fi
 
           UNEXPECTED=$(echo "$CHANGES" | awk '{print $2}' | grep -vE '^(package.json|src-tauri/Cargo.toml|src-tauri/tauri.conf.json)$' || true)
@@ -121,28 +120,25 @@ jobs:
       - name: Commit changes with [skip ci]
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add package.json src-tauri/Cargo.toml src-tauri/tauri.conf.json
-
-          # Commit may be empty if nothing changed; that's fine.
           git commit -m "chore: bump version to ${VERSION} [skip ci]" || echo "No changes to commit"
 
       - name: Create bump branch and push
         run: |
           VERSION="${{ steps.bump_version.outputs.next_version }}"
-          BRANCH="release/v${VERSION}"
-          git checkout -b "$BRANCH"
-          git push origin "$BRANCH"
+          BUMP_BRANCH="bump/v${VERSION}"
+          git checkout -b "$BUMP_BRANCH"
+          git push origin "$BUMP_BRANCH"
 
       - name: Open Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release/v${{ steps.bump_version.outputs.next_version }}
+          branch: bump/v${{ steps.bump_version.outputs.next_version }}
+          base: main
           title: "chore: bump version to ${{ steps.bump_version.outputs.next_version }}"
           body: |
             Automated version bump to ${{ steps.bump_version.outputs.next_version }}.
