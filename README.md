@@ -7,7 +7,6 @@
 # FMMLoader26
 ### 🎮 Cross-Platform Mod Manager for Football Manager 2026
 
-[![CC BY-NC-SA 4.0 License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-fdfdfd?style=flat-square&labelColor=black&logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-7289da?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/AspRvTTAch)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-ff5f5f?style=flat-square&logo=ko-fi&logoColor=white)](https://ko-fi.com/jalco)
 
@@ -814,25 +813,6 @@ FMMLoader26 is **free and open-source**, developed as a passion project. If you 
 ---
 
 ## 📜 License
-
-This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
-
-[![CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-
-### What this means:
-
-✅ **You ARE free to:**
-- Use FMMLoader26 for personal use
-- Share and distribute FMMLoader26
-- Modify and adapt the code
-- Share your modifications (under the same license)
-
-❌ **You CANNOT:**
-- Use FMMLoader26 for commercial purposes
-- Remove attribution
-- Distribute without sharing the source code
-- Change the license terms
-
 📖 **[Read the full license](LICENSE)**
 
 ---
