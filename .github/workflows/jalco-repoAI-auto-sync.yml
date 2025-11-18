@@ -19,11 +19,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run jalco-repoAI init (idempotent)
-        run: npx jalco-repoAI init --no-sample
+      - name: Run jalco-repoai init (idempotent)
+        run: npx jalco-repoai init --no-sample
 
       - name: Sync tasks index
-        run: npx jalco-repoAI sync
+        run: npx jalco-repoai sync
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
