@@ -135,8 +135,16 @@ Check the [Tauri documentation](https://tauri.app/v1/guides/building/) for platf
 
 ## GitHub Actions
 
-This project includes GitHub Actions workflows for automated building and releases. When you push a tag, it automatically:
+This project includes GitHub Actions workflows for CI/CD:
 
+### CI Workflow (`.github/workflows/ci.yml`)
+Runs on all pull requests and pushes to feature branches to ensure code quality:
+- Frontend validation (build, ESLint, Prettier)
+- Backend validation (cargo check, test, clippy, fmt)
+- Must pass before merging to main
+
+### Build/Release Workflow (`.github/workflows/build.yml`)
+When you push a tag matching `v*`, it automatically:
 1. Builds for Windows, macOS, and Linux
 2. Creates installers/packages for each platform
 3. Creates a GitHub release with all artifacts
