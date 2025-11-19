@@ -98,11 +98,12 @@ fn main() {
             std::process::exit(1);
         });
 
-    let user_dir = user_override.or(config.user_dir_path.clone()).map(|path| {
-        let buf = PathBuf::from(&path);
-        ensure_dir(&buf);
-        path
-    });
+    let user_dir = user_override
+        .or(config.user_dir_path.clone())
+        .inspect(|path| {
+            let buf = PathBuf::from(path);
+            ensure_dir(&buf);
+        });
 
     let game_target = PathBuf::from(&target_path);
     ensure_dir(&game_target);
