@@ -50,6 +50,7 @@ jobs:
 
       - name: Extract clean version
         id: extract_version
+        shell: bash
         run: |
           if [[ "${GITHUB_REF_NAME}" == v* ]]; then
             echo "CLEAN_VERSION=${GITHUB_REF_NAME:1}" >> $GITHUB_OUTPUT
