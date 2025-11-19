@@ -48,6 +48,18 @@ pub struct FileEntry {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResolvedFilePreview {
+    pub target_subpath: String,
+    pub resolved_path: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModInstallPreview {
+    pub base_target: String,
+    pub resolved_files: Vec<ResolvedFilePreview>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub target_path: Option<String>,

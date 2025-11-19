@@ -1,6 +1,6 @@
 use crate::config::{get_backup_dir, get_mods_dir, get_restore_points_dir};
 use crate::game_detection::get_fm_user_dir;
-use crate::types::ModManifest;
+use crate::types::{FileEntry, ModInstallPreview, ModManifest, ResolvedFilePreview};
 use chrono::Local;
 use std::fs;
 use std::io;
@@ -132,6 +132,30 @@ pub fn get_target_for_type(mod_type: &str, game_target: &Path, user_dir: Option<
         "graphics" => user_path.join("graphics"),
         "editor-data" => user_path.join("editor data"),
         _ => game_target.to_path_buf(),
+    }
+}
+
+pub fn preview_mod_install(
+    mod_type: &str,
+    game_target: &Path,
+    user_dir: Option<&str>,
+    files: &[FileEntry],
+) -> ModInstallPreview {
+    let base_target = get_target_for_type(mod_type, game_target, user_dir);
+    let resolved_files = files
+        .iter()
+        .map(|file| ResolvedFilePreview {
+            target_subpath: file.target_subpath.clone(),
+            resolved_path: base_target
+                .join(&file.target_subpath)
+                .to_string_lossy()
+                .to_string(),
+        })
+        .collect();
+
+    ModInstallPreview {
+        base_target: base_target.to_string_lossy().to_string(),
+        resolved_files,
     }
 }
 
@@ -322,6 +346,17 @@ pub fn cleanup_old_restore_points(keep: usize) -> Result<(), String> {
 mod tests {
     use super::*;
     use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_temp_dir() -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("fmml_mod_manager_test_{}", nanos));
+        let _ = std::fs::create_dir_all(&path);
+        path
+    }
 
     #[test]
     fn test_get_current_platform() {
@@ -350,7 +385,7 @@ mod tests {
     #[test]
     fn test_get_target_for_type_skins() {
         let game_target = PathBuf::from("/test/game/path");
-        let user_dir = None;
+        let user_dir = Some("/should/not/use/user");
 
         let target = get_target_for_type("skins", &game_target, user_dir);
 
@@ -361,7 +396,7 @@ mod tests {
     #[test]
     fn test_get_target_for_type_ui() {
         let game_target = PathBuf::from("/test/game/path");
-        let user_dir = None;
+        let user_dir = Some("/should/not/use/user");
 
         let target = get_target_for_type("ui", &game_target, user_dir);
         assert_eq!(target, game_target);
@@ -370,7 +405,7 @@ mod tests {
     #[test]
     fn test_get_target_for_type_bundle() {
         let game_target = PathBuf::from("/test/game/path");
-        let user_dir = None;
+        let user_dir = Some("/should/not/use/user");
 
         let target = get_target_for_type("bundle", &game_target, user_dir);
         assert_eq!(target, game_target);
@@ -379,36 +414,74 @@ mod tests {
     #[test]
     fn test_get_target_for_type_tactics() {
         let game_target = PathBuf::from("/test/game/path");
-        let user_dir = None;
+        let user_dir = unique_temp_dir();
+        let user_dir_str = user_dir.to_string_lossy().to_string();
 
-        let target = get_target_for_type("tactics", &game_target, user_dir);
+        let target = get_target_for_type("tactics", &game_target, Some(&user_dir_str));
 
-        // Tactics should go to user tactics folder, not game target
-        assert_ne!(target, game_target);
-        assert!(target.ends_with("tactics"));
+        assert_eq!(target, user_dir.join("tactics"));
+        let _ = std::fs::remove_dir_all(&user_dir);
     }
 
     #[test]
     fn test_get_target_for_type_graphics() {
         let game_target = PathBuf::from("/test/game/path");
-        let user_dir = None;
+        let user_dir = unique_temp_dir();
+        let user_dir_str = user_dir.to_string_lossy().to_string();
 
-        let target = get_target_for_type("graphics", &game_target, user_dir);
+        let target = get_target_for_type("graphics", &game_target, Some(&user_dir_str));
 
-        // Graphics should go to user graphics folder
-        assert_ne!(target, game_target);
-        assert!(target.ends_with("graphics"));
+        assert_eq!(target, user_dir.join("graphics"));
+        let _ = std::fs::remove_dir_all(&user_dir);
     }
 
     #[test]
     fn test_get_target_for_type_editor_data() {
         let game_target = PathBuf::from("/test/game/path");
-        let user_dir = None;
+        let user_dir = unique_temp_dir();
+        let user_dir_str = user_dir.to_string_lossy().to_string();
 
-        let target = get_target_for_type("editor-data", &game_target, user_dir);
+        let target = get_target_for_type("editor-data", &game_target, Some(&user_dir_str));
 
-        // Editor data should go to user editor data folder
-        assert_ne!(target, game_target);
-        assert!(target.ends_with("editor data"));
+        assert_eq!(target, user_dir.join("editor data"));
+        let _ = std::fs::remove_dir_all(&user_dir);
+    }
+
+    #[test]
+    fn test_preview_mod_install_maps_paths() {
+        let game_target = PathBuf::from("/test/game/path");
+        let user_dir = unique_temp_dir();
+        let user_dir_str = user_dir.to_string_lossy().to_string();
+
+        let files = vec![
+            FileEntry {
+                source: "src/file1".to_string(),
+                target_subpath: "graphics/faces/config.xml".to_string(),
+                platform: None,
+            },
+            FileEntry {
+                source: "src/file2".to_string(),
+                target_subpath: "graphics/faces/face.png".to_string(),
+                platform: None,
+            },
+        ];
+
+        let preview = preview_mod_install("graphics", &game_target, Some(&user_dir_str), &files);
+
+        assert_eq!(
+            preview.base_target,
+            user_dir.join("graphics").to_string_lossy().to_string()
+        );
+        assert_eq!(preview.resolved_files.len(), 2);
+        assert_eq!(
+            preview.resolved_files[0].resolved_path,
+            user_dir
+                .join("graphics")
+                .join("graphics/faces/config.xml")
+                .to_string_lossy()
+                .to_string()
+        );
+
+        let _ = std::fs::remove_dir_all(&user_dir);
     }
 }

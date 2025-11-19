@@ -80,6 +80,122 @@ interface ModWithInfo extends ModManifest {
   enabled: boolean;
 }
 
+type DebugUIProps = {
+  metadataDialogOpen: boolean;
+  conflictsDialogOpen: boolean;
+  restoreDialogOpen: boolean;
+  settingsOpen: boolean;
+  modDetailsOpen: boolean;
+  setMetadataDialogOpen: (open: boolean) => void;
+  setConflictsDialogOpen: (open: boolean) => void;
+  setRestoreDialogOpen: (open: boolean) => void;
+  setSettingsOpen: (open: boolean) => void;
+  setModDetailsOpen: (open: boolean) => void;
+  setSelectedMod: (mod: ModWithInfo | null) => void;
+  setPendingGraphicsAnalysis: (analysis: GraphicsPackAnalysis | null) => void;
+  setPendingGraphicsPath: (path: string | null) => void;
+};
+
+function DebugUI({
+  metadataDialogOpen,
+  conflictsDialogOpen,
+  restoreDialogOpen,
+  settingsOpen,
+  modDetailsOpen,
+  setMetadataDialogOpen,
+  setConflictsDialogOpen,
+  setRestoreDialogOpen,
+  setSettingsOpen,
+  setModDetailsOpen,
+  setSelectedMod,
+  setPendingGraphicsAnalysis,
+  setPendingGraphicsPath,
+}: DebugUIProps) {
+  const sampleMod: ModWithInfo = {
+    id: 'debug-mod',
+    name: 'Debug Mod',
+    version: '0.0.0',
+    mod_type: 'graphics',
+    author: 'Debug',
+    homepage: '',
+    description: 'Sample mod for UI debug',
+    license: 'MIT',
+    compatibility: { fm_version: '26' },
+    dependencies: [],
+    conflicts: [],
+    load_after: [],
+    files: [
+      { source: 'sample/face.png', target_subpath: 'graphics/faces/face.png' },
+      { source: 'sample/config.xml', target_subpath: 'graphics/faces/config.xml' },
+    ],
+    enabled: false,
+  };
+
+  const sampleAnalysis: GraphicsPackAnalysis = {
+    pack_type: 'Faces',
+    confidence: 0.82,
+    suggested_paths: ['faces/sample-pack', 'faces/alt-path'],
+    file_count: 2,
+    total_size_bytes: 2048,
+    has_config_xml: true,
+    subdirectory_breakdown: { faces: 2 },
+    is_flat_pack: true,
+  };
+
+  const openGraphicsDialog = () => {
+    setPendingGraphicsPath('debug/sample/pack.zip');
+    setPendingGraphicsAnalysis(sampleAnalysis);
+  };
+
+  const openModDetails = () => {
+    setSelectedMod(sampleMod);
+    setModDetailsOpen(true);
+  };
+
+  const openStates = [
+    metadataDialogOpen ? 'Metadata' : null,
+    conflictsDialogOpen ? 'Conflicts' : null,
+    restoreDialogOpen ? 'Restore Points' : null,
+    settingsOpen ? 'Settings' : null,
+    modDetailsOpen ? 'Mod Details' : null,
+  ].filter(Boolean);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>UI Debug / Playground (dev only)</CardTitle>
+        <CardDescription>Quick toggles to open dialogs without full flows.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <Button variant="secondary" onClick={() => setMetadataDialogOpen(true)}>
+            Open Metadata Dialog
+          </Button>
+          <Button variant="secondary" onClick={() => setConflictsDialogOpen(true)}>
+            Open Conflicts Dialog
+          </Button>
+          <Button variant="secondary" onClick={() => setRestoreDialogOpen(true)}>
+            Open Restore Points
+          </Button>
+          <Button variant="secondary" onClick={() => setSettingsOpen(true)}>
+            Open Settings Sheet
+          </Button>
+          <Button variant="secondary" onClick={openModDetails}>
+            Open Mod Details
+          </Button>
+          <Button variant="secondary" onClick={openGraphicsDialog}>
+            Open Graphics Confirm
+          </Button>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          Open modals:{' '}
+          {openStates.length > 0 ? openStates.join(', ') : 'None – toggle above to inspect.'}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // Helper function to safely convert unknown errors to strings
 const formatError = (error: unknown): string => {
   if (error instanceof Error) {
@@ -1293,6 +1409,26 @@ function App() {
             </div>
           </div>
         </div>
+
+        {import.meta.env.VITE_ENABLE_DEBUG_UI === 'true' && (
+          <div className="mx-4 mt-4">
+            <DebugUI
+              metadataDialogOpen={metadataDialogOpen}
+              conflictsDialogOpen={conflictsDialogOpen}
+              restoreDialogOpen={restoreDialogOpen}
+              settingsOpen={settingsOpen}
+              modDetailsOpen={modDetailsOpen}
+              setMetadataDialogOpen={setMetadataDialogOpen}
+              setConflictsDialogOpen={setConflictsDialogOpen}
+              setRestoreDialogOpen={setRestoreDialogOpen}
+              setSettingsOpen={setSettingsOpen}
+              setModDetailsOpen={setModDetailsOpen}
+              setSelectedMod={setSelectedMod}
+              setPendingGraphicsAnalysis={setPendingGraphicsAnalysis}
+              setPendingGraphicsPath={setPendingGraphicsPath}
+            />
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="flex-1 overflow-hidden">
