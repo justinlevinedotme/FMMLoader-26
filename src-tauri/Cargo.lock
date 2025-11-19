@@ -982,7 +982,7 @@ dependencies = [
 
 [[package]]
 name = "fmmloader26"
-version = "1.0.5"
+version = "1.1.0"
 dependencies = [
  "chrono",
  "dirs 5.0.1",
