@@ -117,6 +117,13 @@ jobs:
             exit 1
           fi
 
+      - name: "Guard: require GH_TOKEN for PR creation"
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "GH_TOKEN (secrets.GH_TOKEN) is required because organization policy blocks the default GITHUB_TOKEN from creating PRs."
+            exit 1
+          fi
+
       - name: Open Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6
@@ -124,7 +131,7 @@ jobs:
           token: ${{ env.GH_TOKEN }}
           branch: bump/v${{ steps.bump_version.outputs.next_version }}
           base: main
-          commit-message: "chore: bump version to ${{ steps.bump_version.outputs.next_version }} [skip ci]"
+          commit-message: "chore: bump version to ${{ steps.bump_version.outputs.next_version }}"
           add-paths: |
             package.json
             src-tauri/Cargo.toml
@@ -140,6 +147,43 @@ jobs:
       - name: Enable auto-merge (squash)
         if: ${{ steps.cpr.outputs.pull-request-number != '' && env.GH_TOKEN != '' }}
         run: gh pr merge --squash --auto "${{ steps.cpr.outputs.pull-request-number }}"
+
+      - name: Wait for merge and tag release
+        if: ${{ steps.cpr.outputs.pull-request-number != '' && env.GH_TOKEN != '' }}
+        run: |
+          PR="${{ steps.cpr.outputs.pull-request-number }}"
+          VERSION="${{ steps.bump_version.outputs.next_version }}"
+
+          echo "Waiting for PR #$PR to merge before tagging v${VERSION}..."
+          MERGED=""
+          for i in {1..90}; do
+            MERGED=$(gh pr view "$PR" --json mergedAt -q '.mergedAt // ""')
+            if [ -n "$MERGED" ]; then
+              echo "Merged at $MERGED"
+              break
+            fi
+            sleep 10
+          done
+
+          if [ -z "$MERGED" ]; then
+            echo "Timed out waiting for PR to merge; tag not created."
+            exit 1
+          fi
+
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+
+          TAG="v${VERSION}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists; skipping."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
 
       - name: Skip auto-merge (no GH token)
         if: ${{ steps.cpr.outputs.pull-request-number != '' && env.GH_TOKEN == '' }}
