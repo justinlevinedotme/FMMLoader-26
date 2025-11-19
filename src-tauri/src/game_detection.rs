@@ -138,3 +138,68 @@ pub fn get_fm_user_dir(custom_path: Option<&str>) -> PathBuf {
             .join("Football Manager 26")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::Path;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_temp_dir() -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("fmml_user_dir_test_{}", nanos));
+        let _ = fs::create_dir_all(&path);
+        path
+    }
+
+    #[test]
+    fn uses_existing_custom_path() {
+        let temp_dir = unique_temp_dir();
+        let custom_str = temp_dir.to_string_lossy().to_string();
+
+        let result = get_fm_user_dir(Some(&custom_str));
+        assert_eq!(result, temp_dir);
+
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn falls_back_when_custom_missing() {
+        let missing = std::env::temp_dir().join("fmml_missing_user_dir_path");
+        let _ = fs::remove_dir_all(&missing);
+
+        let result = get_fm_user_dir(missing.to_str());
+
+        assert_ne!(result, missing);
+
+        #[cfg(target_os = "windows")]
+        {
+            let expected_suffix = Path::new("Documents")
+                .join("Sports Interactive")
+                .join("Football Manager 26");
+            assert!(result.ends_with(&expected_suffix));
+        }
+
+        #[cfg(target_os = "macos")]
+        {
+            let expected_suffix = Path::new("Library")
+                .join("Application Support")
+                .join("Sports Interactive")
+                .join("Football Manager 26");
+            assert!(result.ends_with(&expected_suffix));
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            let expected_suffix = Path::new(".local")
+                .join("share")
+                .join("Sports Interactive")
+                .join("Football Manager 26");
+            assert!(result.ends_with(&expected_suffix));
+        }
+    }
+}

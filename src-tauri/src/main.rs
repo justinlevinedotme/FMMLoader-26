@@ -23,13 +23,14 @@ use import::{
 };
 use mod_manager::{
     cleanup_old_backups, cleanup_old_restore_points, get_mod_info, install_mod, list_mods,
+    preview_mod_install as compute_preview,
 };
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
 use std::path::{Path, PathBuf};
 use tauri::{Emitter, Manager};
 use types::{
-    Config, ConflictInfo, ExtractionProgress, GraphicsConflictInfo, GraphicsPackMetadata,
-    ModManifest, RestorePoint,
+    Config, ConflictInfo, ExtractionProgress, FileEntry, GraphicsConflictInfo,
+    GraphicsPackMetadata, ModInstallPreview, ModManifest, RestorePoint,
 };
 
 #[tauri::command]
@@ -78,6 +79,28 @@ fn detect_user_dir() -> Result<String, String> {
     let config = load_config()?;
     let user_dir = game_detection::get_fm_user_dir(config.user_dir_path.as_deref());
     Ok(user_dir.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn preview_mod_install(
+    mod_type: String,
+    files: Option<Vec<FileEntry>>,
+    game_target: Option<String>,
+    user_dir: Option<String>,
+) -> Result<ModInstallPreview, String> {
+    let config = load_config()?;
+    let target_path = game_target
+        .or(config.target_path.clone())
+        .ok_or("Game target not set")?;
+
+    let preview = compute_preview(
+        &mod_type,
+        &PathBuf::from(target_path),
+        user_dir.as_deref().or(config.user_dir_path.as_deref()),
+        files.as_deref().unwrap_or(&[]),
+    );
+
+    Ok(preview)
 }
 
 #[tauri::command]
@@ -1538,6 +1561,7 @@ fn main() {
             validate_graphics,
             migrate_graphics_pack,
             check_graphics_conflicts,
+            preview_mod_install,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

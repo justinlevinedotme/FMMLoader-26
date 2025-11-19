@@ -122,6 +122,16 @@ export interface GraphicsPackAnalysis {
   is_flat_pack: boolean;
 }
 
+export interface ResolvedFilePreview {
+  target_subpath: string;
+  resolved_path: string;
+}
+
+export interface ModInstallPreview {
+  base_target: string;
+  resolved_files: ResolvedFilePreview[];
+}
+
 export const tauriCommands = {
   initApp: () => safeInvoke<void>('init_app'),
 
@@ -174,6 +184,19 @@ export const tauriCommands = {
   openModsFolder: () => safeInvoke<void>('open_mods_folder'),
 
   getLogsPath: () => safeInvoke<string>('get_logs_path'),
+
+  previewModInstall: (
+    modType: string,
+    files?: FileEntry[],
+    gameTarget?: string,
+    userDir?: string
+  ) =>
+    safeInvoke<ModInstallPreview>('preview_mod_install', {
+      modType,
+      files,
+      gameTarget,
+      userDir,
+    }),
 
   // Log update events to backend file logs with structured [UPDATE_*] prefixes
   logUpdateEvent: (

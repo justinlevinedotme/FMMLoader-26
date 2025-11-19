@@ -1,8 +1,16 @@
 use crate::types::{Config, GraphicsPackMetadata, GraphicsPacksRegistry};
+use std::env;
 use std::fs;
 use std::path::PathBuf;
 
 pub fn get_app_data_dir() -> PathBuf {
+    if let Ok(override_dir) = env::var("FMML_TEST_APPDATA") {
+        let path = PathBuf::from(override_dir);
+        if !path.as_os_str().is_empty() {
+            return path;
+        }
+    }
+
     let app_name = "FMMLoader26";
 
     #[cfg(target_os = "windows")]
@@ -146,4 +154,38 @@ pub fn add_graphics_pack(metadata: GraphicsPackMetadata) -> Result<(), String> {
     registry.graphics_packs.push(metadata);
     save_graphics_packs(&registry)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_temp_dir() -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = env::temp_dir().join(format!("fmml_test_appdata_{}", nanos));
+        let _ = fs::create_dir_all(&path);
+        path
+    }
+
+    #[test]
+    fn get_app_data_dir_honors_test_override() {
+        let temp_dir = unique_temp_dir();
+        env::set_var("FMML_TEST_APPDATA", &temp_dir);
+
+        let base = get_app_data_dir();
+        assert_eq!(base, temp_dir);
+        assert_eq!(get_mods_dir(), base.join("mods"));
+        assert_eq!(get_backup_dir(), base.join("backups"));
+        assert_eq!(get_restore_points_dir(), base.join("restore_points"));
+        assert_eq!(get_logs_dir(), base.join("logs"));
+        assert_eq!(get_name_fixes_dir(), base.join("name_fixes"));
+        assert_eq!(get_graphics_packs_path(), base.join("graphics_packs.json"));
+
+        env::remove_var("FMML_TEST_APPDATA");
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
 }
