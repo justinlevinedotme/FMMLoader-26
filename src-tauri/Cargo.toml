@@ -6,6 +6,7 @@ authors = ["Justin Levine"]
 license = "CC-BY-NC-SA-4.0"
 repository = "https://github.com/justinlevinedotme/FMMLoader-26"
 edition = "2021"
+default-run = "fmmloader26"
 
 [build-dependencies]
 tauri-build = { version = "2.0.0", features = [] }
