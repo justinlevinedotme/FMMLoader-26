@@ -48,7 +48,7 @@ jobs:
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Target version: $VERSION"
+          echo "Target version: $VERSION"
 
           # Read current versions
           PKG_VERSION=$(node -p "require('./package.json').version")
@@ -56,7 +56,7 @@ jobs:
           TAURI_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
 
           echo ""
-          echo "📋 Current versions:"
+          echo "Current versions:"
           echo "   package.json:     $PKG_VERSION"
           echo "   Cargo.toml:       $CARGO_VERSION"
           echo "   tauri.conf.json:  $TAURI_VERSION"
@@ -66,21 +66,20 @@ jobs:
           CHANGED="false"
           if [[ "$PKG_VERSION" != "$VERSION" || "$CARGO_VERSION" != "$VERSION" || "$TAURI_VERSION" != "$VERSION" ]]; then
             CHANGED="true"
-            echo "⚠️  Version mismatch detected - syncing..."
+            echo "Version mismatch detected - syncing..."
           else
-            echo "✅ All versions match tag"
+            echo "All versions match tag"
           fi
 
           echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             echo ""
-            echo "🧪 DRY RUN - Would update to version $VERSION"
+            echo "DRY RUN - Would update to version $VERSION"
             echo "   No files modified"
-            exit 0
           fi
 
-          if [[ "$CHANGED" == "true" ]]; then
+          if [[ "$CHANGED" == "true" && "${{ inputs.dry_run }}" != "true" ]]; then
             # Update package.json
             npm version "$VERSION" --no-git-tag-version --allow-same-version
 
@@ -96,7 +95,7 @@ jobs:
             "
 
             echo ""
-            echo "✅ Updated versions:"
+            echo "Updated versions:"
             echo "   package.json:     $(node -p "require('./package.json').version")"
             echo "   Cargo.toml:       $(grep -m1 '^version = ' src-tauri/Cargo.toml | sed 's/version = "\(.*\)"/\1/')"
             echo "   tauri.conf.json:  $(node -p "require('./src-tauri/tauri.conf.json').version")"
@@ -112,6 +111,55 @@ jobs:
             src-tauri/Cargo.toml
             src-tauri/tauri.conf.json
           retention-days: 1
+
+  preview-release-notes:
+    needs: sync-version
+    if: ${{ inputs.dry_run == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preview release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.sync-version.outputs.version }}"
+          TAG="v${VERSION}"
+
+          echo "Preview Release Notes for $TAG"
+          echo "=================================="
+          echo ""
+
+          # Get auto-generated release notes from GitHub
+          # Use previous tag as the baseline
+          PREV_TAG=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name' 2>/dev/null || echo "")
+
+          if [ -n "$PREV_TAG" ]; then
+            echo "Changes since $PREV_TAG"
+            echo ""
+            NOTES=$(gh api repos/${{ github.repository }}/releases/generate-notes \
+              -f tag_name="$TAG" \
+              -f previous_tag_name="$PREV_TAG" \
+              --jq '.body' 2>/dev/null || echo "No changes found or tag doesn't exist yet")
+          else
+            echo "No previous release found - showing all merged PRs"
+            echo ""
+            NOTES=$(gh api repos/${{ github.repository }}/releases/generate-notes \
+              -f tag_name="$TAG" \
+              --jq '.body' 2>/dev/null || echo "No changes found or tag doesn't exist yet")
+          fi
+
+          echo "$NOTES"
+          echo ""
+          echo "---"
+          echo ""
+          echo "### Installation"
+          echo ""
+          echo "Pick your installer:"
+          echo "- **macOS (Apple Silicon):** \`FMMLoader26_${VERSION}_aarch64.dmg\`"
+          echo "- **macOS (Intel):** \`FMMLoader26_${VERSION}_x86_64.dmg\`"
+          echo "- **Windows:** \`FMMLoader26_${VERSION}_setup.exe\`"
+          echo "- **Linux (AppImage):** \`FMMLoader26_${VERSION}.AppImage\`"
+          echo ""
+          echo "> *Ignore \`*.tar.gz\` / \`*.sig\` -- used by the auto-updater.*"
 
   publish-tauri:
     needs: sync-version
@@ -160,7 +208,7 @@ jobs:
             mv Cargo.toml src-tauri/Cargo.toml
             mv tauri.conf.json src-tauri/tauri.conf.json 2>/dev/null || true
           fi
-          echo "📋 Version files applied:"
+          echo "Version files applied:"
           echo "   package.json:     $(node -p "require('./package.json').version")"
           echo "   Cargo.toml:       $(grep -m1 '^version = ' src-tauri/Cargo.toml | sed 's/version = \"\(.*\)\"/\1/')"
           echo "   tauri.conf.json:  $(node -p "require('./src-tauri/tauri.conf.json').version")"
