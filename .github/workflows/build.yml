@@ -123,7 +123,7 @@ jobs:
 
   publish-tauri:
     needs: sync-version
-    if: ${{ inputs.dry_run != true }}
+    if: inputs.dry_run != true
     permissions:
       contents: write
     timeout-minutes: 45
@@ -228,7 +228,7 @@ jobs:
 
   finalize-release:
     needs: publish-tauri
-    if: ${{ inputs.dry_run != true }}
+    if: inputs.dry_run != true
     runs-on: ubuntu-latest
     permissions:
       contents: write
