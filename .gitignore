@@ -9,6 +9,7 @@ __pycache__/
 
 # Node.js / npm
 node_modules/
+,vscode/
 
 # Build outputs
 dist/

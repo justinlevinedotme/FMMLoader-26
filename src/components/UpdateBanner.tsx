@@ -11,12 +11,12 @@ export function UpdateBanner() {
   }
 
   return (
-    <div className=" pt-10 bg-[#ff4f00] text-white px-4 py-3 flex items-center justify-between shadow-lg">
+    <div className="pt-10 bg-[#ff4f00] text-white px-4 py-3 flex items-center justify-between shadow-lg">
       <div className="flex items-center gap-3 flex-1">
         <Download className="h-5 w-5 flex-shrink-0" />
         <div className="flex-1">
           <p className="font-medium">Update Available: v{status.latestVersion}</p>
-          <p className="text-sm text-blue-100">A new version is ready to install</p>
+          <p className="text-sm text-orange-100">A new version is ready to install</p>
         </div>
       </div>
 
@@ -24,7 +24,7 @@ export function UpdateBanner() {
         {status.downloading && (
           <div className="flex items-center gap-2 mr-4">
             <div className="text-sm">Downloading: {status.downloadProgress}%</div>
-            <div className="w-32 h-2 bg-blue-800/50 rounded-full overflow-hidden">
+            <div className="w-32 h-2 bg-orange-800/50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white transition-all duration-300"
                 style={{ width: `${status.downloadProgress}%` }}
