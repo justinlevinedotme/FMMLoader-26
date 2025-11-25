@@ -23,6 +23,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -257,6 +267,10 @@ function App() {
     path: string;
     shouldSplit: boolean;
   } | null>(null);
+
+  // Confirmation dialog states
+  const [confirmDeleteMod, setConfirmDeleteMod] = useState<string | null>(null);
+  const [confirmDeleteNameFix, setConfirmDeleteNameFix] = useState<NameFixSource | null>(null);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -505,10 +519,6 @@ function App() {
   };
 
   const removeMod = async (modId: string) => {
-    if (!confirm(`Are you sure you want to remove ${modId}?`)) {
-      return;
-    }
-
     try {
       await tauriCommands.removeMod(modId);
       addLog(`Removed ${modId}`);
@@ -524,6 +534,8 @@ function App() {
     } catch (error) {
       addLog(`Error removing mod: ${formatError(error)}`);
       toast.error(`Failed to remove mod: ${formatError(error)}`);
+    } finally {
+      setConfirmDeleteMod(null);
     }
   };
 
@@ -1024,17 +1036,10 @@ function App() {
     }
   };
 
-  const handleDeleteNameFix = async (nameFixId: string) => {
-    const source = nameFixSources.find((s) => s.id === nameFixId);
-    if (!source) return;
-
-    if (!confirm(`Are you sure you want to delete "${source.name}"?`)) {
-      return;
-    }
-
+  const handleDeleteNameFix = async (source: NameFixSource) => {
     try {
       addLog(`Deleting ${source.name}...`);
-      const result = await tauriCommands.deleteNameFix(nameFixId);
+      const result = await tauriCommands.deleteNameFix(source.id);
       addLog(result);
       toast.success(result);
 
@@ -1043,13 +1048,15 @@ function App() {
       await checkNameFixStatus();
 
       // Reset selection if deleted source was selected
-      if (selectedNameFixId === nameFixId) {
+      if (selectedNameFixId === source.id) {
         setSelectedNameFixId(nameFixSources[0]?.id || '');
       }
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error deleting name fix: ${errorMsg}`);
       toast.error(`Failed to delete name fix: ${errorMsg}`);
+    } finally {
+      setConfirmDeleteNameFix(null);
     }
   };
 
@@ -1338,7 +1345,12 @@ function App() {
                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSettingsOpen(true)}
+                aria-label="Settings"
+              >
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
@@ -1507,7 +1519,7 @@ function App() {
                                 size="icon"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  void removeMod(mod.id);
+                                  setConfirmDeleteMod(mod.id);
                                 }}
                               >
                                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -1698,7 +1710,10 @@ function App() {
                         {selectedNameFixId && nameFixSources.length > 0 && (
                           <Button
                             variant="outline"
-                            onClick={() => void handleDeleteNameFix(selectedNameFixId)}
+                            onClick={() => {
+                              const source = nameFixSources.find((s) => s.id === selectedNameFixId);
+                              if (source) setConfirmDeleteNameFix(source);
+                            }}
                             disabled={installingNameFix || selectedNameFixId === activeNameFixId}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
@@ -1714,7 +1729,7 @@ function App() {
 
                       <p className="text-xs text-muted-foreground mt-2">
                         You can download name fixes from the community or create your own. We
-                        reccomend fixes from our friends at SortItOutSI or FMScout
+                        recommend fixes from our friends at SortItOutSI or FMScout
                       </p>
                     </CardContent>
                   </Card>
@@ -2106,7 +2121,7 @@ function App() {
                   <Button
                     className="w-full"
                     variant="outline"
-                    onClick={() => removeMod(selectedMod.id)}
+                    onClick={() => setConfirmDeleteMod(selectedMod.id)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Remove Mod
@@ -2274,6 +2289,65 @@ function App() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Mod Confirmation Dialog */}
+        <AlertDialog
+          open={confirmDeleteMod !== null}
+          onOpenChange={(open) => !open && setConfirmDeleteMod(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Mod?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove the mod "
+                {mods.find((m) => m.id === confirmDeleteMod)?.name || confirmDeleteMod}" from your
+                library. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (confirmDeleteMod) {
+                    void removeMod(confirmDeleteMod);
+                  }
+                  setConfirmDeleteMod(null);
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete Name Fix Confirmation Dialog */}
+        <AlertDialog
+          open={confirmDeleteNameFix !== null}
+          onOpenChange={(open) => !open && setConfirmDeleteNameFix(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Name Fix Source?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove "{confirmDeleteNameFix?.name}" from your available name
+                fix sources. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (confirmDeleteNameFix) {
+                    void handleDeleteNameFix(confirmDeleteNameFix);
+                  }
+                  setConfirmDeleteNameFix(null);
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </TooltipProvider>
   );

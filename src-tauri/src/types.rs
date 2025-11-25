@@ -108,6 +108,7 @@ pub struct ModInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RestorePoint {
+    pub name: String,
     pub timestamp: String,
     pub path: PathBuf,
 }

@@ -65,6 +65,7 @@ export interface ConflictInfo {
 }
 
 export interface RestorePoint {
+  name: string;
   timestamp: string;
   path: string;
 }

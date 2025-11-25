@@ -41,7 +41,8 @@
       "Bash(do echo \"=== Validating $f ===\")",
       "Bash(yq eval:*)",
       "Bash(done)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
