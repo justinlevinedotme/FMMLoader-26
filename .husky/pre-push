@@ -3,6 +3,10 @@
 # Validate branch name
 npx validate-branch-name
 
+# Run frontend tests with coverage
+echo "🧪 Running frontend tests..."
+npm run test:ui -- --run --coverage
+
 # Run frontend build check
 echo "🔨 Building frontend..."
 npm run build
