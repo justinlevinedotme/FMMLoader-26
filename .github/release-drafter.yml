@@ -1,0 +1,51 @@
+name-template: "FMMLoader26 v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+categories:
+  - title: "## Features"
+    labels:
+      - "Type: Enhancement"
+  - title: "## Bug Fixes"
+    labels:
+      - "Type: Bug"
+  - title: "## Other Changes"
+    labels:
+      - "javascript"
+      - "Type: Release"
+
+exclude-labels:
+  - "Type: Question"
+  - "Type: Maintenance"
+  - "dependencies"
+
+change-template: "- $TITLE by @$AUTHOR in #$NUMBER"
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+      - "Type: Enhancement"
+  patch:
+    labels:
+      - "patch"
+      - "Type: Bug"
+  default: patch
+
+template: |
+  $CHANGES
+
+  ---
+
+  ### Installation
+
+  Pick your installer:
+  - **macOS (Apple Silicon):** `FMMLoader26_$RESOLVED_VERSION_aarch64.dmg`
+  - **macOS (Intel):** `FMMLoader26_$RESOLVED_VERSION_x86_64.dmg`
+  - **Windows:** `FMMLoader26_$RESOLVED_VERSION_setup.exe`
+  - **Linux (AppImage):** `FMMLoader26_$RESOLVED_VERSION.AppImage`
+
+  > *Ignore `*.tar.gz` / `*.sig` — used by the auto-updater.*
