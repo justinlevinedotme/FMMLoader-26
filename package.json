@@ -36,7 +36,7 @@
     "@tauri-apps/plugin-shell": "^2.0.0",
     "@tauri-apps/plugin-updater": "^2.0.0",
     "class-variance-authority": "^0.7.1",
-    "claude": "^0.1.1",
+    "claude": "^0.1.2",
     "clsx": "^2.1.1",
     "jalco-repoai": "^1.0.3",
     "lucide-react": "^0.553.0",
