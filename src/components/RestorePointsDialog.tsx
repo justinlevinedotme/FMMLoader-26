@@ -7,6 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,6 +43,7 @@ export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePo
   const [creating, setCreating] = useState(false);
   const [newPointName, setNewPointName] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [confirmingRestore, setConfirmingRestore] = useState<RestorePoint | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -53,15 +64,12 @@ export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePo
   };
 
   const handleRestore = async (point: RestorePoint) => {
-    if (!confirm(`Are you sure you want to restore to "${point.timestamp}"?`)) {
-      return;
-    }
-
     try {
       await tauriCommands.restoreFromPoint(point.path);
       if (onRestore) {
         onRestore();
       }
+      setConfirmingRestore(null);
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to restore:', error);
@@ -91,106 +99,140 @@ export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePo
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" />
-            Restore Points
-          </DialogTitle>
-          <DialogDescription>
-            Restore your game to a previous state or create a new backup.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Restore Points
+            </DialogTitle>
+            <DialogDescription>
+              Restore your game to a previous state or create a new backup.
+            </DialogDescription>
+          </DialogHeader>
 
-        {!showCreateForm ? (
-          <div className="space-y-4">
-            <div className="flex justify-end">
-              <Button onClick={() => setShowCreateForm(true)} size="sm" variant="outline">
-                <History className="mr-2 h-4 w-4" />
-                Create Restore Point
-              </Button>
-            </div>
+          {!showCreateForm ? (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Button onClick={() => setShowCreateForm(true)} size="sm" variant="outline">
+                  <History className="mr-2 h-4 w-4" />
+                  Create Restore Point
+                </Button>
+              </div>
 
-            <div className="max-h-[400px] overflow-y-auto border rounded-lg">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <p className="text-muted-foreground">Loading restore points...</p>
-                </div>
-              ) : restorePoints.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <History className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                  <p className="text-muted-foreground">No restore points yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Create one to backup your current state
-                  </p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Timestamp</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {restorePoints.map((point, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-mono text-sm">{point.timestamp}</TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={() => handleRestore(point)}>
-                            <Undo2 className="mr-2 h-4 w-4" />
-                            Restore
-                          </Button>
-                        </TableCell>
+              <div className="max-h-[400px] overflow-y-auto border rounded-lg">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-muted-foreground">Loading restore points...</p>
+                  </div>
+                ) : restorePoints.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <History className="h-12 w-12 text-muted-foreground/50 mb-3" />
+                    <p className="text-muted-foreground">No restore points yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Create one to backup your current state
+                    </p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                    </TableHeader>
+                    <TableBody>
+                      {restorePoints.map((point, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{point.name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {point.timestamp}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setConfirmingRestore(point)}
+                            >
+                              <Undo2 className="mr-2 h-4 w-4" />
+                              Restore
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="point-name">Restore Point Name</Label>
-              <Input
-                id="point-name"
-                value={newPointName}
-                onChange={(e) => setNewPointName(e.target.value)}
-                placeholder="e.g., Before installing new tactics"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !creating) {
-                    void handleCreate();
-                  }
-                }}
-              />
-            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="point-name">Restore Point Name</Label>
+                <Input
+                  id="point-name"
+                  value={newPointName}
+                  onChange={(e) => setNewPointName(e.target.value)}
+                  placeholder="e.g., Before installing new tactics"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !creating) {
+                      void handleCreate();
+                    }
+                  }}
+                />
+              </div>
 
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    setNewPointName('');
+                  }}
+                  disabled={creating}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleCreate} disabled={!newPointName.trim() || creating}>
+                  {creating ? 'Creating...' : 'Create'}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+
+          {!showCreateForm && (
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowCreateForm(false);
-                  setNewPointName('');
-                }}
-                disabled={creating}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleCreate} disabled={!newPointName.trim() || creating}>
-                {creating ? 'Creating...' : 'Create'}
-              </Button>
+              <Button onClick={() => onOpenChange(false)}>Close</Button>
             </DialogFooter>
-          </div>
-        )}
+          )}
+        </DialogContent>
+      </Dialog>
 
-        {!showCreateForm && (
-          <DialogFooter>
-            <Button onClick={() => onOpenChange(false)}>Close</Button>
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
+      <AlertDialog
+        open={confirmingRestore !== null}
+        onOpenChange={(open) => !open && setConfirmingRestore(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Restore to this point?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will restore your game to "{confirmingRestore?.name}" from{' '}
+              {confirmingRestore?.timestamp}. Your current mods will be replaced with the backed up
+              state.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => confirmingRestore && handleRestore(confirmingRestore)}
+            >
+              Restore
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

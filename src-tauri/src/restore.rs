@@ -60,22 +60,58 @@ pub fn list_restore_points() -> Result<Vec<RestorePoint>, String> {
     for entry in entries.flatten() {
         let path = entry.path();
         if path.is_dir() {
-            if let Some(_name) = path.file_name() {
-                let timestamp = entry
-                    .metadata()
-                    .and_then(|m| m.modified())
-                    .ok()
-                    .and_then(|t| {
-                        use std::time::UNIX_EPOCH;
-                        t.duration_since(UNIX_EPOCH).ok()
-                    })
-                    .map(|d| {
-                        let datetime = chrono::DateTime::<chrono::Utc>::from(UNIX_EPOCH + d);
-                        datetime.format("%Y-%m-%d %H:%M:%S").to_string()
-                    })
-                    .unwrap_or_else(|| "Unknown".to_string());
+            if let Some(folder_name) = path.file_name() {
+                let folder_name_str = folder_name.to_string_lossy();
 
-                points.push(RestorePoint { timestamp, path });
+                // Folder name format: YYYYMMDD_HHMMSS_Name
+                // Parse timestamp and name from folder name
+                let (timestamp, name) = if folder_name_str.len() >= 16 {
+                    // Try to parse the timestamp part (first 15 chars: YYYYMMDD_HHMMSS)
+                    let ts_part = &folder_name_str[..15];
+                    let name_part = if folder_name_str.len() > 16 {
+                        folder_name_str[16..].to_string()
+                    } else {
+                        "Unnamed".to_string()
+                    };
+
+                    // Format timestamp nicely: YYYYMMDD_HHMMSS -> YYYY-MM-DD HH:MM:SS
+                    let formatted_ts = if ts_part.len() == 15 && ts_part.chars().nth(8) == Some('_')
+                    {
+                        format!(
+                            "{}-{}-{} {}:{}:{}",
+                            &ts_part[0..4],   // Year
+                            &ts_part[4..6],   // Month
+                            &ts_part[6..8],   // Day
+                            &ts_part[9..11],  // Hour
+                            &ts_part[11..13], // Minute
+                            &ts_part[13..15]  // Second
+                        )
+                    } else {
+                        ts_part.to_string()
+                    };
+
+                    (formatted_ts, name_part)
+                } else {
+                    // Fallback to file modification time if folder name doesn't match expected format
+                    let timestamp = entry
+                        .metadata()
+                        .and_then(|m| m.modified())
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| {
+                            let datetime = chrono::DateTime::<chrono::Utc>::from(UNIX_EPOCH + d);
+                            datetime.format("%Y-%m-%d %H:%M:%S").to_string()
+                        })
+                        .unwrap_or_else(|| "Unknown".to_string());
+
+                    (timestamp, folder_name_str.to_string())
+                };
+
+                points.push(RestorePoint {
+                    name,
+                    timestamp,
+                    path,
+                });
             }
         }
     }
