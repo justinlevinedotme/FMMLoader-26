@@ -44,7 +44,15 @@ jobs:
           elif [[ "${GITHUB_REF_NAME}" == v* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="${GITHUB_REF_NAME}"
+            echo "::error::This workflow must be triggered by a version tag (v*) or with a test_version input for dry runs."
+            echo "::error::Got ref: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+
+          # Validate version is semver-ish (x.y.z with optional pre-release)
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Invalid version format: $VERSION (expected semver like 1.2.3)"
+            exit 1
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
