@@ -246,23 +246,19 @@ jobs:
             --jq '.body')
 
           # Append installation footer
-          FOOTER=$(cat <<'FOOTER_EOF'
+          FOOTER="
 
----
+          ---
 
-### Installation
+          ### Installation
 
-Pick your installer:
-- **macOS (Apple Silicon):** `FMMLoader26_VERSION_aarch64.dmg`
-- **macOS (Intel):** `FMMLoader26_VERSION_x86_64.dmg`
-- **Windows:** `FMMLoader26_VERSION_setup.exe`
-- **Linux (AppImage):** `FMMLoader26_VERSION.AppImage`
+          Pick your installer:
+          - **macOS (Apple Silicon):** \`FMMLoader26_${VERSION}_aarch64.dmg\`
+          - **macOS (Intel):** \`FMMLoader26_${VERSION}_x86_64.dmg\`
+          - **Windows:** \`FMMLoader26_${VERSION}_setup.exe\`
+          - **Linux (AppImage):** \`FMMLoader26_${VERSION}.AppImage\`
 
-> *Ignore `*.tar.gz` / `*.sig` — used by the auto-updater.*
-FOOTER_EOF
-          )
-          # Replace VERSION placeholder
-          FOOTER="${FOOTER//VERSION/$VERSION}"
+          > *Ignore \`*.tar.gz\` / \`*.sig\` — used by the auto-updater.*"
 
           FULL_BODY="${NOTES}${FOOTER}"
 
