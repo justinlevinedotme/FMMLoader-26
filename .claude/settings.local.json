@@ -35,7 +35,13 @@
       "Bash(gh pr create:*)",
       "WebFetch(domain:productionresultssa14.blob.core.windows.net)",
       "Bash(cargo clippy:*)",
-      "Bash(cargo test:*)"
+      "Bash(cargo test:*)",
+      "Bash(gh label list:*)",
+      "Bash(for f in .github/workflows/*.yml)",
+      "Bash(do echo \"=== Validating $f ===\")",
+      "Bash(yq eval:*)",
+      "Bash(done)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []
