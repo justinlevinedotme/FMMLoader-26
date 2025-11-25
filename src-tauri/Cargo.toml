@@ -12,7 +12,7 @@ default-run = "fmmloader26"
 tauri-build = { version = "2.0.0", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0", features = ["devtools"] }
+tauri = { version = "2.9.3", features = ["devtools"] }
 tauri-plugin-dialog = "2.0.0"
 tauri-plugin-fs = "2.0.0"
 tauri-plugin-os = "2.0.0"
@@ -21,17 +21,17 @@ tauri-plugin-shell = "2.0.0"
 tauri-plugin-updater = "2.0.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-zip = "0.6"
+zip = "4.6"
 walkdir = "2"
 regex = "1"
-dirs = "5"
+dirs = "6"
 chrono = "0.4"
 uuid = { version = "1", features = ["v4"] }
-reqwest = { version = "0.11", features = ["blocking", "json"] }
+reqwest = { version = "0.12", features = ["blocking", "json"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-appender = "0.2"
-hostname = "0.3"
+hostname = "0.4"
 tokio = { version = "1", features = ["full"] }
 
 [features]
