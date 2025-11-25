@@ -16,6 +16,7 @@ on:
 jobs:
   bump:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -66,14 +67,7 @@ jobs:
           echo "Bumping $CURRENT -> $NEXT"
 
       - name: Update package.json version
-        run: |
-          VERSION="${{ steps.bump_version.outputs.next_version }}"
-          node -e "
-          const fs = require('fs');
-          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-          pkg.version = '${VERSION}';
-          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-          "
+        run: npm version "${{ steps.bump_version.outputs.next_version }}" --no-git-tag-version --allow-same-version
 
       - name: Update src-tauri/Cargo.toml version
         run: |
@@ -81,13 +75,14 @@ jobs:
           sed -i '0,/^version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/s//version = "'"$VERSION"'"/' src-tauri/Cargo.toml
 
       - name: Update src-tauri/tauri.conf.json version
+        env:
+          VERSION: ${{ steps.bump_version.outputs.next_version }}
         run: |
-          VERSION="${{ steps.bump_version.outputs.next_version }}"
           node -e "
           const fs = require('fs');
           const path = 'src-tauri/tauri.conf.json';
           const conf = JSON.parse(fs.readFileSync(path, 'utf8'));
-          conf.version = '${VERSION}';
+          conf.version = process.env.VERSION;
           fs.writeFileSync(path, JSON.stringify(conf, null, 2) + '\n');
           "
 
@@ -126,7 +121,7 @@ jobs:
 
       - name: Open Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@67ccf781d68cd99b580ae25a5c18a1cc84ffff1f # v7.0.6
         with:
           token: ${{ env.GH_TOKEN }}
           branch: bump/v${{ steps.bump_version.outputs.next_version }}
