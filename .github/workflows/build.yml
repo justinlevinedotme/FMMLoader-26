@@ -208,7 +208,7 @@ jobs:
         id: tauri
         uses: tauri-apps/tauri-action@v0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
@@ -235,7 +235,7 @@ jobs:
     steps:
       - name: Generate release notes and publish
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           TAG="${GITHUB_REF_NAME}"
           VERSION="${TAG#v}"
@@ -267,3 +267,9 @@ jobs:
             --repo "${{ github.repository }}" \
             --notes "$FULL_BODY" \
             --draft=false
+
+      - name: Trigger changelog revalidation
+        run: |
+          curl -X GET "https://www.fmmloader.com/api/revalidate" \
+            -H "Authorization: Bearer ${{ secrets.REVALIDATE_TOKEN }}" \
+            -H "Content-Type: application/json"
