@@ -22,7 +22,7 @@
   <a href="#-installation">🚀 Installation</a> •
   <a href="#-features">✨ Features</a> •
   <a href="#-usage-guide">📚 Usage</a> •
-  <a href=".github/modders.md">🔧 For Modders</a> •
+  <a href="#-for-modders">🔧 For Modders</a> •
   <a href="https://discord.gg/AspRvTTAch">💬 Discord</a>
 </p>
 
@@ -170,8 +170,12 @@ Drag the app from Applications to your Dock for easy access.
 #### Prerequisites
 ```bash
 sudo apt update
-sudo apt install python3 python3-pip python3-tk
+sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
 ```
+
+You'll also need:
+- **Node.js 18+** and npm
+- **Rust 1.70+** (install from https://rustup.rs)
 
 #### Install from source
 ```bash
@@ -179,27 +183,26 @@ sudo apt install python3 python3-pip python3-tk
 git clone https://github.com/justinlevinedotme/FMMLoader-26.git
 cd FMMLoader-26
 
-# Install dependencies
-pip3 install -r src/requirements.txt
+# Install Node.js dependencies
+npm install
 
-# Optional: Install tkinterdnd2 for drag-and-drop
-pip3 install tkinterdnd2
+# Run in development mode
+npm run tauri dev
 
-# Run the application
-python3 src/fmmloader26.py
+# Or build for production
+npm run tauri build
 ```
 
+The built application will be in `src-tauri/target/release/bundle/` as `.deb` or `.AppImage`.
+
 #### Optional: Create a desktop launcher
-Create a file `~/.local/share/applications/fmmloader26.desktop`:
-```ini
-[Desktop Entry]
-Name=FMMLoader26
-Comment=Football Manager 2026 Mod Manager
-Exec=/usr/bin/python3 /path/to/FMMLoader-26/src/fmmloader26.py
-Icon=/path/to/FMMLoader-26/src/assets/icon.ico
-Terminal=false
-Type=Application
-Categories=Game;Utility;
+After building, the `.deb` package will automatically create a desktop entry. For `.AppImage`:
+```bash
+# Make the AppImage executable
+chmod +x FMMLoader26_*.AppImage
+
+# Run directly
+./FMMLoader26_*.AppImage
 ```
 
 </details>
@@ -663,8 +666,6 @@ FMMLoader26 automatically keeps only the **10 most recent restore points** and d
 
 Are you a mod creator? FMMLoader26 supports **manifest.json** for detailed mod metadata and installation control.
 
-📖 **[Read the Full Modders Guide](.github/modders.md)**
-
 ### Quick Start: Create a Manifest
 
 Create a `manifest.json` file in your mod folder:
@@ -759,7 +760,6 @@ npm run tauri dev
   - **Linux**: `sudo apt install libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev`
   - **macOS**: Xcode Command Line Tools
   - **Windows**: WebView2 (pre-installed on Windows 10/11)
-- For full platform setup and troubleshooting, see [BUILD.md](BUILD.md).
 
 ```bash
 # Build for production (creates installers/executables)
