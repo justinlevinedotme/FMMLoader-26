@@ -1,0 +1,18 @@
+changelog:
+  exclude:
+    labels:
+      - "Type: Question"
+      - "Type: Maintenance"
+      - "dependencies"
+  categories:
+    - title: "## Features"
+      labels:
+        - "Type: Enhancement"
+    - title: "## Bug Fixes"
+      labels:
+        - "Type: Bug"
+    - title: "## Other Changes"
+      labels:
+        - "javascript"
+        - "Type: Release"
+        - "*"

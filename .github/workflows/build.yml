@@ -5,13 +5,117 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (test version sync without building)"
+        type: boolean
+        default: false
+      test_version:
+        description: "Test version (e.g., 1.2.3) - only used in dry run"
+        type: string
+        default: ""
 
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: false # Don't cancel in-progress releases
 
 jobs:
+  sync-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.sync.outputs.version }}
+      changed: ${{ steps.sync.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+
+      - name: Sync version files to tag
+        id: sync
+        shell: bash
+        run: |
+          # Determine version from tag or input
+          if [[ "${{ inputs.dry_run }}" == "true" && -n "${{ inputs.test_version }}" ]]; then
+            VERSION="${{ inputs.test_version }}"
+            echo "::notice::DRY RUN: Testing with version $VERSION"
+          elif [[ "${GITHUB_REF_NAME}" == v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${GITHUB_REF_NAME}"
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Target version: $VERSION"
+
+          # Read current versions
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          CARGO_VERSION=$(grep -m1 '^version = ' src-tauri/Cargo.toml | sed 's/version = "\(.*\)"/\1/')
+          TAURI_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+
+          echo ""
+          echo "📋 Current versions:"
+          echo "   package.json:     $PKG_VERSION"
+          echo "   Cargo.toml:       $CARGO_VERSION"
+          echo "   tauri.conf.json:  $TAURI_VERSION"
+          echo ""
+
+          # Check if sync needed
+          CHANGED="false"
+          if [[ "$PKG_VERSION" != "$VERSION" || "$CARGO_VERSION" != "$VERSION" || "$TAURI_VERSION" != "$VERSION" ]]; then
+            CHANGED="true"
+            echo "⚠️  Version mismatch detected - syncing..."
+          else
+            echo "✅ All versions match tag"
+          fi
+
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            echo ""
+            echo "🧪 DRY RUN - Would update to version $VERSION"
+            echo "   No files modified"
+            exit 0
+          fi
+
+          if [[ "$CHANGED" == "true" ]]; then
+            # Update package.json
+            npm version "$VERSION" --no-git-tag-version --allow-same-version
+
+            # Update Cargo.toml
+            sed -i '0,/^version = "[0-9]\+\.[0-9]\+\.[0-9]\+"/s//version = "'"$VERSION"'"/' src-tauri/Cargo.toml
+
+            # Update tauri.conf.json
+            node -e "
+              const fs = require('fs');
+              const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json', 'utf8'));
+              conf.version = '$VERSION';
+              fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2) + '\n');
+            "
+
+            echo ""
+            echo "✅ Updated versions:"
+            echo "   package.json:     $(node -p "require('./package.json').version")"
+            echo "   Cargo.toml:       $(grep -m1 '^version = ' src-tauri/Cargo.toml | sed 's/version = "\(.*\)"/\1/')"
+            echo "   tauri.conf.json:  $(node -p "require('./src-tauri/tauri.conf.json').version")"
+          fi
+
+      - name: Upload synced source
+        if: ${{ inputs.dry_run != true }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: synced-source
+          path: |
+            package.json
+            src-tauri/Cargo.toml
+            src-tauri/tauri.conf.json
+          retention-days: 1
+
   publish-tauri:
+    needs: sync-version
+    if: ${{ inputs.dry_run != true }}
     permissions:
       contents: write
     timeout-minutes: 45
@@ -32,6 +136,34 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Download synced version files
+        uses: actions/download-artifact@v5
+        with:
+          name: synced-source
+
+      - name: Apply synced version files
+        shell: bash
+        run: |
+          # The artifact preserves directory structure
+          if [ -f synced-source/package.json ]; then
+            cp synced-source/package.json ./package.json
+          fi
+          if [ -f synced-source/src-tauri/Cargo.toml ]; then
+            cp synced-source/src-tauri/Cargo.toml ./src-tauri/Cargo.toml
+          fi
+          if [ -f synced-source/src-tauri/tauri.conf.json ]; then
+            cp synced-source/src-tauri/tauri.conf.json ./src-tauri/tauri.conf.json
+          fi
+          # Also check if files are directly in artifact root (depends on upload structure)
+          if [ -f package.json ] && [ -f Cargo.toml ]; then
+            mv Cargo.toml src-tauri/Cargo.toml
+            mv tauri.conf.json src-tauri/tauri.conf.json 2>/dev/null || true
+          fi
+          echo "📋 Version files applied:"
+          echo "   package.json:     $(node -p "require('./package.json').version")"
+          echo "   Cargo.toml:       $(grep -m1 '^version = ' src-tauri/Cargo.toml | sed 's/version = \"\(.*\)\"/\1/')"
+          echo "   tauri.conf.json:  $(node -p "require('./src-tauri/tauri.conf.json').version")"
 
       - name: setup node
         uses: actions/setup-node@v6
@@ -64,16 +196,6 @@ jobs:
       - name: install frontend dependencies
         run: npm ci
 
-      - name: Extract clean version
-        id: extract_version
-        shell: bash
-        run: |
-          if [[ "${GITHUB_REF_NAME}" == v* ]]; then
-            echo "CLEAN_VERSION=${GITHUB_REF_NAME:1}" >> $GITHUB_OUTPUT
-          else
-            echo "CLEAN_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build & publish (tauri-action)
         id: tauri
         uses: tauri-apps/tauri-action@v0
@@ -81,20 +203,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          CLEAN_VERSION: ${{ steps.extract_version.outputs.CLEAN_VERSION }}
         with:
-          # ⬇️ Use the tag that triggered the workflow
-          tagName: ${{ github.ref_name }}               # e.g., v1.0.2
+          tagName: ${{ github.ref_name }}
           releaseName: "FMMLoader26 ${{ github.ref_name }}"
-          releaseBody: |
-            **Pick your installer (version ${{ env.CLEAN_VERSION }}):**
-            - macOS (Apple Silicon): `FMMLoader26_${{ env.CLEAN_VERSION }}_aarch64.dmg`
-            - macOS (Intel): `FMMLoader26_${{ env.CLEAN_VERSION }}_x86_64.dmg`
-            - Windows: `FMMLoader26_${{ env.CLEAN_VERSION }}_setup.exe`
-            - Linux (AppImage): `FMMLoader26_${{ env.CLEAN_VERSION }}.AppImage`
-
-            _Ignore the `*.tar.gz` / `*.sig` — used by the auto-updater._
-          releaseDraft: false          # set true if you want it to stay draft until you publish
+          releaseBody: "Building artifacts..."
+          releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
 
@@ -104,3 +217,49 @@ jobs:
         with:
           name: tauri-bundles-${{ matrix.platform }}-${{ github.ref_name }}
           path: ${{ steps.tauri.outputs.artifactPaths }}
+
+  finalize-release:
+    needs: publish-tauri
+    if: ${{ inputs.dry_run != true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Generate release notes and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+
+          # Get auto-generated release notes from GitHub
+          NOTES=$(gh api repos/${{ github.repository }}/releases/generate-notes \
+            -f tag_name="$TAG" \
+            --jq '.body')
+
+          # Append installation footer
+          FOOTER=$(cat <<'FOOTER_EOF'
+
+---
+
+### Installation
+
+Pick your installer:
+- **macOS (Apple Silicon):** `FMMLoader26_VERSION_aarch64.dmg`
+- **macOS (Intel):** `FMMLoader26_VERSION_x86_64.dmg`
+- **Windows:** `FMMLoader26_VERSION_setup.exe`
+- **Linux (AppImage):** `FMMLoader26_VERSION.AppImage`
+
+> *Ignore `*.tar.gz` / `*.sig` — used by the auto-updater.*
+FOOTER_EOF
+          )
+          # Replace VERSION placeholder
+          FOOTER="${FOOTER//VERSION/$VERSION}"
+
+          FULL_BODY="${NOTES}${FOOTER}"
+
+          # Update the release with notes and publish (undraft)
+          gh release edit "$TAG" \
+            --repo "${{ github.repository }}" \
+            --notes "$FULL_BODY" \
+            --draft=false
