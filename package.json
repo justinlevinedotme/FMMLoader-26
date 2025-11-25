@@ -2,7 +2,20 @@
   "name": "fmmloader26",
   "version": "1.1.0",
   "description": "A mod manager for Football Manager 2026",
+  "license": "GPL-3.0",
+  "author": "Justin Levine <justin@justinlevine.me> (https://justinlevine.me)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justinlevinedotme/FMMLoader-26.git"
+  },
+  "bugs": {
+    "url": "https://github.com/justinlevinedotme/FMMLoader-26/issues"
+  },
+  "homepage": "https://github.com/justinlevinedotme/FMMLoader-26#readme",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -36,9 +49,7 @@
     "@tauri-apps/plugin-shell": "^2.0.0",
     "@tauri-apps/plugin-updater": "^2.0.0",
     "class-variance-authority": "^0.7.1",
-    "claude": "^0.1.1",
     "clsx": "^2.1.1",
-    "jalco-repoai": "^1.0.3",
     "lucide-react": "^0.553.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

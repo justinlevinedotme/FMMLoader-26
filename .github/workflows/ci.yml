@@ -52,6 +52,9 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: Run frontend tests with coverage
+        run: npm run test:ui -- --run --coverage
+
       - name: Run ESLint
         run: npm run lint
 
