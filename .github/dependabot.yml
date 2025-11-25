@@ -4,16 +4,14 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
     labels:
       - "dependencies"
       - "javascript"
     groups:
-      dev-dependencies:
+      all-npm:
         patterns:
           - "*"
-        dependency-type: "development"
     commit-message:
       prefix: "chore(deps)"
 
@@ -21,11 +19,14 @@ updates:
   - package-ecosystem: "cargo"
     directory: "/src-tauri"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
     labels:
       - "dependencies"
       - "rust"
+    groups:
+      all-cargo:
+        patterns:
+          - "*"
     commit-message:
       prefix: "chore(deps)"
 
@@ -33,10 +34,13 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
     labels:
       - "dependencies"
       - "Type: Maintenance"
+    groups:
+      all-actions:
+        patterns:
+          - "*"
     commit-message:
       prefix: "chore(deps)"
