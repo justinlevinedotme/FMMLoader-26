@@ -1338,7 +1338,12 @@ function App() {
                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSettingsOpen(true)}
+                aria-label="Settings"
+              >
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
@@ -1714,7 +1719,7 @@ function App() {
 
                       <p className="text-xs text-muted-foreground mt-2">
                         You can download name fixes from the community or create your own. We
-                        reccomend fixes from our friends at SortItOutSI or FMScout
+                        recommend fixes from our friends at SortItOutSI or FMScout
                       </p>
                     </CardContent>
                   </Card>
