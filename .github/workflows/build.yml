@@ -45,10 +45,14 @@ jobs:
           if [[ "${{ inputs.dry_run }}" == "true" && -n "${{ inputs.test_version }}" ]]; then
             VERSION="${{ inputs.test_version }}"
             echo "::notice::DRY RUN: Testing with version $VERSION"
+          elif [[ "${{ inputs.test_build }}" == "true" ]]; then
+            # For test builds, use current package.json version
+            VERSION=$(node -p "require('./package.json').version")
+            echo "::notice::TEST BUILD: Using current version $VERSION"
           elif [[ "${GITHUB_REF_NAME}" == v* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            echo "::error::This workflow must be triggered by a version tag (v*) or with a test_version input for dry runs."
+            echo "::error::This workflow must be triggered by a version tag (v*) or with test_build enabled."
             echo "::error::Got ref: ${GITHUB_REF_NAME}"
             exit 1
           fi
