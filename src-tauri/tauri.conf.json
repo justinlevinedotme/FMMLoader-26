@@ -32,8 +32,8 @@
       "frameworks": [],
       "minimumSystemVersion": "",
       "exceptionDomain": "",
-      "signingIdentity": null,
-      "entitlements": null
+      "signingIdentity": "Developer ID Application: Justin Levine (B5K625NG2X)",
+      "entitlements": "entitlements.plist"
     },
     "linux": {
       "deb": {
