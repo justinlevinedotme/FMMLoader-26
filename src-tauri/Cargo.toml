@@ -34,6 +34,17 @@ tracing-appender = "0.2"
 hostname = "0.4"
 tokio = { version = "1", features = ["full"] }
 
+[[bin]]
+name = "fmmloader26"
+path = "src/main.rs"
+
+# Debug binary - only for local development, excluded from Tauri bundles
+[[bin]]
+name = "fmml_path_debug"
+path = "src/bin/fmml_path_debug.rs"
+required-features = ["__debug_only"]
+
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
+__debug_only = []  # Feature flag that's never enabled in production
