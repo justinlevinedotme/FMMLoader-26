@@ -226,13 +226,6 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions temp.keychain
           rm certificate.p12
 
-      - name: Clean stale debug binary from cache
-        run: |
-          # Remove any stale fmml_path_debug binary that might exist in cached target directory
-          find src-tauri/target -name "fmml_path_debug*" -type f -delete 2>/dev/null || true
-          # Also clean bundle directories to ensure fresh bundling
-          rm -rf src-tauri/target/*/release/bundle 2>/dev/null || true
-
       - name: Build (test mode - no release)
         if: inputs.test_build == true
         id: tauri_test
