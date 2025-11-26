@@ -37,7 +37,6 @@ tokio = { version = "1", features = ["full"] }
 [[bin]]
 name = "fmmloader26"
 path = "src/main.rs"
-path = "src/main.rs"
 
 [[bin]]
 name = "fmml_path_debug"
