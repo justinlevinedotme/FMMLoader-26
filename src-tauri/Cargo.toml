@@ -38,10 +38,11 @@ tokio = { version = "1", features = ["full"] }
 name = "fmmloader26"
 path = "src/main.rs"
 
-[[bin]]
-name = "fmml_path_debug"
-path = "src/bin/fmml_path_debug.rs"
-required-features = ["path-debug-cli"]
+# Debug binary removed from Cargo.toml to prevent Tauri bundler issues.
+# Tauri attempts to bundle all [[bin]] entries regardless of required-features.
+# To run the debug helper locally:
+#   cargo run --bin fmml_path_debug --features path-debug-cli -p fmmloader26
+# Or create a separate workspace member for the debug tool.
 
 [features]
 default = ["custom-protocol"]
