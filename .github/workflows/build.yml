@@ -222,8 +222,22 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions temp.keychain
           rm certificate.p12
 
-      - name: Build & publish (tauri-action)
-        id: tauri
+      - name: Build (test mode - no release)
+        if: inputs.test_build == true
+        id: tauri_test
+        uses: tauri-apps/tauri-action@v0
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          args: ${{ matrix.args }}
+
+      - name: Build & publish (release mode)
+        if: inputs.test_build != true
+        id: tauri_release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -233,10 +247,10 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
-          tagName: ${{ inputs.test_build == true && '' || github.ref_name }}
-          releaseName: ${{ inputs.test_build == true && '' || format('FMMLoader26 {0}', github.ref_name) }}
-          releaseBody: ${{ inputs.test_build == true && '' || 'Building artifacts...' }}
-          releaseDraft: ${{ inputs.test_build != true }}
+          tagName: ${{ github.ref_name }}
+          releaseName: "FMMLoader26 ${{ github.ref_name }}"
+          releaseBody: "Building artifacts..."
+          releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
 
@@ -244,8 +258,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v5
         with:
-          name: tauri-bundles-${{ matrix.platform }}-${{ github.ref_name }}
-          path: ${{ steps.tauri.outputs.artifactPaths }}
+          name: tauri-bundles-${{ matrix.platform }}-${{ inputs.test_build == true && 'test' || github.ref_name }}
+          path: ${{ inputs.test_build == true && steps.tauri_test.outputs.artifactPaths || steps.tauri_release.outputs.artifactPaths }}
 
   finalize-release:
     needs: publish-tauri
