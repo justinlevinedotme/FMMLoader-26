@@ -29,8 +29,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "format:fix": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
-    "prepare": "husky",
-    "test:paths": "FMML_TEST_APPDATA=.tmp/fmml-test-appdata cargo run --manifest-path src-tauri/Cargo.toml --bin fmml_path_debug -- --target-path .tmp/fmml-test-game --user-dir .tmp/fmml-test-user --mod-type bundle --mod-type ui --mod-type graphics --mod-type tactics --mod-type editor-data"
+    "prepare": "husky"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",

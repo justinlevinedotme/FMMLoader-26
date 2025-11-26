@@ -13,7 +13,7 @@ This project includes quick utilities to verify mod path resolution and open UI 
   - Prints the base target for each mod type and resolved paths for sample subpaths.
 - **Custom file overrides**: `npm run test:paths -- --file graphics/faces/face.png --file tactics/433.fmf`
   - Each `--file` is treated as a `target_subpath`; the script shows where it would land per mod type.
-- **Direct CLI**: `FMML_TEST_APPDATA=/tmp/fake cargo run --manifest-path src-tauri/Cargo.toml --bin fmml_path_debug -- --target-path /tmp/game --user-dir /tmp/user --mod-type graphics --file graphics/faces/foo.png`
+<!-- fmml_path_debug helper binary removed -->
   - No files are written; it only computes paths.
 
 ### UI Debug Playground
