@@ -134,7 +134,7 @@ jobs:
     if: inputs.dry_run != true && (github.event_name == 'push' || inputs.test_build == true)
     permissions:
       contents: write
-    timeout-minutes: 45
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
