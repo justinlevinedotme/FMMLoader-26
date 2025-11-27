@@ -44,5 +44,31 @@
     "createdBy": "FMMLoader26 v{version} | Yapan: JALCO / Justin Levine",
     "supportKofi": "Ko-Fi'da destekle",
     "joinDiscord": "Discord'a katıl"
+  },
+  "toolbar": {
+    "import": "İçe Aktar",
+    "conflicts": "Çakışmalar",
+    "restore": "Geri Yükle",
+    "refresh": "Yenile",
+    "tooltips": {
+      "import": "Yeni mod paketi içe aktar",
+      "conflicts": "Modlar arasındaki dosya çakışmalarını kontrol et",
+      "restore": "Önceki yedeğe geri dön",
+      "refresh": "Mod listesi ve durumunu yenile"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "Oyun Dizini:",
+      "tooltip": ".bundle dosyalarını içeren FM26 kurulum klasörü",
+      "placeholder": "Ayarlanmadı - Seç veya Oyunu Algıla'ya tıkla",
+      "detect": "Algıla"
+    },
+    "userDir": {
+      "label": "Kullanıcı Dizini:",
+      "tooltip": "Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini",
+      "placeholder": "Sistemden otomatik algılandı",
+      "detect": "Algıla"
+    }
   }
 }

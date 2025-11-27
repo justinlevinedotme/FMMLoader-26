@@ -44,5 +44,31 @@
     "createdBy": "FMMLoader26 v{version} | 제작: JALCO / Justin Levine",
     "supportKofi": "Ko-Fi에서 후원하기",
     "joinDiscord": "Discord 참여"
+  },
+  "toolbar": {
+    "import": "가져오기",
+    "conflicts": "충돌",
+    "restore": "복원",
+    "refresh": "새로고침",
+    "tooltips": {
+      "import": "새 모드 패키지 가져오기",
+      "conflicts": "모드 간 파일 충돌 확인",
+      "restore": "이전 백업으로 복원",
+      "refresh": "모드 목록 및 상태 새로고침"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "게임 디렉터리:",
+      "tooltip": ".bundle 파일이 있는 FM26 설치 폴더",
+      "placeholder": "설정되지 않음 - 선택 또는 게임 감지 클릭",
+      "detect": "감지"
+    },
+    "userDir": {
+      "label": "사용자 디렉터리:",
+      "tooltip": "저장 및 설정이 저장되는 FM26 사용자 디렉터리",
+      "placeholder": "시스템에서 자동 감지됨",
+      "detect": "감지"
+    }
   }
 }

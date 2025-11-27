@@ -176,3 +176,106 @@ footer:
     tr: Discord'a katıl
     pt-PT: Entrar no Discord
     de: Discord beitreten
+
+toolbar:
+  import:
+    en: Import
+    ko: 가져오기
+    tr: İçe Aktar
+    pt-PT: Importar
+    de: Importieren
+  conflicts:
+    en: Conflicts
+    ko: 충돌
+    tr: Çakışmalar
+    pt-PT: Conflitos
+    de: Konflikte
+  restore:
+    en: Restore
+    ko: 복원
+    tr: Geri Yükle
+    pt-PT: Restaurar
+    de: Wiederherstellen
+  refresh:
+    en: Refresh
+    ko: 새로고침
+    tr: Yenile
+    pt-PT: Atualizar
+    de: Aktualisieren
+  tooltips:
+    import:
+      en: Import a new mod package
+      ko: 새 모드 패키지 가져오기
+      tr: Yeni mod paketi içe aktar
+      pt-PT: Importar novo pacote de mod
+      de: Neues Mod-Paket importieren
+    conflicts:
+      en: Check for file conflicts between mods
+      ko: 모드 간 파일 충돌 확인
+      tr: Modlar arasındaki dosya çakışmalarını kontrol et
+      pt-PT: Verificar conflitos de ficheiros entre mods
+      de: Dateikonflikte zwischen Mods prüfen
+    restore:
+      en: Roll back to a previous backup
+      ko: 이전 백업으로 복원
+      tr: Önceki yedeğe geri dön
+      pt-PT: Reverter para um backup anterior
+      de: Auf ein vorheriges Backup zurücksetzen
+    refresh:
+      en: Reload mod list and state
+      ko: 모드 목록 및 상태 새로고침
+      tr: Mod listesi ve durumunu yenile
+      pt-PT: Recarregar lista e estado de mods
+      de: Modliste und Status neu laden
+
+paths:
+  gameDir:
+    label:
+      en: "Game Directory:"
+      ko: "게임 디렉터리:"
+      tr: "Oyun Dizini:"
+      pt-PT: "Diretório do Jogo:"
+      de: "Spielverzeichnis:"
+    tooltip:
+      en: The FM26 installation folder containing the .bundle files
+      ko: .bundle 파일이 있는 FM26 설치 폴더
+      tr: .bundle dosyalarını içeren FM26 kurulum klasörü
+      pt-PT: A pasta de instalação do FM26 com os ficheiros .bundle
+      de: Der FM26-Installationsordner mit den .bundle-Dateien
+    placeholder:
+      en: Not set - click Select or Detect Game
+      ko: 설정되지 않음 - 선택 또는 게임 감지 클릭
+      tr: Ayarlanmadı - Seç veya Oyunu Algıla'ya tıkla
+      pt-PT: Não definido - clique em Selecionar ou Detetar Jogo
+      de: Nicht gesetzt – auf Auswählen oder Spiel erkennen klicken
+    detect:
+      en: Detect
+      ko: 감지
+      tr: Algıla
+      pt-PT: Detetar
+      de: Erkennen
+  userDir:
+    label:
+      en: "User Directory:"
+      ko: "사용자 디렉터리:"
+      tr: "Kullanıcı Dizini:"
+      pt-PT: "Diretório do Utilizador:"
+      de: "Benutzerverzeichnis:"
+    tooltip:
+      en: The FM26 User Directory where saves and settings are stored
+      ko: 저장 및 설정이 저장되는 FM26 사용자 디렉터리
+      tr: Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini
+      pt-PT: Diretório do Utilizador do FM26 onde ficam saves e definições
+      de: Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen
+    placeholder:
+      en: Auto-detected from system
+      ko: 시스템에서 자동 감지됨
+      tr: Sistemden otomatik algılandı
+      pt-PT: Detetado automaticamente pelo sistema
+      de: Automatisch vom System erkannt
+    detect:
+      en: Detect
+      ko: 감지
+      tr: Algıla
+      pt-PT: Detetar
+      de: Erkennen

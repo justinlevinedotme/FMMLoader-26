@@ -44,5 +44,31 @@
     "createdBy": "FMMLoader26 v{version} | Created by JALCO / Justin Levine",
     "supportKofi": "Support on Ko-Fi",
     "joinDiscord": "Join Discord"
+  },
+  "toolbar": {
+    "import": "Import",
+    "conflicts": "Conflicts",
+    "restore": "Restore",
+    "refresh": "Refresh",
+    "tooltips": {
+      "import": "Import a new mod package",
+      "conflicts": "Check for file conflicts between mods",
+      "restore": "Roll back to a previous backup",
+      "refresh": "Reload mod list and state"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "Game Directory:",
+      "tooltip": "The FM26 installation folder containing the .bundle files",
+      "placeholder": "Not set - click Select or Detect Game",
+      "detect": "Detect"
+    },
+    "userDir": {
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
+    }
   }
 }

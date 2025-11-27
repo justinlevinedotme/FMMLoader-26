@@ -1274,24 +1274,12 @@ function App() {
   const TabsHeader = () => {
     const { t } = useI18n();
     return (
-      <div className="border-b px-4 pb-2">
-        <TabsList>
-          <TabsTrigger value="mods">
-            <FolderOpen className="mr-2 h-4 w-4" />
-            {t('nav.mods')}
-          </TabsTrigger>
-          <TabsTrigger value="graphics">
-            <History className="mr-2 h-4 w-4" />
-            {t('nav.graphics')}
-          </TabsTrigger>
-          <TabsTrigger value="namefix">
-            <Settings className="mr-2 h-4 w-4" />
-            {t('nav.nameFix')}
-          </TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings className="mr-2 h-4 w-4" />
-            {t('nav.settings')}
-          </TabsTrigger>
+      <div className="border-b px-4 pb-2 flex justify-center">
+        <TabsList className="mx-0 mt-0 gap-2">
+          <TabsTrigger value="mods">{t('nav.mods')}</TabsTrigger>
+          <TabsTrigger value="graphics">{t('nav.graphics')}</TabsTrigger>
+          <TabsTrigger value="namefix">{t('nav.nameFix')}</TabsTrigger>
+          <TabsTrigger value="settings">{t('nav.settings')}</TabsTrigger>
         </TabsList>
       </div>
     );
@@ -1352,11 +1340,11 @@ function App() {
                       disabled={loading}
                     >
                       <Upload className="mr-2 h-4 w-4" />
-                      Import
+                      {t('toolbar.import')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Import mod from ZIP, folder, or file</p>
+                    <p>{t('toolbar.tooltips.import')}</p>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
@@ -1368,11 +1356,11 @@ function App() {
                       disabled={loading || !config?.target_path}
                     >
                       <AlertTriangle className="mr-2 h-4 w-4" />
-                      Conflicts
+                      {t('toolbar.conflicts')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Check for file conflicts between mods</p>
+                    <p>{t('toolbar.tooltips.conflicts')}</p>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
@@ -1384,17 +1372,17 @@ function App() {
                       disabled={loading}
                     >
                       <History className="mr-2 h-4 w-4" />
-                      Restore
+                      {t('toolbar.restore')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Rollback to a previous backup</p>
+                    <p>{t('toolbar.tooltips.restore')}</p>
                   </TooltipContent>
                 </Tooltip>
 
                 <Button variant="outline" size="sm" onClick={loadMods} disabled={loading}>
                   <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
+                  {t('toolbar.refresh')}
                 </Button>
                 <Button
                   variant="outline"
@@ -1414,11 +1402,11 @@ function App() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        Game Directory:
+                        {t('paths.gameDir.label')}
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>The FM26 installation folder containing the .bundle files</p>
+                      <p>{t('paths.gameDir.tooltip')}</p>
                     </TooltipContent>
                   </Tooltip>
                   <input
@@ -1428,12 +1416,12 @@ function App() {
                     onBlur={saveGameTarget}
                     onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
                     className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    placeholder="Not set - click 'Select' or 'Detect Game'"
+                    placeholder={t('paths.gameDir.placeholder')}
                     disabled={loading}
                   />
                 </div>
                 <Button variant="outline" size="sm" onClick={detectGamePath} disabled={loading}>
-                  Detect
+                  {t('paths.gameDir.detect')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={selectGamePath} disabled={loading}>
                   <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
@@ -1445,11 +1433,11 @@ function App() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        User Directory:
+                        {t('paths.userDir.label')}
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>The FM26 User Directory where saves and settings are stored</p>
+                      <p>{t('paths.userDir.tooltip')}</p>
                     </TooltipContent>
                   </Tooltip>
                   <input
@@ -1459,7 +1447,7 @@ function App() {
                     onBlur={saveUserDirectory}
                     onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
                     className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    placeholder="Auto-detected from system"
+                    placeholder={t('paths.userDir.placeholder')}
                     disabled={loading}
                   />
                 </div>
@@ -1469,7 +1457,7 @@ function App() {
                   onClick={detectUserDirectory}
                   disabled={loading}
                 >
-                  Detect
+                  {t('paths.userDir.detect')}
                 </Button>
                 <Button
                   variant="outline"
