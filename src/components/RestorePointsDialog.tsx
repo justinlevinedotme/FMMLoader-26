@@ -29,7 +29,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { History, Undo2 } from 'lucide-react';
-import { tauriCommands, type RestorePoint } from '@/hooks/useTauri';
+import { tauriCommands } from '@/hooks/useTauri';
+import type { RestorePoint } from '@/types';
 
 interface RestorePointsDialogProps {
   open: boolean;

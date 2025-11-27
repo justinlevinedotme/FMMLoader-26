@@ -17,7 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { tauriCommands, type ModMetadata } from '@/hooks/useTauri';
+import { tauriCommands } from '@/hooks/useTauri';
+import type { ModMetadata } from '@/types';
 
 interface ModMetadataDialogProps {
   open: boolean;

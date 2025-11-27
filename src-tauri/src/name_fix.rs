@@ -1,5 +1,6 @@
 use crate::config::{get_app_data_dir, get_name_fixes_dir, load_config, save_config};
 use crate::types::{NameFixInstallType, NameFixSource, NameFixSourceType};
+use crate::utils;
 use reqwest::blocking::Client;
 use std::fs;
 use std::io::{Read, Write};
@@ -392,7 +393,7 @@ fn create_folder_backups(db_dir: &Path) -> Result<(), String> {
                 source_folder,
                 backup_folder
             );
-            copy_dir_recursive(&source_folder, &backup_folder)?;
+            utils::copy_dir_recursive(&source_folder, &backup_folder)?;
         } else {
             tracing::warn!("{} folder does not exist, skipping backup", folder_name);
         }
@@ -584,7 +585,7 @@ fn restore_folders_backup(db_dir: &Path, backup_dir: &Path) -> Result<(), String
                 backup_folder,
                 dest_folder
             );
-            copy_dir_recursive(&backup_folder, &dest_folder)?;
+            utils::copy_dir_recursive(&backup_folder, &dest_folder)?;
             restored_count += 1;
         } else {
             tracing::warn!("Backup {} folder not found", folder_name);
@@ -1212,7 +1213,7 @@ fn install_folders_type(
                 src_folder,
                 dest_folder
             );
-            copy_dir_recursive(&src_folder, &dest_folder)?;
+            utils::copy_dir_recursive(&src_folder, &dest_folder)?;
             installed_count += 1;
         }
     }
@@ -1255,30 +1256,6 @@ fn install_folders_type(
             }
         } else {
             tracing::warn!("User directory not set, skipping editor data installation");
-        }
-    }
-
-    Ok(())
-}
-
-/// Recursively copy a directory
-fn copy_dir_recursive(src: &Path, dest: &Path) -> Result<(), String> {
-    fs::create_dir_all(dest)
-        .map_err(|e| format!("Failed to create directory {:?}: {}", dest, e))?;
-
-    let entries =
-        fs::read_dir(src).map_err(|e| format!("Failed to read directory {:?}: {}", src, e))?;
-
-    for entry in entries.flatten() {
-        let src_path = entry.path();
-        let filename = entry.file_name();
-        let dest_path = dest.join(&filename);
-
-        if src_path.is_dir() {
-            copy_dir_recursive(&src_path, &dest_path)?;
-        } else {
-            fs::copy(&src_path, &dest_path)
-                .map_err(|e| format!("Failed to copy file {:?}: {}", src_path, e))?;
         }
     }
 

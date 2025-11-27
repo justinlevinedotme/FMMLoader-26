@@ -49,18 +49,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  tauriCommands,
-  type Config,
-  type ModManifest,
-  type ModMetadata,
-  type NameFixSource,
-  type ExtractionProgress,
-  type GraphicsPackMetadata,
-  type GraphicsPackAnalysis,
-  type GraphicsPackIssue,
-  type GraphicsConflictInfo,
-} from '@/hooks/useTauri';
+import { tauriCommands } from '@/hooks/useTauri';
+import type {
+  Config,
+  ModManifest,
+  ModMetadata,
+  NameFixSource,
+  ExtractionProgress,
+  GraphicsPackMetadata,
+  GraphicsPackAnalysis,
+  GraphicsPackIssue,
+  GraphicsConflictInfo,
+} from '@/types';
 import {
   FolderOpen,
   RefreshCw,
