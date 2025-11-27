@@ -1297,8 +1297,9 @@ function App() {
     );
   };
 
-  return (
-    <I18nProvider locale={locale} fallbackLocale="en" onLocaleChange={setLocale}>
+  const TranslatedUI = () => {
+    const { t } = useI18n();
+    return (
       <TooltipProvider>
         <div className="h-screen flex flex-col bg-background" data-locale-ready={localeReady}>
           {/* Custom TitleBar */}
@@ -2069,6 +2070,12 @@ function App() {
           </AlertDialog>
         </div>
       </TooltipProvider>
+    );
+  };
+
+  return (
+    <I18nProvider locale={locale} fallbackLocale="en" onLocaleChange={setLocale}>
+      <TranslatedUI />
     </I18nProvider>
   );
 }
