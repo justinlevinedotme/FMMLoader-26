@@ -70,5 +70,53 @@
       "placeholder": "Automatisch vom System erkannt",
       "detect": "Erkennen"
     }
+  },
+  "nameFix": {
+    "title": "Namensfix",
+    "subtitle": "FM-Namensfix verwalten",
+    "sectionTitle": "FM-Namensfix",
+    "sectionDescription": "Behebt Lizenzprobleme und schaltet echte Namen für Vereine, Spieler und Wettbewerbe frei",
+    "status": {
+      "checking": "Prüfe...",
+      "installed": "Installiert",
+      "notInstalled": "Nicht installiert"
+    },
+    "whatItDoes": {
+      "heading": "Was es macht:",
+      "bullets": [
+        "Schaltet echte Namen für Vereine wie AC Milan, Inter und Lazio frei",
+        "Korrigiert japanische Spielernamen",
+        "Entfernt gefälschte/lizenzlose Inhalte",
+        "Funktioniert in allen Ligen und Wettbewerben"
+      ]
+    },
+    "active": {
+      "heading": "Aktuell aktiv:",
+      "unknown": "Unbekannt"
+    },
+    "selectLabel": "Namensfix-Quelle wählen:",
+    "selectPlaceholder": "Wähle eine Namensfix-Quelle",
+    "activeSuffix": " - Aktiv",
+    "noSources": "Keine Namensfix-Quellen verfügbar. Importiere eine ZIP, um zu starten.",
+    "buttons": {
+      "install": "Installieren",
+      "reinstall": "Neu installieren",
+      "uninstall": "Aus Spiel entfernen",
+      "importZip": "Aus ZIP importieren",
+      "checkStatus": "Status prüfen",
+      "deleteSource": "Quelle löschen"
+    },
+    "warnings": {
+      "needGameDir": "Bitte zuerst das Spielverzeichnis festlegen"
+    },
+    "notes": {
+      "community": "Du kannst Namensfixes aus der Community laden oder eigene erstellen. Wir empfehlen Fixes von SortItOutSI oder FMScout."
+    },
+    "userDir": {
+      "label": "Benutzerverzeichnis:",
+      "tooltip": "Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen",
+      "placeholder": "Automatisch vom System erkannt",
+      "detect": "Erkennen"
+    }
   }
 }

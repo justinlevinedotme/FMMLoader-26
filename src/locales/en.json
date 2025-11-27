@@ -70,5 +70,53 @@
       "placeholder": "Auto-detected from system",
       "detect": "Detect"
     }
+  },
+  "nameFix": {
+    "title": "Name Fix",
+    "subtitle": "Manage FM Name Fix",
+    "sectionTitle": "FM Name Fix",
+    "sectionDescription": "Fixes licensing issues and unlocks real names for clubs, players, and competitions",
+    "status": {
+      "checking": "Checking...",
+      "installed": "Installed",
+      "notInstalled": "Not installed"
+    },
+    "whatItDoes": {
+      "heading": "What it does:",
+      "bullets": [
+        "Unlocks real names for clubs like AC Milan, Inter, and Lazio",
+        "Fixes Japanese player names",
+        "Removes fake/unlicensed content",
+        "Works with all leagues and competitions"
+      ]
+    },
+    "active": {
+      "heading": "Currently Active:",
+      "unknown": "Unknown"
+    },
+    "selectLabel": "Select Name Fix Source:",
+    "selectPlaceholder": "Select a name fix source",
+    "activeSuffix": " - Active",
+    "noSources": "No name fix sources available. Import a name fix ZIP file to get started.",
+    "buttons": {
+      "install": "Install",
+      "reinstall": "Reinstall",
+      "uninstall": "Uninstall from Game",
+      "importZip": "Import from ZIP",
+      "checkStatus": "Check Status",
+      "deleteSource": "Delete Source"
+    },
+    "warnings": {
+      "needGameDir": "Please set your Game Directory first"
+    },
+    "notes": {
+      "community": "You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout"
+    },
+    "userDir": {
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
+    }
   }
 }

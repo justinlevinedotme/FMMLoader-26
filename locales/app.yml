@@ -279,3 +279,189 @@ paths:
       tr: Algıla
       pt-PT: Detetar
       de: Erkennen
+
+nameFix:
+  title:
+    en: Name Fix
+    ko: 이름 수정
+    tr: İsim Düzeltme
+    pt-PT: Correção de Nomes
+    de: Namensfix
+  subtitle:
+    en: Manage FM Name Fix
+    ko: FM 이름 수정 관리
+    tr: FM İsim Düzeltmesini yönet
+    pt-PT: Gerir correção de nomes FM
+    de: FM-Namensfix verwalten
+  sectionTitle:
+    en: FM Name Fix
+    ko: FM 이름 수정
+    tr: FM İsim Düzeltme
+    pt-PT: Correção de nomes FM
+    de: FM-Namensfix
+  sectionDescription:
+    en: Fixes licensing issues and unlocks real names for clubs, players, and competitions
+    ko: 라이선스 문제를 해결하고 구단, 선수, 대회 이름을 실제 이름으로 표시합니다
+    tr: Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek isimlerini açar
+    pt-PT: Corrige licenças e ativa nomes reais para clubes, jogadores e competições
+    de: Behebt Lizenzprobleme und schaltet echte Namen für Vereine, Spieler und Wettbewerbe frei
+  status:
+    checking:
+      en: Checking...
+      ko: 확인 중...
+      tr: Kontrol ediliyor...
+      pt-PT: A verificar...
+      de: Prüfe...
+    installed:
+      en: Installed
+      ko: 설치됨
+      tr: Kurulu
+      pt-PT: Instalado
+      de: Installiert
+    notInstalled:
+      en: Not installed
+      ko: 미설치
+      tr: Kurulu değil
+      pt-PT: Não instalado
+      de: Nicht installiert
+  whatItDoes:
+    heading:
+      en: "What it does:"
+      ko: "기능:"
+      tr: "Ne yapar:"
+      pt-PT: "O que faz:"
+      de: "Was es macht:"
+    bullets:
+      - en: Unlocks real names for clubs like AC Milan, Inter, and Lazio
+        ko: AC 밀란, 인테르, 라치오 등 구단의 실제 이름을 표시
+        tr: AC Milan, Inter, Lazio gibi kulüplerin gerçek isimlerini açar
+        pt-PT: Desbloqueia nomes reais para clubes como AC Milan, Inter e Lazio
+        de: Schaltet echte Namen für Vereine wie AC Milan, Inter und Lazio frei
+      - en: Fixes Japanese player names
+        ko: 일본 선수 이름을 수정
+        tr: Japon oyuncu isimlerini düzeltir
+        pt-PT: Corrige nomes de jogadores japoneses
+        de: Korrigiert japanische Spielernamen
+      - en: Removes fake/unlicensed content
+        ko: 가짜/라이선스 없는 콘텐츠 제거
+        tr: Sahte/lisanssız içeriği kaldırır
+        pt-PT: Remove conteúdo falso/não licenciado
+        de: Entfernt gefälschte/lizenzlose Inhalte
+      - en: Works with all leagues and competitions
+        ko: 모든 리그 및 대회에서 작동
+        tr: Tüm lig ve turnuvalarda çalışır
+        pt-PT: Funciona com todas as ligas e competições
+        de: Funktioniert in allen Ligen und Wettbewerben
+  active:
+    heading:
+      en: "Currently Active:"
+      ko: "현재 활성:"
+      tr: "Şu an etkin:"
+      pt-PT: "Atualmente ativo:"
+      de: "Aktuell aktiv:"
+    unknown:
+      en: Unknown
+      ko: 알 수 없음
+      tr: Bilinmiyor
+      pt-PT: Desconhecido
+      de: Unbekannt
+  selectLabel:
+    en: "Select Name Fix Source:"
+    ko: "이름 수정 소스 선택:"
+    tr: "İsim düzeltme kaynağını seç:"
+    pt-PT: "Selecionar fonte de correção:"
+    de: "Namensfix-Quelle wählen:"
+  selectPlaceholder:
+    en: Select a name fix source
+    ko: 이름 수정 소스를 선택하세요
+    tr: Bir isim düzeltme kaynağı seçin
+    pt-PT: Selecione uma fonte de correção de nomes
+    de: Wähle eine Namensfix-Quelle
+  activeSuffix:
+    en: " - Active"
+    ko: " - 활성"
+    tr: " - Etkin"
+    pt-PT: " - Ativo"
+    de: " - Aktiv"
+  noSources:
+    en: No name fix sources available. Import a name fix ZIP file to get started.
+    ko: 사용할 이름 수정 소스가 없습니다. ZIP 파일을 가져와 시작하세요.
+    tr: İsim düzeltme kaynağı yok. Başlamak için bir ZIP içe aktarın.
+    pt-PT: Sem fontes de correção. Importe um ZIP para começar.
+    de: Keine Namensfix-Quellen verfügbar. Importiere eine ZIP, um zu starten.
+  buttons:
+    install:
+      en: Install
+      ko: 설치
+      tr: Yükle
+      pt-PT: Instalar
+      de: Installieren
+    reinstall:
+      en: Reinstall
+      ko: 재설치
+      tr: Yeniden Yükle
+      pt-PT: Reinstalar
+      de: Neu installieren
+    uninstall:
+      en: Uninstall from Game
+      ko: 게임에서 제거
+      tr: Oyundan Kaldır
+      pt-PT: Desinstalar do jogo
+      de: Aus Spiel entfernen
+    importZip:
+      en: Import from ZIP
+      ko: ZIP에서 가져오기
+      tr: ZIP'ten içe aktar
+      pt-PT: Importar de ZIP
+      de: Aus ZIP importieren
+    checkStatus:
+      en: Check Status
+      ko: 상태 확인
+      tr: Durumu Kontrol Et
+      pt-PT: Verificar estado
+      de: Status prüfen
+    deleteSource:
+      en: Delete Source
+      ko: 소스 삭제
+      tr: Kaynağı Sil
+      pt-PT: Apagar fonte
+      de: Quelle löschen
+  warnings:
+    needGameDir:
+      en: Please set your Game Directory first
+      ko: 먼저 게임 디렉터리를 설정하세요
+      tr: Önce Oyun Dizininizi ayarlayın
+      pt-PT: Defina primeiro o Diretório do Jogo
+      de: Bitte zuerst das Spielverzeichnis festlegen
+  notes:
+    community:
+      en: You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout
+      ko: 커뮤니티에서 이름 수정을 다운로드하거나 직접 만들 수 있습니다. SortItOutSI 또는 FMScout의 수정을 권장합니다.
+      tr: Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz. SortItOutSI veya FMScout düzeltmelerini öneririz.
+      pt-PT: Pode descarregar correções da comunidade ou criar as suas. Recomendamos as correções do SortItOutSI ou FMScout.
+      de: Du kannst Namensfixes aus der Community laden oder eigene erstellen. Wir empfehlen Fixes von SortItOutSI oder FMScout.
+  userDir:
+    label:
+      en: "User Directory:"
+      ko: "사용자 디렉터리:"
+      tr: "Kullanıcı Dizini:"
+      pt-PT: "Diretório do Utilizador:"
+      de: "Benutzerverzeichnis:"
+    tooltip:
+      en: The FM26 User Directory where saves and settings are stored
+      ko: 저장 및 설정이 저장되는 FM26 사용자 디렉터리
+      tr: Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini
+      pt-PT: Diretório do Utilizador do FM26 onde ficam saves e definições
+      de: Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen
+    placeholder:
+      en: Auto-detected from system
+      ko: 시스템에서 자동 감지됨
+      tr: Sistemden otomatik algılandı
+      pt-PT: Detetado automaticamente pelo sistema
+      de: Automatisch vom System erkannt
+    detect:
+      en: Detect
+      ko: 감지
+      tr: Algıla
+      pt-PT: Detetar
+      de: Erkennen

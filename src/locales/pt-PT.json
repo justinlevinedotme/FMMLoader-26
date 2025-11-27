@@ -70,5 +70,53 @@
       "placeholder": "Detetado automaticamente pelo sistema",
       "detect": "Detetar"
     }
+  },
+  "nameFix": {
+    "title": "Correção de Nomes",
+    "subtitle": "Gerir correção de nomes FM",
+    "sectionTitle": "Correção de nomes FM",
+    "sectionDescription": "Corrige licenças e ativa nomes reais para clubes, jogadores e competições",
+    "status": {
+      "checking": "A verificar...",
+      "installed": "Instalado",
+      "notInstalled": "Não instalado"
+    },
+    "whatItDoes": {
+      "heading": "O que faz:",
+      "bullets": [
+        "Desbloqueia nomes reais para clubes como AC Milan, Inter e Lazio",
+        "Corrige nomes de jogadores japoneses",
+        "Remove conteúdo falso/não licenciado",
+        "Funciona com todas as ligas e competições"
+      ]
+    },
+    "active": {
+      "heading": "Atualmente ativo:",
+      "unknown": "Desconhecido"
+    },
+    "selectLabel": "Selecionar fonte de correção:",
+    "selectPlaceholder": "Selecione uma fonte de correção de nomes",
+    "activeSuffix": " - Ativo",
+    "noSources": "Sem fontes de correção. Importe um ZIP para começar.",
+    "buttons": {
+      "install": "Instalar",
+      "reinstall": "Reinstalar",
+      "uninstall": "Desinstalar do jogo",
+      "importZip": "Importar de ZIP",
+      "checkStatus": "Verificar estado",
+      "deleteSource": "Apagar fonte"
+    },
+    "warnings": {
+      "needGameDir": "Defina primeiro o Diretório do Jogo"
+    },
+    "notes": {
+      "community": "Pode descarregar correções da comunidade ou criar as suas. Recomendamos as correções do SortItOutSI ou FMScout."
+    },
+    "userDir": {
+      "label": "Diretório do Utilizador:",
+      "tooltip": "Diretório do Utilizador do FM26 onde ficam saves e definições",
+      "placeholder": "Detetado automaticamente pelo sistema",
+      "detect": "Detetar"
+    }
   }
 }

@@ -30,19 +30,15 @@ const flattenLocales = (tree: YamlTree, locale: Locale): Bundle => {
       return node.map((item) => walk(item));
     }
     // If node is an object
+    const keys = Object.keys(node);
+    const isLocaleMap = keys.length > 0 && keys.every((k) => SUPPORTED.includes(k as Locale));
+    if (isLocaleMap) {
+      const map = node as Record<string, unknown>;
+      return map[locale];
+    }
     const obj: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(node)) {
-      if (
-        typeof v === 'object' &&
-        v !== null &&
-        !Array.isArray(v) &&
-        Object.prototype.hasOwnProperty.call(v, locale)
-      ) {
-        // Leaf locale map
-        obj[k] = (v as Record<string, unknown>)[locale];
-      } else {
-        obj[k] = walk(v as YamlNode);
-      }
+      obj[k] = walk(v as YamlNode);
     }
     return obj;
   };

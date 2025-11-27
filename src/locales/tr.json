@@ -70,5 +70,53 @@
       "placeholder": "Sistemden otomatik algılandı",
       "detect": "Algıla"
     }
+  },
+  "nameFix": {
+    "title": "İsim Düzeltme",
+    "subtitle": "FM İsim Düzeltmesini yönet",
+    "sectionTitle": "FM İsim Düzeltme",
+    "sectionDescription": "Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek isimlerini açar",
+    "status": {
+      "checking": "Kontrol ediliyor...",
+      "installed": "Kurulu",
+      "notInstalled": "Kurulu değil"
+    },
+    "whatItDoes": {
+      "heading": "Ne yapar:",
+      "bullets": [
+        "AC Milan, Inter, Lazio gibi kulüplerin gerçek isimlerini açar",
+        "Japon oyuncu isimlerini düzeltir",
+        "Sahte/lisanssız içeriği kaldırır",
+        "Tüm lig ve turnuvalarda çalışır"
+      ]
+    },
+    "active": {
+      "heading": "Şu an etkin:",
+      "unknown": "Bilinmiyor"
+    },
+    "selectLabel": "İsim düzeltme kaynağını seç:",
+    "selectPlaceholder": "Bir isim düzeltme kaynağı seçin",
+    "activeSuffix": " - Etkin",
+    "noSources": "İsim düzeltme kaynağı yok. Başlamak için bir ZIP içe aktarın.",
+    "buttons": {
+      "install": "Yükle",
+      "reinstall": "Yeniden Yükle",
+      "uninstall": "Oyundan Kaldır",
+      "importZip": "ZIP'ten içe aktar",
+      "checkStatus": "Durumu Kontrol Et",
+      "deleteSource": "Kaynağı Sil"
+    },
+    "warnings": {
+      "needGameDir": "Önce Oyun Dizininizi ayarlayın"
+    },
+    "notes": {
+      "community": "Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz. SortItOutSI veya FMScout düzeltmelerini öneririz."
+    },
+    "userDir": {
+      "label": "Kullanıcı Dizini:",
+      "tooltip": "Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini",
+      "placeholder": "Sistemden otomatik algılandı",
+      "detect": "Algıla"
+    }
   }
 }
