@@ -23,14 +23,7 @@
     },
     "language": {
       "title": "Language",
-      "description": "Choose your preferred language. Overrides system detection on restart.",
-      "options": {
-        "en": "English",
-        "ko": "영어",
-        "tr": "İngilizce",
-        "pt-PT": "Inglês",
-        "de": "Englisch"
-      }
+      "description": "Choose your preferred language. Overrides system detection on restart."
     }
   },
   "common": {

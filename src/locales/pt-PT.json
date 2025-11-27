@@ -23,14 +23,7 @@
     },
     "language": {
       "title": "Idioma",
-      "description": "Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.",
-      "options": {
-        "en": "Portuguese (Portugal)",
-        "ko": "포르투갈어(포르투갈)",
-        "tr": "Portekizce (Portekiz)",
-        "pt-PT": "Português (Portugal)",
-        "de": "Portugiesisch (Portugal)"
-      }
+      "description": "Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar."
     }
   },
   "common": {

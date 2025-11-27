@@ -23,14 +23,7 @@
     },
     "language": {
       "title": "Dil",
-      "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.",
-      "options": {
-        "en": "Turkish",
-        "ko": "터키어",
-        "tr": "Türkçe",
-        "pt-PT": "Turco",
-        "de": "Türkisch"
-      }
+      "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar."
     }
   },
   "common": {

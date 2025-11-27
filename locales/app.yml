@@ -102,37 +102,6 @@ settings:
       tr: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
       pt-PT: Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.
       de: Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.
-    options:
-      en:
-        en: English
-        ko: 영어
-        tr: İngilizce
-        pt-PT: Inglês
-        de: Englisch
-      ko:
-        en: Korean
-        ko: 한국어
-        tr: Korece
-        pt-PT: Coreano
-        de: Koreanisch
-      tr:
-        en: Turkish
-        ko: 터키어
-        tr: Türkçe
-        pt-PT: Turco
-        de: Türkisch
-      pt-PT:
-        en: Portuguese (Portugal)
-        ko: 포르투갈어(포르투갈)
-        tr: Portekizce (Portekiz)
-        pt-PT: Português (Portugal)
-        de: Portugiesisch (Portugal)
-      de:
-        en: German
-        ko: 독일어
-        tr: Almanca
-        pt-PT: Alemão
-        de: Deutsch
 
 common:
   open:

@@ -23,14 +23,7 @@
     },
     "language": {
       "title": "Sprache",
-      "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.",
-      "options": {
-        "en": "German",
-        "ko": "독일어",
-        "tr": "Almanca",
-        "pt-PT": "Alemão",
-        "de": "Deutsch"
-      }
+      "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
     }
   },
   "common": {
