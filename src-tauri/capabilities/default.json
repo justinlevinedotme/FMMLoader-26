@@ -28,7 +28,6 @@
     "process:allow-restart",
     "process:allow-exit",
     "core:window:allow-start-dragging",
-    "updater:default",
-    "macos-permissions:default"
+    "updater:default"
   ]
 }
