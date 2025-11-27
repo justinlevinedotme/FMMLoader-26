@@ -34,6 +34,13 @@ export function SettingsTab({
   onLocaleChange,
 }: SettingsTabProps) {
   const { t } = useI18n();
+  const localeOptions: { value: SupportedLocale; label: string }[] = [
+    { value: 'en', label: 'English' },
+    { value: 'ko', label: '한국어' },
+    { value: 'tr', label: 'Türkçe' },
+    { value: 'pt-PT', label: 'Português (Portugal)' },
+    { value: 'de', label: 'Deutsch' },
+  ];
 
   return (
     <Card className="h-full flex flex-col">
@@ -109,11 +116,11 @@ export function SettingsTab({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="en">{t('settings.language.options.en')}</SelectItem>
-              <SelectItem value="ko">{t('settings.language.options.ko')}</SelectItem>
-              <SelectItem value="tr">{t('settings.language.options.tr')}</SelectItem>
-              <SelectItem value="pt-PT">{t('settings.language.options.pt-PT')}</SelectItem>
-              <SelectItem value="de">{t('settings.language.options.de')}</SelectItem>
+              {localeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
