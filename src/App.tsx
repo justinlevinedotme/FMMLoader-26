@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { open as openUrl } from '@tauri-apps/plugin-shell';
 import { listen } from '@tauri-apps/api/event';
@@ -65,6 +65,12 @@ import { Toaster } from '@/components/ui/sonner';
 import { UpdateBanner } from '@/components/UpdateBanner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ModsTab, GraphicsTab, NameFixTab, SettingsTab, type ModWithInfo } from '@/components/tabs';
+import {
+  I18nProvider,
+  detectSystemLocale,
+  ensureSupportedLocale,
+  type SupportedLocale,
+} from '@/lib/i18n';
 
 type DebugUIProps = {
   metadataDialogOpen: boolean;
@@ -208,6 +214,9 @@ function App() {
   const [gameTargetInput, setGameTargetInput] = useState('');
   const [userDirInput, setUserDirInput] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [locale, setLocale] = useState<SupportedLocale>('en');
+  const [localeReady, setLocaleReady] = useState(false);
+  const localeInitialized = useRef(false);
 
   // Dialog states
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
@@ -253,6 +262,30 @@ function App() {
     setLogs((prev) => [`[${timestamp}] ${message}`, ...prev].slice(0, 100));
   };
 
+  const resolveAndApplyLocale = async (cfg: Config) => {
+    const configured = ensureSupportedLocale(cfg.language);
+    const detected = await detectSystemLocale();
+    const resolved = configured ?? ensureSupportedLocale(detected ?? undefined);
+    setLocale(resolved);
+    setLocaleReady(true);
+
+    if (!localeInitialized.current && cfg.language != resolved) {
+      const updatedConfig = { ...cfg, language: resolved };
+      try {
+        await tauriCommands.updateConfig(updatedConfig);
+        setConfig(updatedConfig);
+      } catch (error) {
+        // If persistence fails, keep runtime locale and log
+        addLog(`Error saving locale preference: ${formatError(error)}`);
+        setConfig(cfg);
+      }
+    } else {
+      setConfig(cfg);
+    }
+
+    localeInitialized.current = true;
+  };
+
   const runWithBlockingMessage = async <T,>(
     message: string,
     action: () => Promise<T>,
@@ -292,7 +325,6 @@ function App() {
   const loadConfig = async () => {
     try {
       const cfg = await tauriCommands.getConfig();
-      setConfig(cfg);
       setGameTargetInput(cfg.target_path ?? '');
       setUserDirInput(cfg.user_dir_path ?? '');
 
@@ -305,6 +337,7 @@ function App() {
         document.documentElement.classList.remove('dark');
       }
 
+      await resolveAndApplyLocale(cfg);
       addLog('Configuration loaded');
     } catch (error) {
       addLog(`Error loading config: ${formatError(error)}`);
@@ -1225,763 +1258,781 @@ function App() {
       : null;
 
   return (
-    <TooltipProvider>
-      <div className="h-screen flex flex-col bg-background">
-        {/* Custom TitleBar */}
-        <TitleBar />
+    <I18nProvider locale={locale} fallbackLocale="en" onLocaleChange={setLocale}>
+      <TooltipProvider>
+        <div className="h-screen flex flex-col bg-background" data-locale-ready={localeReady}>
+          {/* Custom TitleBar */}
+          <TitleBar />
 
-        {/* Update Banner */}
-        <UpdateBanner />
+          {/* Update Banner */}
+          <UpdateBanner />
 
-        {/* File Drop Zone - covers everything below titlebar */}
-        {/* This invisible overlay catches file drops without blocking interactions */}
-        <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
-          {/* Drag overlay visual feedback */}
-          {isDragging && (
-            <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary flex items-center justify-center z-40 pointer-events-none">
-              <div className="bg-background/95 p-8 rounded-lg shadow-lg">
-                <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
-                <p className="text-xl font-semibold">Drop mod file to import</p>
+          {/* File Drop Zone - covers everything below titlebar */}
+          {/* This invisible overlay catches file drops without blocking interactions */}
+          <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
+            {/* Drag overlay visual feedback */}
+            {isDragging && (
+              <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary flex items-center justify-center z-40 pointer-events-none">
+                <div className="bg-background/95 p-8 rounded-lg shadow-lg">
+                  <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
+                  <p className="text-xl font-semibold">Drop mod file to import</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Header */}
+          <div className="border-b pt-6">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <svg
+                  className="h-14 w-auto fill-foreground"
+                  viewBox="0 0 800 600"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M190.4,348.5l-5.3,24.4h60.4l-7.6,35.4h-60.2l-10.5,49.3h-48.9l31.4-147.4h118.4l-4,38.3h-73.7Z" />
+                  <path d="M264.1,457.5l31.4-147.4h53.7l20.6,62.8,45.3-62.8h58.3l-31.4,147.4h-47l17.3-82.5-55,72.9h-2.3l-26.5-72.6-17.5,82.3h-47Z" />
+                  <path d="M473.7,457.5l31.4-147.4h53.7l20.6,62.8,45.3-62.8h58.3l-31.4,147.4h-47l17.3-82.5-55,72.9h-2.3l-26.5-72.6-17.5,82.3h-47Z" />
+                  <path d="M117,559l18.1-85.1h28.2l-13.1,61.4h40.9l-7.2,23.7h-66.9Z" />
+                  <path d="M197.4,522.1c0-14.1,4.4-25.9,13.1-35.5,9.6-10.5,22.6-15.7,39.2-15.7,24.6,0,42.2,14.4,42.2,39.8s-4.4,25.9-13.1,35.4c-9.6,10.6-22.6,15.8-39.2,15.8-24.6,0-42.2-14.3-42.2-39.8h0ZM264.5,512.4c0-11.2-6.1-17.9-17.4-17.9s-22.4,12.4-22.4,25.8,6.1,18.1,17.4,18.1,22.4-12.7,22.4-26Z" />
+                  <path d="M288.2,559l43.9-85.1h46l7.7,85.1h-28.7l-1.3-16.5h-29.2l-8.4,16.5h-29.9,0ZM348.7,497l-12.6,25.7h18.9l-1.5-25.7h-4.7Z" />
+                  <path d="M395.6,559l18.1-85.1h32.5c30.3,0,45.4,11.9,45.4,35.6s-3.9,24.3-11.8,33.2c-9.6,10.8-24,16.3-42.9,16.3h-41.2,0ZM437.2,496.5l-8.5,39.9h10.2c15.1,0,24.3-10,24.3-24.8s-5.8-15.1-17.6-15.1h-8.4Z" />
+                  <path d="M537.3,495.9l-2.3,10.6h34.7l-4.1,19.1h-34.7l-2.4,11.4h46.2l-6.7,22h-72.2l18.1-85.1h70l-2.1,22h-44.5Z" />
+                  <path d="M670.9,559h-30.3l-11.8-21.5h-11.8l-4.6,21.5h-28.2l18.1-85.1h41.2c18.8,0,34.8,7,34.8,28.1s-7.5,27.2-22.5,32.1l15.1,24.9h0ZM638,516.4c7.3,0,12.5-4.6,12.5-12s-3.4-8.8-10.3-8.8h-14.3l-4.4,20.8h16.5Z" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleImportClick}
+                      disabled={loading}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Import
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Import mod from ZIP, folder, or file</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setConflictsDialogOpen(true)}
+                      disabled={loading || !config?.target_path}
+                    >
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      Conflicts
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Check for file conflicts between mods</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setRestoreDialogOpen(true)}
+                      disabled={loading}
+                    >
+                      <History className="mr-2 h-4 w-4" />
+                      Restore
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Rollback to a previous backup</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Button variant="outline" size="sm" onClick={loadMods} disabled={loading}>
+                  <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSettingsOpen(true)}
+                  aria-label="Settings"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Header */}
-        <div className="border-b pt-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
-              <svg
-                className="h-14 w-auto fill-foreground"
-                viewBox="0 0 800 600"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M190.4,348.5l-5.3,24.4h60.4l-7.6,35.4h-60.2l-10.5,49.3h-48.9l31.4-147.4h118.4l-4,38.3h-73.7Z" />
-                <path d="M264.1,457.5l31.4-147.4h53.7l20.6,62.8,45.3-62.8h58.3l-31.4,147.4h-47l17.3-82.5-55,72.9h-2.3l-26.5-72.6-17.5,82.3h-47Z" />
-                <path d="M473.7,457.5l31.4-147.4h53.7l20.6,62.8,45.3-62.8h58.3l-31.4,147.4h-47l17.3-82.5-55,72.9h-2.3l-26.5-72.6-17.5,82.3h-47Z" />
-                <path d="M117,559l18.1-85.1h28.2l-13.1,61.4h40.9l-7.2,23.7h-66.9Z" />
-                <path d="M197.4,522.1c0-14.1,4.4-25.9,13.1-35.5,9.6-10.5,22.6-15.7,39.2-15.7,24.6,0,42.2,14.4,42.2,39.8s-4.4,25.9-13.1,35.4c-9.6,10.6-22.6,15.8-39.2,15.8-24.6,0-42.2-14.3-42.2-39.8h0ZM264.5,512.4c0-11.2-6.1-17.9-17.4-17.9s-22.4,12.4-22.4,25.8,6.1,18.1,17.4,18.1,22.4-12.7,22.4-26Z" />
-                <path d="M288.2,559l43.9-85.1h46l7.7,85.1h-28.7l-1.3-16.5h-29.2l-8.4,16.5h-29.9,0ZM348.7,497l-12.6,25.7h18.9l-1.5-25.7h-4.7Z" />
-                <path d="M395.6,559l18.1-85.1h32.5c30.3,0,45.4,11.9,45.4,35.6s-3.9,24.3-11.8,33.2c-9.6,10.8-24,16.3-42.9,16.3h-41.2,0ZM437.2,496.5l-8.5,39.9h10.2c15.1,0,24.3-10,24.3-24.8s-5.8-15.1-17.6-15.1h-8.4Z" />
-                <path d="M537.3,495.9l-2.3,10.6h34.7l-4.1,19.1h-34.7l-2.4,11.4h46.2l-6.7,22h-72.2l18.1-85.1h70l-2.1,22h-44.5Z" />
-                <path d="M670.9,559h-30.3l-11.8-21.5h-11.8l-4.6,21.5h-28.2l18.1-85.1h41.2c18.8,0,34.8,7,34.8,28.1s-7.5,27.2-22.5,32.1l15.1,24.9h0ZM638,516.4c7.3,0,12.5-4.6,12.5-12s-3.4-8.8-10.3-8.8h-14.3l-4.4,20.8h16.5Z" />
-              </svg>
+            {/* Game Target and User Directory */}
+            <div className="px-4 pb-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        Game Directory:
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>The FM26 installation folder containing the .bundle files</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <input
+                    type="text"
+                    value={gameTargetInput}
+                    onChange={(e) => handleGameTargetChange(e.target.value)}
+                    onBlur={saveGameTarget}
+                    onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
+                    className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    placeholder="Not set - click 'Select' or 'Detect Game'"
+                    disabled={loading}
+                  />
+                </div>
+                <Button variant="outline" size="sm" onClick={detectGamePath} disabled={loading}>
+                  Detect
+                </Button>
+                <Button variant="outline" size="sm" onClick={selectGamePath} disabled={loading}>
+                  <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        User Directory:
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>The FM26 User Directory where saves and settings are stored</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <input
+                    type="text"
+                    value={userDirInput}
+                    onChange={(e) => handleUserDirChange(e.target.value)}
+                    onBlur={saveUserDirectory}
+                    onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
+                    className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    placeholder="Auto-detected from system"
+                    disabled={loading}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={detectUserDirectory}
+                  disabled={loading}
+                >
+                  Detect
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={selectUserDirectory}
+                  disabled={loading}
+                >
+                  <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleImportClick}
-                    disabled={loading}
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Import mod from ZIP, folder, or file</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setConflictsDialogOpen(true)}
-                    disabled={loading || !config?.target_path}
-                  >
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    Conflicts
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Check for file conflicts between mods</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setRestoreDialogOpen(true)}
-                    disabled={loading}
-                  >
-                    <History className="mr-2 h-4 w-4" />
-                    Restore
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Rollback to a previous backup</p>
-                </TooltipContent>
-              </Tooltip>
+          </div>
 
-              <Button variant="outline" size="sm" onClick={loadMods} disabled={loading}>
-                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
+          {import.meta.env.VITE_ENABLE_DEBUG_UI === 'true' && (
+            <div className="mx-4 mt-4">
+              <DebugUI
+                metadataDialogOpen={metadataDialogOpen}
+                conflictsDialogOpen={conflictsDialogOpen}
+                restoreDialogOpen={restoreDialogOpen}
+                settingsOpen={settingsOpen}
+                modDetailsOpen={modDetailsOpen}
+                setMetadataDialogOpen={setMetadataDialogOpen}
+                setConflictsDialogOpen={setConflictsDialogOpen}
+                setRestoreDialogOpen={setRestoreDialogOpen}
+                setSettingsOpen={setSettingsOpen}
+                setModDetailsOpen={setModDetailsOpen}
+                setSelectedMod={setSelectedMod}
+                setPendingGraphicsAnalysis={setPendingGraphicsAnalysis}
+                setPendingGraphicsPath={setPendingGraphicsPath}
+              />
+            </div>
+          )}
+
+          {/* Main Content */}
+          <div className="flex-1 overflow-hidden">
+            <Tabs defaultValue="mods" className="h-full flex flex-col">
+              <TabsList className="mx-4 mt-4">
+                <TabsTrigger value="mods">Mods</TabsTrigger>
+                <TabsTrigger value="graphics">Graphics</TabsTrigger>
+                <TabsTrigger value="namefix">Name Fix</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
+                <ModsTab
+                  mods={mods}
+                  config={config}
+                  loading={loading}
+                  onApplyMods={applyMods}
+                  onToggleMod={toggleMod}
+                  onSelectMod={(mod) => {
+                    setSelectedMod(mod);
+                    setModDetailsOpen(true);
+                  }}
+                  onDeleteMod={(modId) => setConfirmDeleteMod(modId)}
+                />
+              </TabsContent>
+
+              <TabsContent value="graphics" className="flex-1 overflow-hidden m-4 mt-2">
+                <GraphicsTab
+                  config={config}
+                  graphicsPacks={graphicsPacks}
+                  importingGraphics={importingGraphics}
+                  graphicsProgress={graphicsProgress}
+                  validatingGraphics={validatingGraphics}
+                  onImportGraphicsPack={handleImportGraphicsPack}
+                  onValidateGraphics={handleValidateGraphics}
+                />
+              </TabsContent>
+
+              <TabsContent value="namefix" className="flex-1 overflow-hidden m-4 mt-2">
+                <NameFixTab
+                  config={config}
+                  nameFixInstalled={nameFixInstalled}
+                  checkingNameFix={checkingNameFix}
+                  installingNameFix={installingNameFix}
+                  nameFixSources={nameFixSources}
+                  activeNameFixId={activeNameFixId}
+                  selectedNameFixId={selectedNameFixId}
+                  onSelectNameFix={setSelectedNameFixId}
+                  onInstall={installSelectedNameFix}
+                  onUninstall={uninstallNameFix}
+                  onImport={handleImportNameFix}
+                  onCheckStatus={checkNameFixStatus}
+                  onDeleteSource={(source) => setConfirmDeleteNameFix(source)}
+                />
+              </TabsContent>
+
+              <TabsContent value="settings" className="flex-1 overflow-hidden m-4 mt-2">
+                <SettingsTab
+                  darkMode={darkMode}
+                  onToggleDarkMode={toggleDarkMode}
+                  addLog={addLog}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* Footer */}
+          <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
+            <div className="text-xs text-muted-foreground font-medium">
+              FMMLoader26 v{appVersion} | Created by JALCO / Justin Levine
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openUrl('https://ko-fi.com/jalco')}
+                className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
+              >
+                <SiKofi className="mr-2 h-4 w-4" />
+                Support on Ko-Fi
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSettingsOpen(true)}
-                aria-label="Settings"
+                onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
+                className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
               >
-                <Settings className="h-4 w-4" />
+                <FaDiscord className="mr-2 h-4 w-4" />
+                Discord
               </Button>
             </div>
           </div>
 
-          {/* Game Target and User Directory */}
-          <div className="px-4 pb-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 flex-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">
-                      Game Directory:
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>The FM26 installation folder containing the .bundle files</p>
-                  </TooltipContent>
-                </Tooltip>
-                <input
-                  type="text"
-                  value={gameTargetInput}
-                  onChange={(e) => handleGameTargetChange(e.target.value)}
-                  onBlur={saveGameTarget}
-                  onKeyDown={(e) => e.key === 'Enter' && saveGameTarget()}
-                  className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  placeholder="Not set - click 'Select' or 'Detect Game'"
-                  disabled={loading}
-                />
-              </div>
-              <Button variant="outline" size="sm" onClick={detectGamePath} disabled={loading}>
-                Detect
-              </Button>
-              <Button variant="outline" size="sm" onClick={selectGamePath} disabled={loading}>
-                <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
-              </Button>
-            </div>
+          {/* Dialogs */}
+          <ModMetadataDialog
+            open={metadataDialogOpen}
+            onOpenChange={setMetadataDialogOpen}
+            sourcePath={pendingImportPath ?? ''}
+            onSubmit={handleMetadataSubmit}
+          />
 
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 flex-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">
-                      User Directory:
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>The FM26 User Directory where saves and settings are stored</p>
-                  </TooltipContent>
-                </Tooltip>
-                <input
-                  type="text"
-                  value={userDirInput}
-                  onChange={(e) => handleUserDirChange(e.target.value)}
-                  onBlur={saveUserDirectory}
-                  onKeyDown={(e) => e.key === 'Enter' && saveUserDirectory()}
-                  className="flex-1 px-2 py-1 text-sm font-mono bg-background rounded border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  placeholder="Auto-detected from system"
-                  disabled={loading}
-                />
-              </div>
-              <Button variant="outline" size="sm" onClick={detectUserDirectory} disabled={loading}>
-                Detect
-              </Button>
-              <Button variant="outline" size="sm" onClick={selectUserDirectory} disabled={loading}>
-                <FolderOpen className="h-4 w-4 text-foreground flex-shrink-0" />
-              </Button>
-            </div>
-          </div>
-        </div>
+          <ConflictsDialog
+            open={conflictsDialogOpen}
+            onOpenChange={setConflictsDialogOpen}
+            onDisableMod={handleConflictDisable}
+          />
 
-        {import.meta.env.VITE_ENABLE_DEBUG_UI === 'true' && (
-          <div className="mx-4 mt-4">
-            <DebugUI
-              metadataDialogOpen={metadataDialogOpen}
-              conflictsDialogOpen={conflictsDialogOpen}
-              restoreDialogOpen={restoreDialogOpen}
-              settingsOpen={settingsOpen}
-              modDetailsOpen={modDetailsOpen}
-              setMetadataDialogOpen={setMetadataDialogOpen}
-              setConflictsDialogOpen={setConflictsDialogOpen}
-              setRestoreDialogOpen={setRestoreDialogOpen}
-              setSettingsOpen={setSettingsOpen}
-              setModDetailsOpen={setModDetailsOpen}
-              setSelectedMod={setSelectedMod}
-              setPendingGraphicsAnalysis={setPendingGraphicsAnalysis}
-              setPendingGraphicsPath={setPendingGraphicsPath}
-            />
-          </div>
-        )}
+          <RestorePointsDialog
+            open={restoreDialogOpen}
+            onOpenChange={setRestoreDialogOpen}
+            onRestore={() => {
+              void loadMods();
+              addLog('Restored from backup');
+            }}
+          />
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
-          <Tabs defaultValue="mods" className="h-full flex flex-col">
-            <TabsList className="mx-4 mt-4">
-              <TabsTrigger value="mods">Mods</TabsTrigger>
-              <TabsTrigger value="graphics">Graphics</TabsTrigger>
-              <TabsTrigger value="namefix">Name Fix</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
+          {/* Graphics Pack Confirmation Dialog */}
+          <GraphicsPackConfirmDialog
+            key={
+              pendingGraphicsPath ??
+              pendingGraphicsAnalysis?.suggested_paths.join('|') ??
+              'graphics-dialog'
+            }
+            analysis={pendingGraphicsAnalysis}
+            onConfirm={handleGraphicsConfirm}
+            onCancel={handleGraphicsCancel}
+            userDirPath={config?.user_dir_path}
+          />
 
-            <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
-              <ModsTab
-                mods={mods}
-                config={config}
-                loading={loading}
-                onApplyMods={applyMods}
-                onToggleMod={toggleMod}
-                onSelectMod={(mod) => {
-                  setSelectedMod(mod);
-                  setModDetailsOpen(true);
-                }}
-                onDeleteMod={(modId) => setConfirmDeleteMod(modId)}
-              />
-            </TabsContent>
+          {/* Graphics Conflict Confirmation Dialog */}
+          <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  Confirm Overwrite
+                </DialogTitle>
+                <DialogDescription>
+                  Files exist in the target directory. This action may overwrite existing graphics.
+                </DialogDescription>
+              </DialogHeader>
 
-            <TabsContent value="graphics" className="flex-1 overflow-hidden m-4 mt-2">
-              <GraphicsTab
-                config={config}
-                graphicsPacks={graphicsPacks}
-                importingGraphics={importingGraphics}
-                graphicsProgress={graphicsProgress}
-                validatingGraphics={validatingGraphics}
-                onImportGraphicsPack={handleImportGraphicsPack}
-                onValidateGraphics={handleValidateGraphics}
-              />
-            </TabsContent>
+              {graphicsConflict && (
+                <div className="space-y-3 my-4">
+                  <div className="text-sm">
+                    <p className="mb-2">
+                      There are currently <strong>{graphicsConflict.existing_file_count}</strong>{' '}
+                      file(s) in:
+                    </p>
+                    <div className="bg-muted p-2 rounded text-muted-foreground font-mono text-xs">
+                      {graphicsConflict.target_directory}
+                    </div>
+                  </div>
 
-            <TabsContent value="namefix" className="flex-1 overflow-hidden m-4 mt-2">
-              <NameFixTab
-                config={config}
-                nameFixInstalled={nameFixInstalled}
-                checkingNameFix={checkingNameFix}
-                installingNameFix={installingNameFix}
-                nameFixSources={nameFixSources}
-                activeNameFixId={activeNameFixId}
-                selectedNameFixId={selectedNameFixId}
-                onSelectNameFix={setSelectedNameFixId}
-                onInstall={installSelectedNameFix}
-                onUninstall={uninstallNameFix}
-                onImport={handleImportNameFix}
-                onCheckStatus={checkNameFixStatus}
-                onDeleteSource={(source) => setConfirmDeleteNameFix(source)}
-              />
-            </TabsContent>
+                  <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
+                    <p className="text-sm text-amber-900 dark:text-amber-200">
+                      Installing <strong>{graphicsConflict.pack_name}</strong> may replace or merge
+                      with existing graphics files.
+                    </p>
+                  </div>
 
-            <TabsContent value="settings" className="flex-1 overflow-hidden m-4 mt-2">
-              <SettingsTab darkMode={darkMode} onToggleDarkMode={toggleDarkMode} addLog={addLog} />
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* Footer */}
-        <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
-          <div className="text-xs text-muted-foreground font-medium">
-            FMMLoader26 v{appVersion} | Created by JALCO / Justin Levine
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => openUrl('https://ko-fi.com/jalco')}
-              className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
-            >
-              <SiKofi className="mr-2 h-4 w-4" />
-              Support on Ko-Fi
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => openUrl('https://discord.gg/AspRvTTAch')}
-              className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
-            >
-              <FaDiscord className="mr-2 h-4 w-4" />
-              Discord
-            </Button>
-          </div>
-        </div>
-
-        {/* Dialogs */}
-        <ModMetadataDialog
-          open={metadataDialogOpen}
-          onOpenChange={setMetadataDialogOpen}
-          sourcePath={pendingImportPath ?? ''}
-          onSubmit={handleMetadataSubmit}
-        />
-
-        <ConflictsDialog
-          open={conflictsDialogOpen}
-          onOpenChange={setConflictsDialogOpen}
-          onDisableMod={handleConflictDisable}
-        />
-
-        <RestorePointsDialog
-          open={restoreDialogOpen}
-          onOpenChange={setRestoreDialogOpen}
-          onRestore={() => {
-            void loadMods();
-            addLog('Restored from backup');
-          }}
-        />
-
-        {/* Graphics Pack Confirmation Dialog */}
-        <GraphicsPackConfirmDialog
-          key={
-            pendingGraphicsPath ??
-            pendingGraphicsAnalysis?.suggested_paths.join('|') ??
-            'graphics-dialog'
-          }
-          analysis={pendingGraphicsAnalysis}
-          onConfirm={handleGraphicsConfirm}
-          onCancel={handleGraphicsCancel}
-          userDirPath={config?.user_dir_path}
-        />
-
-        {/* Graphics Conflict Confirmation Dialog */}
-        <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                Confirm Overwrite
-              </DialogTitle>
-              <DialogDescription>
-                Files exist in the target directory. This action may overwrite existing graphics.
-              </DialogDescription>
-            </DialogHeader>
-
-            {graphicsConflict && (
-              <div className="space-y-3 my-4">
-                <div className="text-sm">
-                  <p className="mb-2">
-                    There are currently <strong>{graphicsConflict.existing_file_count}</strong>{' '}
-                    file(s) in:
+                  <p className="text-sm text-muted-foreground">
+                    Are you sure you want to continue?
                   </p>
-                  <div className="bg-muted p-2 rounded text-muted-foreground font-mono text-xs">
-                    {graphicsConflict.target_directory}
+                </div>
+              )}
+
+              <DialogFooter>
+                <Button variant="outline" onClick={handleConflictCancel}>
+                  Cancel
+                </Button>
+                <Button onClick={handleConflictConfirm} variant="default">
+                  Continue Installation
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Graphics Validation Dialog */}
+          <Dialog open={showValidationDialog} onOpenChange={setShowValidationDialog}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Graphics Pack Validation Results</DialogTitle>
+                <DialogDescription>
+                  Found {graphicsIssues.length} pack(s) that may need to be moved
+                </DialogDescription>
+              </DialogHeader>
+
+              {migrationProgress && (
+                <div className="text-sm bg-muted p-3 rounded-md space-y-2 mb-4">
+                  <div className="flex justify-between">
+                    <strong>Migration Progress:</strong>
+                    <span>
+                      {Math.round((migrationProgress.current / migrationProgress.total) * 100)}%
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {migrationProgress.current} / {migrationProgress.total} files
+                  </div>
+                  <div className="w-full bg-secondary rounded-full h-2">
+                    <div
+                      className="bg-primary h-2 rounded-full transition-all"
+                      style={{
+                        width: `${(migrationProgress.current / migrationProgress.total) * 100}%`,
+                      }}
+                    />
                   </div>
                 </div>
+              )}
 
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
-                  <p className="text-sm text-amber-900 dark:text-amber-200">
-                    Installing <strong>{graphicsConflict.pack_name}</strong> may replace or merge
-                    with existing graphics files.
-                  </p>
-                </div>
-
-                <p className="text-sm text-muted-foreground">Are you sure you want to continue?</p>
-              </div>
-            )}
-
-            <DialogFooter>
-              <Button variant="outline" onClick={handleConflictCancel}>
-                Cancel
-              </Button>
-              <Button onClick={handleConflictConfirm} variant="default">
-                Continue Installation
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Graphics Validation Dialog */}
-        <Dialog open={showValidationDialog} onOpenChange={setShowValidationDialog}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Graphics Pack Validation Results</DialogTitle>
-              <DialogDescription>
-                Found {graphicsIssues.length} pack(s) that may need to be moved
-              </DialogDescription>
-            </DialogHeader>
-
-            {migrationProgress && (
-              <div className="text-sm bg-muted p-3 rounded-md space-y-2 mb-4">
-                <div className="flex justify-between">
-                  <strong>Migration Progress:</strong>
-                  <span>
-                    {Math.round((migrationProgress.current / migrationProgress.total) * 100)}%
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {migrationProgress.current} / {migrationProgress.total} files
-                </div>
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all"
-                    style={{
-                      width: `${(migrationProgress.current / migrationProgress.total) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-4 my-4">
-              {graphicsIssues.map((issue, index) => (
-                <Card key={index} className="border-amber-200 dark:border-amber-800">
-                  <CardContent className="pt-4">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
-                        <div className="flex-1">
-                          <div className="font-semibold">{issue.pack_name}</div>
-                          <div className="text-sm text-muted-foreground mt-1">{issue.reason}</div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 text-sm bg-muted p-3 rounded">
-                        <div>
-                          <div className="font-medium">Current:</div>
-                          <div className="text-muted-foreground">{issue.current_path}</div>
-                        </div>
-                        <div>
-                          <div className="font-medium">Suggested:</div>
-                          <div className="text-green-600 dark:text-green-400">
-                            {issue.suggested_path}
+              <div className="space-y-4 my-4">
+                {graphicsIssues.map((issue, index) => (
+                  <Card key={index} className="border-amber-200 dark:border-amber-800">
+                    <CardContent className="pt-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+                          <div className="flex-1">
+                            <div className="font-semibold">{issue.pack_name}</div>
+                            <div className="text-sm text-muted-foreground mt-1">{issue.reason}</div>
                           </div>
                         </div>
+
+                        <div className="grid grid-cols-2 gap-3 text-sm bg-muted p-3 rounded">
+                          <div>
+                            <div className="font-medium">Current:</div>
+                            <div className="text-muted-foreground">{issue.current_path}</div>
+                          </div>
+                          <div>
+                            <div className="font-medium">Suggested:</div>
+                            <div className="text-green-600 dark:text-green-400">
+                              {issue.suggested_path}
+                            </div>
+                          </div>
+                        </div>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            void handleMigrateGraphicsPack(issue.pack_name, issue.pack_type)
+                          }
+                          disabled={migratingPack}
+                          className="w-full"
+                        >
+                          {migratingPack ? (
+                            <>
+                              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                              Moving...
+                            </>
+                          ) : (
+                            'Move to Correct Location'
+                          )}
+                        </Button>
                       </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          void handleMigrateGraphicsPack(issue.pack_name, issue.pack_type)
-                        }
-                        disabled={migratingPack}
-                        className="w-full"
-                      >
-                        {migratingPack ? (
-                          <>
-                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                            Moving...
-                          </>
-                        ) : (
-                          'Move to Correct Location'
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowValidationDialog(false)}
-                disabled={migratingPack}
-              >
-                Close
-              </Button>
-              {graphicsIssues.length > 0 && (
-                <Button onClick={() => void handleMigrateAll()} disabled={migratingPack}>
-                  Fix All ({graphicsIssues.length})
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowValidationDialog(false)}
+                  disabled={migratingPack}
+                >
+                  Close
                 </Button>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Mod Details Sheet */}
-        <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
-          <SheetContent className="w-[400px] sm:w-[540px]">
-            <SheetHeader>
-              <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
-              <SheetDescription>
-                {selectedMod ? `Version ${selectedMod.version}` : 'Select a mod to view details'}
-              </SheetDescription>
-            </SheetHeader>
-            {selectedMod && (
-              <div className="mt-6 space-y-4">
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-sm font-medium">Author:</span>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedMod.author || 'Unknown'}
-                    </p>
-                  </div>
-
-                  <div>
-                    <span className="text-sm font-medium">Type:</span>
-                    <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
-                  </div>
-
-                  <div>
-                    <span className="text-sm font-medium">Description:</span>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedMod.description || 'No description available'}
-                    </p>
-                  </div>
-
-                  {selectedMod.license && (
-                    <div>
-                      <span className="text-sm font-medium">License:</span>
-                      <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
-                    </div>
-                  )}
-
-                  {selectedMod.files && selectedMod.files.length > 0 && (
-                    <div>
-                      <span className="text-sm font-medium">
-                        Files ({selectedMod.files.length}):
-                      </span>
-                      <ul className="text-sm text-muted-foreground list-disc list-inside max-h-60 overflow-y-auto">
-                        {selectedMod.files.map((file, i) => (
-                          <li key={i} className="truncate">
-                            {file.source}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 space-y-2">
-                  <Button
-                    className="w-full"
-                    variant={selectedMod.enabled ? 'destructive' : 'default'}
-                    onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
-                  >
-                    {selectedMod.enabled ? 'Disable Mod' : 'Enable Mod'}
+                {graphicsIssues.length > 0 && (
+                  <Button onClick={() => void handleMigrateAll()} disabled={migratingPack}>
+                    Fix All ({graphicsIssues.length})
                   </Button>
-                  <Button
-                    className="w-full"
-                    variant="outline"
-                    onClick={() => setConfirmDeleteMod(selectedMod.id)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Remove Mod
-                  </Button>
-                </div>
-              </div>
-            )}
-          </SheetContent>
-        </Sheet>
-
-        {/* Settings Sheet */}
-        <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Settings</SheetTitle>
-              <SheetDescription>Configure FMMLoader26 preferences</SheetDescription>
-            </SheetHeader>
-            <div className="mt-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <div className="text-sm font-medium">Dark Mode</div>
-                  <div className="text-sm text-muted-foreground">Toggle dark mode theme</div>
-                </div>
-                <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Application Logs</div>
-                  <div className="text-sm text-muted-foreground">
-                    View application logs for troubleshooting. Logs from the last 10 sessions are
-                    kept.
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full mt-2"
-                    onClick={async () => {
-                      try {
-                        await tauriCommands.openLogsFolder();
-                        addLog('Opened logs folder');
-                      } catch (error) {
-                        addLog(`Failed to open logs folder: ${formatError(error)}`);
-                      }
-                    }}
-                  >
-                    <FolderOpen className="mr-2 h-4 w-4" />
-                    Open Logs Folder
-                  </Button>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Mods Storage</div>
-                  <div className="text-sm text-muted-foreground">
-                    View the folder where imported mods are stored. This is where mods are placed
-                    after import.
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full mt-2"
-                    onClick={async () => {
-                      try {
-                        await tauriCommands.openModsFolder();
-                        addLog('Opened mods folder');
-                      } catch (error) {
-                        addLog(`Failed to open mods folder: ${formatError(error)}`);
-                      }
-                    }}
-                  >
-                    <FolderOpen className="mr-2 h-4 w-4" />
-                    Open Mods Folder
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-
-        {/* Keep graphics pack progress visible; only show blocker for mod-oriented flows */}
-        {blockingMessage && !importingGraphics && !graphicsProgress && (
-          <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/70 p-6 text-center backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-6">
-              <div
-                className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary"
-                aria-hidden="true"
-              />
-              <div className="space-y-2">
-                <p className="text-xl font-semibold">{blockingMessage}</p>
-                <p className="text-sm text-muted-foreground">
-                  Large imports can take a moment. Keep the window open until it finishes.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Graphics pack overlay with inline progress (replaces repeated toasts) */}
-        {(importingGraphics || graphicsProgress) && (
-          <div className="fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-4 bg-background/70 p-6 text-center backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-6">
-              <div
-                className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary"
-                aria-hidden="true"
-              />
-              <div className="space-y-2">
-                <p className="text-xl font-semibold">
-                  {graphicsPhaseLabel ?? 'Processing graphics pack'}
-                  {graphicsPercent !== null ? ` • ${graphicsPercent}%` : ''}
-                </p>
-                {graphicsProgress && (
-                  <p className="text-sm text-muted-foreground">
-                    {graphicsProgress.current} / {graphicsProgress.total} files
-                  </p>
                 )}
-                <p className="text-sm text-muted-foreground">
-                  Large graphics packs can take a few minutes. Keep the window open until it
-                  finishes.
-                </p>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Mod Details Sheet */}
+          <Sheet open={modDetailsOpen} onOpenChange={setModDetailsOpen}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>{selectedMod?.name ?? 'Mod Details'}</SheetTitle>
+                <SheetDescription>
+                  {selectedMod ? `Version ${selectedMod.version}` : 'Select a mod to view details'}
+                </SheetDescription>
+              </SheetHeader>
+              {selectedMod && (
+                <div className="mt-6 space-y-4">
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-sm font-medium">Author:</span>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedMod.author || 'Unknown'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span className="text-sm font-medium">Type:</span>
+                      <p className="text-sm text-muted-foreground">{selectedMod.mod_type}</p>
+                    </div>
+
+                    <div>
+                      <span className="text-sm font-medium">Description:</span>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedMod.description || 'No description available'}
+                      </p>
+                    </div>
+
+                    {selectedMod.license && (
+                      <div>
+                        <span className="text-sm font-medium">License:</span>
+                        <p className="text-sm text-muted-foreground">{selectedMod.license}</p>
+                      </div>
+                    )}
+
+                    {selectedMod.files && selectedMod.files.length > 0 && (
+                      <div>
+                        <span className="text-sm font-medium">
+                          Files ({selectedMod.files.length}):
+                        </span>
+                        <ul className="text-sm text-muted-foreground list-disc list-inside max-h-60 overflow-y-auto">
+                          {selectedMod.files.map((file, i) => (
+                            <li key={i} className="truncate">
+                              {file.source}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-4 space-y-2">
+                    <Button
+                      className="w-full"
+                      variant={selectedMod.enabled ? 'destructive' : 'default'}
+                      onClick={() => toggleMod(selectedMod.id, !selectedMod.enabled)}
+                    >
+                      {selectedMod.enabled ? 'Disable Mod' : 'Enable Mod'}
+                    </Button>
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      onClick={() => setConfirmDeleteMod(selectedMod.id)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Remove Mod
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </SheetContent>
+          </Sheet>
+
+          {/* Settings Sheet */}
+          <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Settings</SheetTitle>
+                <SheetDescription>Configure FMMLoader26 preferences</SheetDescription>
+              </SheetHeader>
+              <div className="mt-6 space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium">Dark Mode</div>
+                    <div className="text-sm text-muted-foreground">Toggle dark mode theme</div>
+                  </div>
+                  <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Application Logs</div>
+                    <div className="text-sm text-muted-foreground">
+                      View application logs for troubleshooting. Logs from the last 10 sessions are
+                      kept.
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={async () => {
+                        try {
+                          await tauriCommands.openLogsFolder();
+                          addLog('Opened logs folder');
+                        } catch (error) {
+                          addLog(`Failed to open logs folder: ${formatError(error)}`);
+                        }
+                      }}
+                    >
+                      <FolderOpen className="mr-2 h-4 w-4" />
+                      Open Logs Folder
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Mods Storage</div>
+                    <div className="text-sm text-muted-foreground">
+                      View the folder where imported mods are stored. This is where mods are placed
+                      after import.
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={async () => {
+                        try {
+                          await tauriCommands.openModsFolder();
+                          addLog('Opened mods folder');
+                        } catch (error) {
+                          addLog(`Failed to open mods folder: ${formatError(error)}`);
+                        }
+                      }}
+                    >
+                      <FolderOpen className="mr-2 h-4 w-4" />
+                      Open Mods Folder
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Keep graphics pack progress visible; only show blocker for mod-oriented flows */}
+          {blockingMessage && !importingGraphics && !graphicsProgress && (
+            <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/70 p-6 text-center backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-6">
+                <div
+                  className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary"
+                  aria-hidden="true"
+                />
+                <div className="space-y-2">
+                  <p className="text-xl font-semibold">{blockingMessage}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Large imports can take a moment. Keep the window open until it finishes.
+                  </p>
+                </div>
               </div>
             </div>
-            {graphicsPercent !== null && (
-              <div className="w-80 max-w-[90vw]">
-                <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all"
-                    style={{ width: `${graphicsPercent}%` }}
+          )}
+
+          {/* Graphics pack overlay with inline progress (replaces repeated toasts) */}
+          {(importingGraphics || graphicsProgress) && (
+            <div className="fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-4 bg-background/70 p-6 text-center backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-6">
+                <div
+                  className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary"
+                  aria-hidden="true"
+                />
+                <div className="space-y-2">
+                  <p className="text-xl font-semibold">
+                    {graphicsPhaseLabel ?? 'Processing graphics pack'}
+                    {graphicsPercent !== null ? ` • ${graphicsPercent}%` : ''}
+                  </p>
+                  {graphicsProgress && (
+                    <p className="text-sm text-muted-foreground">
+                      {graphicsProgress.current} / {graphicsProgress.total} files
+                    </p>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Large graphics packs can take a few minutes. Keep the window open until it
+                    finishes.
+                  </p>
+                </div>
+              </div>
+              {graphicsPercent !== null && (
+                <div className="w-80 max-w-[90vw]">
+                  <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-primary h-2 rounded-full transition-all"
+                      style={{ width: `${graphicsPercent}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <Toaster />
+
+          {/* Import Name Fix Dialog */}
+          <Dialog open={importNameFixDialogOpen} onOpenChange={setImportNameFixDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Import Name Fix</DialogTitle>
+                <DialogDescription>Enter a name for this name fix package</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="namefix-name">Name</Label>
+                  <Input
+                    id="namefix-name"
+                    value={importNameFixName}
+                    onChange={(e) => setImportNameFixName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        void confirmImportNameFix();
+                      }
+                    }}
+                    placeholder="e.g., Real Names Fix v1.0"
+                    autoFocus
                   />
                 </div>
               </div>
-            )}
-          </div>
-        )}
-        <Toaster />
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setImportNameFixDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => void confirmImportNameFix()}>Import</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-        {/* Import Name Fix Dialog */}
-        <Dialog open={importNameFixDialogOpen} onOpenChange={setImportNameFixDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Import Name Fix</DialogTitle>
-              <DialogDescription>Enter a name for this name fix package</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="namefix-name">Name</Label>
-                <Input
-                  id="namefix-name"
-                  value={importNameFixName}
-                  onChange={(e) => setImportNameFixName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      void confirmImportNameFix();
+          {/* Delete Mod Confirmation Dialog */}
+          <AlertDialog
+            open={confirmDeleteMod !== null}
+            onOpenChange={(open) => !open && setConfirmDeleteMod(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Mod?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently remove the mod "
+                  {mods.find((m) => m.id === confirmDeleteMod)?.name || confirmDeleteMod}" from your
+                  library. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    if (confirmDeleteMod) {
+                      void removeMod(confirmDeleteMod);
                     }
+                    setConfirmDeleteMod(null);
                   }}
-                  placeholder="e.g., Real Names Fix v1.0"
-                  autoFocus
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setImportNameFixDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => void confirmImportNameFix()}>Import</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-        {/* Delete Mod Confirmation Dialog */}
-        <AlertDialog
-          open={confirmDeleteMod !== null}
-          onOpenChange={(open) => !open && setConfirmDeleteMod(null)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Mod?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently remove the mod "
-                {mods.find((m) => m.id === confirmDeleteMod)?.name || confirmDeleteMod}" from your
-                library. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  if (confirmDeleteMod) {
-                    void removeMod(confirmDeleteMod);
-                  }
-                  setConfirmDeleteMod(null);
-                }}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Delete Name Fix Confirmation Dialog */}
-        <AlertDialog
-          open={confirmDeleteNameFix !== null}
-          onOpenChange={(open) => !open && setConfirmDeleteNameFix(null)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Name Fix Source?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently remove "{confirmDeleteNameFix?.name}" from your available name
-                fix sources. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  if (confirmDeleteNameFix) {
-                    void handleDeleteNameFix(confirmDeleteNameFix);
-                  }
-                  setConfirmDeleteNameFix(null);
-                }}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </TooltipProvider>
+          {/* Delete Name Fix Confirmation Dialog */}
+          <AlertDialog
+            open={confirmDeleteNameFix !== null}
+            onOpenChange={(open) => !open && setConfirmDeleteNameFix(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Name Fix Source?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently remove "{confirmDeleteNameFix?.name}" from your available
+                  name fix sources. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    if (confirmDeleteNameFix) {
+                      void handleDeleteNameFix(confirmDeleteNameFix);
+                    }
+                    setConfirmDeleteNameFix(null);
+                  }}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </TooltipProvider>
+    </I18nProvider>
   );
 }
 

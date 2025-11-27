@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "FMMLoader26"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "description": "Design- und Speicheroptionen",
+    "darkMode": "Dunkelmodus",
+    "darkModeDescription": "Dunkles Design für das App-Fenster umschalten.",
+    "logs": {
+      "title": "Anwendungsprotokolle",
+      "description": "Öffnet den Ordner, in dem aktuelle Logs gespeichert sind.",
+      "open": "Log-Ordner öffnen"
+    },
+    "modsStorage": {
+      "title": "Mods-Speicher",
+      "description": "Öffnet den Ordner, in dem importierte Mods gespeichert sind.",
+      "open": "Mods-Ordner öffnen"
+    },
+    "language": {
+      "title": "Sprache",
+      "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
+    }
+  },
+  "common": {
+    "open": "Öffnen",
+    "close": "Schließen",
+    "language": "Sprache",
+    "apply": "Anwenden",
+    "cancel": "Abbrechen"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen.",
+    "missingKey": "Fehlende Übersetzung: {key}"
+  }
+}

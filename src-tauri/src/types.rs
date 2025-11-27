@@ -70,6 +70,8 @@ pub struct Config {
     #[serde(default)]
     pub dark_mode: bool,
     #[serde(default)]
+    pub language: Option<String>,
+    #[serde(default)]
     pub active_name_fix: Option<String>,
 }
 

@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "FMMLoader26"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "description": "Tema ve depolama tercihleri",
+    "darkMode": "Koyu Mod",
+    "darkModeDescription": "Uygulama penceresi için koyu temayı aç/kapat.",
+    "logs": {
+      "title": "Uygulama Günlükleri",
+      "description": "Son uygulama günlüklerinin bulunduğu klasörü açar.",
+      "open": "Günlük Klasörünü Aç"
+    },
+    "modsStorage": {
+      "title": "Mod Deposu",
+      "description": "İçe aktarılan modların saklandığı klasörü açar.",
+      "open": "Modlar Klasörünü Aç"
+    },
+    "language": {
+      "title": "Dil",
+      "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar."
+    }
+  },
+  "common": {
+    "open": "Aç",
+    "close": "Kapat",
+    "language": "Dil",
+    "apply": "Uygula",
+    "cancel": "İptal"
+  },
+  "errors": {
+    "generic": "Bir sorun oluştu.",
+    "missingKey": "Eksik çeviri: {key}"
+  }
+}

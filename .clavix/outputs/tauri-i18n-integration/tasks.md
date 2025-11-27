@@ -5,9 +5,9 @@
 - [x] Establish backend message code pattern (errors/success) and surface codes instead of hardcoded English strings where applicable.
 
 ## Phase 2: Frontend i18n scaffolding
-- [ ] Add i18n loader/utilities in React: lazy-load JSON from `src/locales/<lang>.json`, cache bundles, expose translate helper with nested keys and missing-key fallback (key or English).
-- [ ] Implement locale detection + persistence flow: use `tauri-plugin-locale` on startup, fallback to `en` if unsupported, and persist user choice in existing config file (same place as dark mode) to override detection on next launch.
-- [ ] Seed base locale files for en, ko, tr, pt-PT, de with initial key structure and samples for UI/common messages.
+- [x] Add i18n loader/utilities in React: lazy-load JSON from `src/locales/<lang>.json`, cache bundles, expose translate helper with nested keys and missing-key fallback (key or English).
+- [x] Implement locale detection + persistence flow: use `tauri-plugin-locale` on startup, fallback to `en` if unsupported, and persist user choice in existing config file (same place as dark mode) to override detection on next launch.
+- [x] Seed base locale files for en, ko, tr, pt-PT, de with initial key structure and samples for UI/common messages.
 
 ## Phase 3: UI integration
 - [ ] Wire i18n provider through the app (main entry + hooks) and replace user-facing strings (navigation, settings, dialogs, toasts/notifications, error surfaces) with translation keys.

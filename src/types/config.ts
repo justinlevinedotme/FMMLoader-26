@@ -3,6 +3,7 @@ export interface Config {
   user_dir_path?: string;
   enabled_mods: string[];
   dark_mode?: boolean;
+  language?: string;
 }
 
 export interface ExtractionProgress {
