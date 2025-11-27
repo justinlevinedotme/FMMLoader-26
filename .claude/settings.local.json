@@ -55,7 +55,12 @@
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: prevent keychain auto-lock during macOS builds\n\nUse dedicated keychain password secret and set 1-hour timeout to\nprevent keychain from locking during long universal builds. Also\nadds find-identity to verify certificate import.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add .github/dependabot.yml)",
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nchore: limit dependabot to security updates only\n\nSet open-pull-requests-limit to 0 to disable version updates while\nstill receiving security updates. Prevents unexpected breaking changes\nfrom major version bumps.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 push origin main --no-verify)"
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 push origin main --no-verify)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 branch --show-current)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 fetch origin)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 branch -a)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add -A)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nrefactor: split name_fix.rs into module structure\n\nSplit the monolithic 1,290-line name_fix.rs into organized submodules:\n- name_fix/mod.rs - Public API and common functions\n- name_fix/db.rs - Platform-specific database path detection\n- name_fix/backup.rs - Backup and restore operations  \n- name_fix/import.rs - Import name fixes from ZIP\n- name_fix/install.rs - Install/uninstall name fixes\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { GraphicsPackAnalysis, GraphicsPackType } from '@/hooks/useTauri';
+import type { GraphicsPackAnalysis, GraphicsPackType } from '@/types';
 
 interface GraphicsPackConfirmDialogProps {
   analysis: GraphicsPackAnalysis | null;

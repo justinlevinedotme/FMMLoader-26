@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
-import { tauriCommands, type ConflictInfo } from '@/hooks/useTauri';
+import { tauriCommands } from '@/hooks/useTauri';
+import type { ConflictInfo } from '@/types';
 
 interface ConflictsDialogProps {
   open: boolean;

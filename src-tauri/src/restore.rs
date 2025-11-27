@@ -1,10 +1,10 @@
 use crate::config::get_restore_points_dir;
 use crate::types::RestorePoint;
+use crate::utils;
 use chrono::Local;
 use std::fs;
 use std::path::PathBuf;
 use std::time::UNIX_EPOCH;
-use walkdir::WalkDir;
 
 pub fn create_restore_point(name: &str, source_paths: &[PathBuf]) -> Result<PathBuf, String> {
     let restore_dir = get_restore_points_dir();
@@ -27,7 +27,7 @@ pub fn create_restore_point(name: &str, source_paths: &[PathBuf]) -> Result<Path
         let dest_path = point_dir.join(&dest_name);
 
         if source_path.is_dir() {
-            copy_dir_all(source_path, &dest_path)?;
+            utils::copy_dir_recursive(source_path, &dest_path)?;
         } else {
             if let Some(parent) = dest_path.parent() {
                 fs::create_dir_all(parent)
@@ -161,7 +161,7 @@ pub fn rollback_to_restore_point(point_path: &PathBuf) -> Result<String, String>
                 fs::remove_dir_all(&original_path)
                     .map_err(|e| format!("Failed to remove existing dir: {}", e))?;
             }
-            copy_dir_all(&path, &original_path)?;
+            utils::copy_dir_recursive(&path, &original_path)?;
         } else {
             if let Some(parent) = original_path.parent() {
                 fs::create_dir_all(parent)
@@ -175,30 +175,4 @@ pub fn rollback_to_restore_point(point_path: &PathBuf) -> Result<String, String>
     }
 
     Ok(format!("Restored {} items", restored_count))
-}
-
-fn copy_dir_all(src: &PathBuf, dst: &PathBuf) -> Result<(), String> {
-    fs::create_dir_all(dst).map_err(|e| format!("Failed to create directory: {}", e))?;
-
-    for entry in WalkDir::new(src) {
-        let entry = entry.map_err(|e| format!("Failed to walk directory: {}", e))?;
-        let path = entry.path();
-
-        if let Ok(rel_path) = path.strip_prefix(src) {
-            let target_path = dst.join(rel_path);
-
-            if path.is_dir() {
-                fs::create_dir_all(&target_path)
-                    .map_err(|e| format!("Failed to create directory: {}", e))?;
-            } else {
-                if let Some(parent) = target_path.parent() {
-                    fs::create_dir_all(parent)
-                        .map_err(|e| format!("Failed to create parent directory: {}", e))?;
-                }
-                fs::copy(path, &target_path).map_err(|e| format!("Failed to copy file: {}", e))?;
-            }
-        }
-    }
-
-    Ok(())
 }
