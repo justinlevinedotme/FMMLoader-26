@@ -2,6 +2,12 @@
   "app": {
     "title": "FMMLoader26"
   },
+  "nav": {
+    "mods": "Mods",
+    "graphics": "Grafiken",
+    "nameFix": "Namensfix",
+    "settings": "Einstellungen"
+  },
   "settings": {
     "title": "Einstellungen",
     "description": "Design- und Speicheroptionen",
@@ -19,7 +25,14 @@
     },
     "language": {
       "title": "Sprache",
-      "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
+      "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.",
+      "options": {
+        "en": "English",
+        "ko": "한국어",
+        "tr": "Türkçe",
+        "pt-PT": "Português (Portugal)",
+        "de": "Deutsch"
+      }
     }
   },
   "common": {

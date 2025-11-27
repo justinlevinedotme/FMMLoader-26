@@ -126,9 +126,10 @@ export function I18nProvider({
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
 
     const load = async () => {
+      if (cancelled) return;
+      setIsLoading(true);
       const [primary, fallback] = await Promise.all([
         loadLocale(currentLocale),
         fallbackLocale === currentLocale ? Promise.resolve(null) : loadLocale(fallbackLocale),

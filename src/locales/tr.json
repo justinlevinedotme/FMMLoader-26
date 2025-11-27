@@ -2,6 +2,12 @@
   "app": {
     "title": "FMMLoader26"
   },
+  "nav": {
+    "mods": "Modlar",
+    "graphics": "Grafikler",
+    "nameFix": "İsim Düzeltme",
+    "settings": "Ayarlar"
+  },
   "settings": {
     "title": "Ayarlar",
     "description": "Tema ve depolama tercihleri",
@@ -19,7 +25,14 @@
     },
     "language": {
       "title": "Dil",
-      "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar."
+      "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.",
+      "options": {
+        "en": "English",
+        "ko": "한국어",
+        "tr": "Türkçe",
+        "pt-PT": "Português (Portugal)",
+        "de": "Deutsch"
+      }
     }
   },
   "common": {

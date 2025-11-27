@@ -69,6 +69,7 @@ import {
   I18nProvider,
   detectSystemLocale,
   ensureSupportedLocale,
+  useI18n,
   type SupportedLocale,
 } from '@/lib/i18n';
 
@@ -217,6 +218,19 @@ function App() {
   const [locale, setLocale] = useState<SupportedLocale>('en');
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
+
+  const handleLocaleChange = async (nextLocale: SupportedLocale) => {
+    setLocale(nextLocale);
+    if (!config) return;
+    const updatedConfig = { ...config, language: nextLocale };
+    try {
+      await tauriCommands.updateConfig(updatedConfig);
+      setConfig(updatedConfig);
+      addLog(`Language set to ${nextLocale}`);
+    } catch (error) {
+      addLog(`Error saving locale preference: ${formatError(error)}`);
+    }
+  };
 
   // Dialog states
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
@@ -1257,6 +1271,32 @@ function App() {
       ? Math.round((graphicsProgress.current / graphicsProgress.total) * 100)
       : null;
 
+  const TabsHeader = () => {
+    const { t } = useI18n();
+    return (
+      <div className="border-b px-4 pb-2">
+        <TabsList>
+          <TabsTrigger value="mods">
+            <FolderOpen className="mr-2 h-4 w-4" />
+            {t('nav.mods')}
+          </TabsTrigger>
+          <TabsTrigger value="graphics">
+            <History className="mr-2 h-4 w-4" />
+            {t('nav.graphics')}
+          </TabsTrigger>
+          <TabsTrigger value="namefix">
+            <Settings className="mr-2 h-4 w-4" />
+            {t('nav.nameFix')}
+          </TabsTrigger>
+          <TabsTrigger value="settings">
+            <Settings className="mr-2 h-4 w-4" />
+            {t('nav.settings')}
+          </TabsTrigger>
+        </TabsList>
+      </div>
+    );
+  };
+
   return (
     <I18nProvider locale={locale} fallbackLocale="en" onLocaleChange={setLocale}>
       <TooltipProvider>
@@ -1465,12 +1505,7 @@ function App() {
           {/* Main Content */}
           <div className="flex-1 overflow-hidden">
             <Tabs defaultValue="mods" className="h-full flex flex-col">
-              <TabsList className="mx-4 mt-4">
-                <TabsTrigger value="mods">Mods</TabsTrigger>
-                <TabsTrigger value="graphics">Graphics</TabsTrigger>
-                <TabsTrigger value="namefix">Name Fix</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
+              <TabsHeader />
 
               <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
                 <ModsTab
@@ -1522,6 +1557,8 @@ function App() {
                   darkMode={darkMode}
                   onToggleDarkMode={toggleDarkMode}
                   addLog={addLog}
+                  locale={locale}
+                  onLocaleChange={handleLocaleChange}
                 />
               </TabsContent>
             </Tabs>

@@ -10,8 +10,8 @@
 - [x] Seed base locale files for en, ko, tr, pt-PT, de with initial key structure and samples for UI/common messages.
 
 ## Phase 3: UI integration
-- [ ] Wire i18n provider through the app (main entry + hooks) and replace user-facing strings (navigation, settings, dialogs, toasts/notifications, error surfaces) with translation keys.
-- [ ] Add Settings tab language switcher: show available locales, apply at runtime without restart, persist selection to config, and update UI immediately.
+- [x] Wire i18n provider through the app (main entry + hooks) and replace user-facing strings (navigation, settings, dialogs, toasts/notifications, error surfaces) with translation keys.
+- [x] Add Settings tab language switcher: show available locales, apply at runtime without restart, persist selection to config, and update UI immediately.
 
 ## Phase 4: Backend code mapping
 - [ ] Map Rust command result codes to frontend translation keys (success/error surfaces) and ensure critical paths (config, mods, graphics, name-fix) present localized strings.
