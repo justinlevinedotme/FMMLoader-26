@@ -1,4 +1,6 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   :root {
@@ -59,11 +61,10 @@
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-background text-foreground border-border;
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     font-synthesis: none;
     text-rendering: optimizeLegibility;

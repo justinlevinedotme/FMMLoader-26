@@ -4,7 +4,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ModMetadataDialog } from '@/components/ModMetadataDialog';
 import { ConflictsDialog } from '@/components/ConflictsDialog';
 import { GraphicsPackConfirmDialog } from '@/components/GraphicsPackConfirmDialog';
-import type { GraphicsPackAnalysis } from '@/hooks/useTauri';
+import type { GraphicsPackAnalysis } from '@/types';
 
 const { mockDetectModType, mockCheckConflicts } = vi.hoisted(() => {
   return {

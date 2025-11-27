@@ -52,3 +52,4 @@ sessions/transcripts/
 sessions/.archived/
 
 .tmp/
+/agents

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://tauri.app/schema/capability.json",
+  "identifier": "macos",
+  "description": "macOS-specific permissions",
+  "platforms": ["macOS"],
+  "windows": ["main"],
+  "permissions": [
+    "macos-permissions:default"
+  ]
+}

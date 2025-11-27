@@ -1,6 +1,6 @@
 pub mod config;
-pub mod conflicts;
 pub mod game_detection;
+pub mod graphics;
 pub mod graphics_analyzer;
 pub mod import;
 pub mod logging;
@@ -8,3 +8,4 @@ pub mod mod_manager;
 pub mod name_fix;
 pub mod restore;
 pub mod types;
+pub mod utils;

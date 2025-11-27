@@ -1,4 +1,18 @@
 import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
+import type {
+  Config,
+  ModManifest,
+  ModMetadata,
+  FileEntry,
+  ConflictInfo,
+  RestorePoint,
+  NameFixSource,
+  GraphicsPackMetadata,
+  GraphicsPackAnalysis,
+  GraphicsPackIssue,
+  GraphicsConflictInfo,
+  ModInstallPreview,
+} from '../types';
 
 // Wait for Tauri to be ready
 const waitForTauri = async (timeout = 5000): Promise<boolean> => {
@@ -28,110 +42,6 @@ const safeInvoke = async <T>(cmd: string, args?: InvokeArgs): Promise<T> => {
   }
   return invoke<T>(cmd, args);
 };
-
-export interface Config {
-  target_path?: string;
-  user_dir_path?: string;
-  enabled_mods: string[];
-  dark_mode?: boolean;
-}
-
-export interface ModManifest {
-  name: string;
-  version: string;
-  mod_type: string;
-  author: string;
-  homepage: string;
-  description: string;
-  license: string;
-  compatibility: {
-    fm_version: string;
-  };
-  dependencies: string[];
-  conflicts: string[];
-  load_after: string[];
-  files: FileEntry[];
-}
-
-export interface FileEntry {
-  source: string;
-  target_subpath: string;
-  platform?: string;
-}
-
-export interface ConflictInfo {
-  file_path: string;
-  conflicting_mods: string[];
-}
-
-export interface RestorePoint {
-  name: string;
-  timestamp: string;
-  path: string;
-}
-
-export interface ModMetadata {
-  name?: string;
-  version?: string;
-  mod_type?: string;
-  author?: string;
-  description?: string;
-}
-
-export interface NameFixSource {
-  id: string;
-  name: string;
-  source_type: 'GitHub' | 'Imported';
-  install_type: 'Files' | 'Folders';
-  description: string;
-  imported_date: string;
-}
-
-export interface ExtractionProgress {
-  current: number;
-  total: number;
-  current_file: string;
-  bytes_processed: number;
-  phase: string;
-}
-
-export interface GraphicsPackMetadata {
-  id: string;
-  name: string;
-  install_date: string;
-  file_count: number;
-  source_filename: string;
-  pack_type: string;
-  installed_to: string;
-}
-
-export type GraphicsPackType =
-  | 'Faces'
-  | 'Logos'
-  | 'Kits'
-  | { Mixed: GraphicsPackType[] }
-  | 'Unknown';
-
-export interface GraphicsPackAnalysis {
-  pack_type: GraphicsPackType;
-  confidence: number;
-  suggested_paths: string[];
-  file_count: number;
-  total_size_bytes: number;
-  has_config_xml: boolean;
-  subdirectory_breakdown: Record<string, number>;
-  is_flat_pack: boolean;
-}
-
-export interface ResolvedFilePreview {
-  target_subpath: string;
-  resolved_path: string;
-}
-
-export interface ModInstallPreview {
-  base_target: string;
-  resolved_files: ResolvedFilePreview[];
-}
 
 export const tauriCommands = {
   initApp: () => safeInvoke<void>('init_app'),
@@ -267,18 +177,6 @@ export const tauriCommands = {
 
   migrateGraphicsPack: (packName: string, targetSubdir: string) =>
     safeInvoke<string>('migrate_graphics_pack', { packName, targetSubdir }),
+
+  openAppManagementSettings: () => safeInvoke<void>('open_app_management_settings'),
 };
-
-export interface GraphicsPackIssue {
-  pack_name: string;
-  current_path: string;
-  suggested_path: string;
-  reason: string;
-  pack_type: string;
-}
-
-export interface GraphicsConflictInfo {
-  target_directory: string;
-  existing_file_count: number;
-  pack_name: string;
-}

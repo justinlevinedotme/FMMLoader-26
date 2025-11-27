@@ -41,3 +41,6 @@ path = "src/main.rs"
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
+
+[target.'cfg(target_os = "macos")'.dependencies]
+tauri-plugin-macos-permissions = "2.3.0"
