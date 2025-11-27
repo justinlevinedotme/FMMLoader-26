@@ -701,7 +701,7 @@ We welcome contributions from the community! Whether it's bug fixes, new feature
 
 1. **Fork the Repository**
    ```bash
-   git clone https://github.com/YOUR-USERNAME/FMMLoader-26.git
+   git clone https://github.com/justinlevinedotme/FMMLoader-26.git
    ```
 
 2. **Create a Feature Branch**
