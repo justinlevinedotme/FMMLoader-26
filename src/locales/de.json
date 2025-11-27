@@ -36,5 +36,13 @@
   "errors": {
     "generic": "Etwas ist schiefgelaufen.",
     "missingKey": "Fehlende Übersetzung: {key}"
+  },
+  "overlay": {
+    "dropTitle": "Mod-Datei zum Import hier ablegen"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | Erstellt von JALCO / Justin Levine",
+    "supportKofi": "Auf Ko-Fi unterstützen",
+    "joinDiscord": "Discord beitreten"
   }
 }

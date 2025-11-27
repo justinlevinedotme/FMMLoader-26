@@ -36,5 +36,13 @@
   "errors": {
     "generic": "문제가 발생했습니다.",
     "missingKey": "번역이 없습니다: {key}"
+  },
+  "overlay": {
+    "dropTitle": "모드 파일을 끌어다 놓아 가져오기"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | 제작: JALCO / Justin Levine",
+    "supportKofi": "Ko-Fi에서 후원하기",
+    "joinDiscord": "Discord 참여"
   }
 }

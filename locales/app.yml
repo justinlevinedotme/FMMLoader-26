@@ -148,3 +148,31 @@ errors:
     tr: "Eksik çeviri: {key}"
     pt-PT: "Tradução em falta: {key}"
     de: "Fehlende Übersetzung: {key}"
+
+overlay:
+  dropTitle:
+    en: Drop mod file to import
+    ko: 모드 파일을 끌어다 놓아 가져오기
+    tr: Mod dosyasını içe aktarmak için bırakın
+    pt-PT: Largue o ficheiro de mod para importar
+    de: Mod-Datei zum Import hier ablegen
+
+footer:
+  createdBy:
+    en: "FMMLoader26 v{version} | Created by JALCO / Justin Levine"
+    ko: "FMMLoader26 v{version} | 제작: JALCO / Justin Levine"
+    tr: "FMMLoader26 v{version} | Yapan: JALCO / Justin Levine"
+    pt-PT: "FMMLoader26 v{version} | Criado por JALCO / Justin Levine"
+    de: "FMMLoader26 v{version} | Erstellt von JALCO / Justin Levine"
+  supportKofi:
+    en: Support on Ko-Fi
+    ko: Ko-Fi에서 후원하기
+    tr: Ko-Fi'da destekle
+    pt-PT: Apoiar no Ko-Fi
+    de: Auf Ko-Fi unterstützen
+  joinDiscord:
+    en: Join Discord
+    ko: Discord 참여
+    tr: Discord'a katıl
+    pt-PT: Entrar no Discord
+    de: Discord beitreten

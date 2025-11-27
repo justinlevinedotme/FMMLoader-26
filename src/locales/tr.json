@@ -36,5 +36,13 @@
   "errors": {
     "generic": "Bir sorun oluştu.",
     "missingKey": "Eksik çeviri: {key}"
+  },
+  "overlay": {
+    "dropTitle": "Mod dosyasını içe aktarmak için bırakın"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | Yapan: JALCO / Justin Levine",
+    "supportKofi": "Ko-Fi'da destekle",
+    "joinDiscord": "Discord'a katıl"
   }
 }

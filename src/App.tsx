@@ -1315,7 +1315,7 @@ function App() {
               <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary flex items-center justify-center z-40 pointer-events-none">
                 <div className="bg-background/95 p-8 rounded-lg shadow-lg">
                   <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
-                  <p className="text-xl font-semibold">Drop mod file to import</p>
+                  <p className="text-xl font-semibold">{t('overlay.dropTitle')}</p>
                 </div>
               </div>
             )}
@@ -1567,7 +1567,7 @@ function App() {
           {/* Footer */}
           <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 flex items-center justify-between">
             <div className="text-xs text-muted-foreground font-medium">
-              FMMLoader26 v{appVersion} | Created by JALCO / Justin Levine
+              {t('footer.createdBy', { version: appVersion })}
             </div>
             <div className="flex gap-2">
               <Button
@@ -1577,7 +1577,7 @@ function App() {
                 className="hover:bg-[#FF5E5B] hover:text-white hover:border-[#FF5E5B] transition-colors"
               >
                 <SiKofi className="mr-2 h-4 w-4" />
-                Support on Ko-Fi
+                {t('footer.supportKofi')}
               </Button>
               <Button
                 variant="outline"
@@ -1586,7 +1586,7 @@ function App() {
                 className="hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2] transition-colors"
               >
                 <FaDiscord className="mr-2 h-4 w-4" />
-                Discord
+                {t('footer.joinDiscord')}
               </Button>
             </div>
           </div>
