@@ -6,14 +6,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
@@ -42,17 +34,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { tauriCommands } from '@/hooks/useTauri';
 import type {
   Config,
-  ModManifest,
   ModMetadata,
   NameFixSource,
   ExtractionProgress,
@@ -64,15 +48,11 @@ import type {
 import {
   FolderOpen,
   RefreshCw,
-  Download,
   Trash2,
   Upload,
   AlertTriangle,
   History,
   Settings,
-  Wrench,
-  CheckCircle2,
-  XCircle,
 } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa6';
 import { SiKofi } from 'react-icons/si';
@@ -84,11 +64,7 @@ import { TitleBar } from '@/components/TitleBar';
 import { Toaster } from '@/components/ui/sonner';
 import { UpdateBanner } from '@/components/UpdateBanner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-interface ModWithInfo extends ModManifest {
-  id: string;
-  enabled: boolean;
-}
+import { ModsTab, GraphicsTab, NameFixTab, SettingsTab, type ModWithInfo } from '@/components/tabs';
 
 type DebugUIProps = {
   metadataDialogOpen: boolean;
@@ -1453,431 +1429,52 @@ function App() {
             </TabsList>
 
             <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
-              <div className="h-full">
-                {/* Mods List */}
-                <Card className="flex flex-col h-full">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>Installed Mods</CardTitle>
-                        <CardDescription>{mods.length} mods installed</CardDescription>
-                      </div>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button onClick={applyMods} disabled={loading || !config?.target_path}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Apply Mods
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Apply enabled mods to game (creates backup)</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1 overflow-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12">Status</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Version</TableHead>
-                          <TableHead>Author</TableHead>
-                          <TableHead className="w-24">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mods.map((mod) => (
-                          <TableRow
-                            key={mod.id}
-                            className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => {
-                              setSelectedMod(mod);
-                              setModDetailsOpen(true);
-                            }}
-                          >
-                            <TableCell>
-                              <Switch
-                                checked={mod.enabled}
-                                onCheckedChange={(checked: boolean) => {
-                                  void toggleMod(mod.id, checked);
-                                }}
-                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                              />
-                            </TableCell>
-                            <TableCell className="font-medium">{mod.name}</TableCell>
-                            <TableCell>
-                              <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                {mod.mod_type}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">{mod.version}</TableCell>
-                            <TableCell className="text-muted-foreground">{mod.author}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setConfirmDeleteMod(mod.id);
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </div>
+              <ModsTab
+                mods={mods}
+                config={config}
+                loading={loading}
+                onApplyMods={applyMods}
+                onToggleMod={toggleMod}
+                onSelectMod={(mod) => {
+                  setSelectedMod(mod);
+                  setModDetailsOpen(true);
+                }}
+                onDeleteMod={(modId) => setConfirmDeleteMod(modId)}
+              />
             </TabsContent>
 
             <TabsContent value="graphics" className="flex-1 overflow-hidden m-4 mt-2">
-              <Card className="h-full flex flex-col">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Graphics Packs</CardTitle>
-                      <CardDescription>{graphicsPacks.length} packs installed</CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => void handleImportGraphicsPack()}
-                        disabled={importingGraphics || !config?.user_dir_path}
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Import Graphics Pack
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => void handleValidateGraphics()}
-                        disabled={validatingGraphics || !config?.user_dir_path}
-                      >
-                        <CheckCircle2 className="mr-2 h-4 w-4" />
-                        Validate Graphics
-                      </Button>
-                    </div>
-                  </div>
-                  {importingGraphics && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Importing...
-                    </div>
-                  )}
-                  {graphicsProgress && (
-                    <div className="text-sm bg-muted p-3 rounded-md space-y-2">
-                      <div className="flex justify-between">
-                        <strong>Progress:</strong>
-                        <span>
-                          {Math.round((graphicsProgress.current / graphicsProgress.total) * 100)}%
-                        </span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {graphicsProgress.current} / {graphicsProgress.total} files
-                      </div>
-                      <div className="w-full bg-secondary rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{
-                            width: `${(graphicsProgress.current / graphicsProgress.total) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  {!config?.user_dir_path && (
-                    <p className="text-sm text-amber-600 dark:text-amber-400">
-                      User directory is required for graphics pack installation
-                    </p>
-                  )}
-                </CardHeader>
-                <CardContent className="flex-1 overflow-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Files</TableHead>
-                        <TableHead>Installed</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {graphicsPacks.map((pack) => (
-                        <TableRow key={pack.id} className="hover:bg-muted/50">
-                          <TableCell className="font-medium">{pack.name}</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
-                              {pack.pack_type}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground text-xs">
-                            {pack.file_count} files
-                          </TableCell>
-                          <TableCell className="text-muted-foreground text-xs">
-                            {new Date(pack.install_date).toLocaleDateString()}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {graphicsPacks.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={4} className="text-center text-muted-foreground">
-                            No graphics packs installed yet.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
+              <GraphicsTab
+                config={config}
+                graphicsPacks={graphicsPacks}
+                importingGraphics={importingGraphics}
+                graphicsProgress={graphicsProgress}
+                validatingGraphics={validatingGraphics}
+                onImportGraphicsPack={handleImportGraphicsPack}
+                onValidateGraphics={handleValidateGraphics}
+              />
             </TabsContent>
 
             <TabsContent value="namefix" className="flex-1 overflow-hidden m-4 mt-2">
-              <Card className="h-full flex flex-col">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Wrench className="h-5 w-5" />
-                    Name Fix
-                  </CardTitle>
-                  <CardDescription>Manage FM Name Fix</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 overflow-auto space-y-4">
-                  {/* FM Name Fix */}
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">FM Name Fix</CardTitle>
-                          <CardDescription className="mt-1">
-                            Fixes licensing issues and unlocks real names for clubs, players, and
-                            competitions
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {checkingNameFix ? (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <RefreshCw className="h-4 w-4 animate-spin" />
-                              Checking...
-                            </div>
-                          ) : nameFixInstalled ? (
-                            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                              <CheckCircle2 className="h-4 w-4" />
-                              Installed
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <XCircle className="h-4 w-4" />
-                              Not installed
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="text-sm text-muted-foreground space-y-2">
-                        <p>
-                          <strong>What it does:</strong>
-                        </p>
-                        <ul className="list-disc list-inside space-y-1 ml-2">
-                          <li>Unlocks real names for clubs like AC Milan, Inter, and Lazio</li>
-                          <li>Fixes Japanese player names</li>
-                          <li>Removes fake/unlicensed content</li>
-                          <li>Works with all leagues and competitions</li>
-                        </ul>
-                      </div>
-
-                      {/* Show active name fix */}
-                      {activeNameFixId && (
-                        <div className="text-sm bg-muted p-3 rounded-md">
-                          <strong>Currently Active:</strong>{' '}
-                          {nameFixSources.find((s) => s.id === activeNameFixId)?.name || 'Unknown'}
-                        </div>
-                      )}
-
-                      {/* Name Fix Sources Selection */}
-                      {nameFixSources.length > 0 ? (
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Select Name Fix Source:</label>
-                          <Select
-                            value={selectedNameFixId}
-                            onValueChange={setSelectedNameFixId}
-                            disabled={installingNameFix}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select a name fix source" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {nameFixSources.map((source) => (
-                                <SelectItem key={source.id} value={source.id}>
-                                  {source.name}
-                                  {source.id === activeNameFixId ? ' - Active' : ''}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-muted-foreground">
-                            {nameFixSources.find((s) => s.id === selectedNameFixId)?.description}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-sm bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-md">
-                          <p className="text-amber-800 dark:text-amber-200">
-                            No name fix sources available. Import a name fix ZIP file to get
-                            started.
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          onClick={() => void installSelectedNameFix()}
-                          disabled={
-                            installingNameFix ||
-                            !config?.target_path ||
-                            !selectedNameFixId ||
-                            nameFixSources.length === 0 ||
-                            nameFixInstalled
-                          }
-                        >
-                          {installingNameFix ? (
-                            <>
-                              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                              Installing...
-                            </>
-                          ) : (
-                            <>
-                              <Download className="mr-2 h-4 w-4" />
-                              {nameFixInstalled ? 'Reinstall' : 'Install'}
-                            </>
-                          )}
-                        </Button>
-
-                        {nameFixInstalled && (
-                          <Button
-                            variant="destructive"
-                            onClick={() => void uninstallNameFix()}
-                            disabled={installingNameFix}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Uninstall from Game
-                          </Button>
-                        )}
-
-                        <Button
-                          variant="outline"
-                          onClick={() => void handleImportNameFix()}
-                          disabled={installingNameFix}
-                        >
-                          <Upload className="mr-2 h-4 w-4" />
-                          Import from ZIP
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          onClick={() => void checkNameFixStatus()}
-                          disabled={checkingNameFix}
-                        >
-                          <RefreshCw className="mr-2 h-4 w-4" />
-                          Check Status
-                        </Button>
-
-                        {selectedNameFixId && nameFixSources.length > 0 && (
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              const source = nameFixSources.find((s) => s.id === selectedNameFixId);
-                              if (source) setConfirmDeleteNameFix(source);
-                            }}
-                            disabled={installingNameFix || selectedNameFixId === activeNameFixId}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Source
-                          </Button>
-                        )}
-                      </div>
-                      {!config?.target_path && (
-                        <p className="text-sm text-amber-600 dark:text-amber-400">
-                          Please set your Game Directory first
-                        </p>
-                      )}
-
-                      <p className="text-xs text-muted-foreground mt-2">
-                        You can download name fixes from the community or create your own. We
-                        recommend fixes from our friends at SortItOutSI or FMScout
-                      </p>
-                    </CardContent>
-                  </Card>
-                </CardContent>
-              </Card>
+              <NameFixTab
+                config={config}
+                nameFixInstalled={nameFixInstalled}
+                checkingNameFix={checkingNameFix}
+                installingNameFix={installingNameFix}
+                nameFixSources={nameFixSources}
+                activeNameFixId={activeNameFixId}
+                selectedNameFixId={selectedNameFixId}
+                onSelectNameFix={setSelectedNameFixId}
+                onInstall={installSelectedNameFix}
+                onUninstall={uninstallNameFix}
+                onImport={handleImportNameFix}
+                onCheckStatus={checkNameFixStatus}
+                onDeleteSource={(source) => setConfirmDeleteNameFix(source)}
+              />
             </TabsContent>
 
             <TabsContent value="settings" className="flex-1 overflow-hidden m-4 mt-2">
-              <Card className="h-full flex flex-col">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Settings
-                  </CardTitle>
-                  <CardDescription>Theme and storage preferences</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 overflow-auto space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium">Dark Mode</div>
-                      <div className="text-sm text-muted-foreground">
-                        Toggle dark theme for the app window.
-                      </div>
-                    </div>
-                    <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-                  </div>
-
-                  <div className="space-y-2 border-t pt-4">
-                    <div className="text-sm font-medium">Application Logs</div>
-                    <div className="text-sm text-muted-foreground">
-                      Opens the folder where recent app logs are stored.
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={async () => {
-                        try {
-                          await tauriCommands.openLogsFolder();
-                          addLog('Opened logs folder');
-                        } catch (error) {
-                          addLog(`Failed to open logs folder: ${formatError(error)}`);
-                        }
-                      }}
-                    >
-                      <FolderOpen className="mr-2 h-4 w-4" />
-                      Open Logs Folder
-                    </Button>
-                  </div>
-
-                  <div className="space-y-2 border-t pt-4">
-                    <div className="text-sm font-medium">Mods Storage</div>
-                    <div className="text-sm text-muted-foreground">
-                      Opens the folder where imported mods are stored.
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={async () => {
-                        try {
-                          await tauriCommands.openModsFolder();
-                          addLog('Opened mods folder');
-                        } catch (error) {
-                          addLog(`Failed to open mods folder: ${formatError(error)}`);
-                        }
-                      }}
-                    >
-                      <FolderOpen className="mr-2 h-4 w-4" />
-                      Open Mods Folder
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <SettingsTab darkMode={darkMode} onToggleDarkMode={toggleDarkMode} addLog={addLog} />
             </TabsContent>
           </Tabs>
         </div>
