@@ -71,6 +71,27 @@
       "detect": "감지"
     }
   },
+  "modsTab": {
+    "tabs": {
+      "mods": "모드",
+      "graphics": "그래픽",
+      "namefix": "이름 수정",
+      "settings": "설정"
+    },
+    "primaryActions": {
+      "apply": "선택된 모드 적용",
+      "enable": "활성화",
+      "disable": "비활성화"
+    },
+    "table": {
+      "name": "이름",
+      "type": "유형",
+      "status": "상태",
+      "version": "버전",
+      "actions": "작업"
+    },
+    "empty": "모드를 찾을 수 없습니다. 모드를 가져와 시작하세요."
+  },
   "nameFix": {
     "title": "이름 수정",
     "subtitle": "FM 이름 수정 관리",

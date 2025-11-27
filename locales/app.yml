@@ -280,6 +280,89 @@ paths:
       pt-PT: Detetar
       de: Erkennen
 
+modsTab:
+  tabs:
+    mods:
+      en: Mods
+      ko: 모드
+      tr: Modlar
+      pt-PT: Mods
+      de: Mods
+    graphics:
+      en: Graphics
+      ko: 그래픽
+      tr: Grafikler
+      pt-PT: Gráficos
+      de: Grafiken
+    namefix:
+      en: Name Fix
+      ko: 이름 수정
+      tr: İsim Düzeltme
+      pt-PT: Correção de nomes
+      de: Namensfix
+    settings:
+      en: Settings
+      ko: 설정
+      tr: Ayarlar
+      pt-PT: Definições
+      de: Einstellungen
+  primaryActions:
+    apply:
+      en: Apply Selected Mods
+      ko: 선택된 모드 적용
+      tr: Seçili Modları Uygula
+      pt-PT: Aplicar mods selecionados
+      de: Ausgewählte Mods anwenden
+    enable:
+      en: Enable
+      ko: 활성화
+      tr: Etkinleştir
+      pt-PT: Ativar
+      de: Aktivieren
+    disable:
+      en: Disable
+      ko: 비활성화
+      tr: Devre dışı bırak
+      pt-PT: Desativar
+      de: Deaktivieren
+  table:
+    name:
+      en: Name
+      ko: 이름
+      tr: İsim
+      pt-PT: Nome
+      de: Name
+    type:
+      en: Type
+      ko: 유형
+      tr: Tür
+      pt-PT: Tipo
+      de: Typ
+    status:
+      en: Status
+      ko: 상태
+      tr: Durum
+      pt-PT: Estado
+      de: Status
+    version:
+      en: Version
+      ko: 버전
+      tr: Sürüm
+      pt-PT: Versão
+      de: Version
+    actions:
+      en: Actions
+      ko: 작업
+      tr: İşlemler
+      pt-PT: Ações
+      de: Aktionen
+  empty:
+    en: No mods found. Import a mod to get started.
+    ko: 모드를 찾을 수 없습니다. 모드를 가져와 시작하세요.
+    tr: Mod bulunamadı. Başlamak için bir mod içe aktarın.
+    pt-PT: Nenhum mod encontrado. Importe um mod para começar.
+    de: Keine Mods gefunden. Importiere ein Mod, um zu starten.
+
 nameFix:
   title:
     en: Name Fix

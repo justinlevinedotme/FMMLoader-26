@@ -71,6 +71,27 @@
       "detect": "Algıla"
     }
   },
+  "modsTab": {
+    "tabs": {
+      "mods": "Modlar",
+      "graphics": "Grafikler",
+      "namefix": "İsim Düzeltme",
+      "settings": "Ayarlar"
+    },
+    "primaryActions": {
+      "apply": "Seçili Modları Uygula",
+      "enable": "Etkinleştir",
+      "disable": "Devre dışı bırak"
+    },
+    "table": {
+      "name": "İsim",
+      "type": "Tür",
+      "status": "Durum",
+      "version": "Sürüm",
+      "actions": "İşlemler"
+    },
+    "empty": "Mod bulunamadı. Başlamak için bir mod içe aktarın."
+  },
   "nameFix": {
     "title": "İsim Düzeltme",
     "subtitle": "FM İsim Düzeltmesini yönet",

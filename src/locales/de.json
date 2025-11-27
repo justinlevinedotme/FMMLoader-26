@@ -71,6 +71,27 @@
       "detect": "Erkennen"
     }
   },
+  "modsTab": {
+    "tabs": {
+      "mods": "Mods",
+      "graphics": "Grafiken",
+      "namefix": "Namensfix",
+      "settings": "Einstellungen"
+    },
+    "primaryActions": {
+      "apply": "Ausgewählte Mods anwenden",
+      "enable": "Aktivieren",
+      "disable": "Deaktivieren"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Typ",
+      "status": "Status",
+      "version": "Version",
+      "actions": "Aktionen"
+    },
+    "empty": "Keine Mods gefunden. Importiere ein Mod, um zu starten."
+  },
   "nameFix": {
     "title": "Namensfix",
     "subtitle": "FM-Namensfix verwalten",

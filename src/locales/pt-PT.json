@@ -71,6 +71,27 @@
       "detect": "Detetar"
     }
   },
+  "modsTab": {
+    "tabs": {
+      "mods": "Mods",
+      "graphics": "Gráficos",
+      "namefix": "Correção de nomes",
+      "settings": "Definições"
+    },
+    "primaryActions": {
+      "apply": "Aplicar mods selecionados",
+      "enable": "Ativar",
+      "disable": "Desativar"
+    },
+    "table": {
+      "name": "Nome",
+      "type": "Tipo",
+      "status": "Estado",
+      "version": "Versão",
+      "actions": "Ações"
+    },
+    "empty": "Nenhum mod encontrado. Importe um mod para começar."
+  },
   "nameFix": {
     "title": "Correção de Nomes",
     "subtitle": "Gerir correção de nomes FM",

@@ -71,6 +71,27 @@
       "detect": "Detect"
     }
   },
+  "modsTab": {
+    "tabs": {
+      "mods": "Mods",
+      "graphics": "Graphics",
+      "namefix": "Name Fix",
+      "settings": "Settings"
+    },
+    "primaryActions": {
+      "apply": "Apply Selected Mods",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "version": "Version",
+      "actions": "Actions"
+    },
+    "empty": "No mods found. Import a mod to get started."
+  },
   "nameFix": {
     "title": "Name Fix",
     "subtitle": "Manage FM Name Fix",
