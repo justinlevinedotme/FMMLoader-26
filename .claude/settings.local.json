@@ -42,7 +42,20 @@
       "Bash(yq eval:*)",
       "Bash(done)",
       "Bash(python3:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 push origin main)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add .github/workflows/build.yml)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: clean stale debug binary before building\n\nAdd a step to remove any cached fmml_path_debug binaries and bundle\ndirectories before the build. The cache restore-keys fallback was\nstill restoring stale caches with the old debug binary.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add src-tauri/Cargo.toml src-tauri/src/bin/fmml_path_debug.rs .github/workflows/build.yml)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: remove debug helper entirely\n\nThe debug helper was causing build failures due to Tauri bundler\nattempting to include it regardless of feature flags. Remove it\nentirely rather than fighting with caches and cross-platform issues.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: use universal binary instead of separate x86_64 build\n\nUniversal binary includes both arm64 and x86_64, eliminating the need\nfor a separate x86_64 build. This halves macOS build time and reduces\nsigning/notarization overhead.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nchore: add verbose logging to Tauri builds\n\nEnables detailed output for signing and notarization progress.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(gh run cancel:*)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: prevent keychain auto-lock during macOS builds\n\nUse dedicated keychain password secret and set 1-hour timeout to\nprevent keychain from locking during long universal builds. Also\nadds find-identity to verify certificate import.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add .github/dependabot.yml)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nchore: limit dependabot to security updates only\n\nSet open-pull-requests-limit to 0 to disable version updates while\nstill receiving security updates. Prevents unexpected breaking changes\nfrom major version bumps.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 push origin main --no-verify)"
     ],
     "deny": [],
     "ask": []

@@ -219,7 +219,7 @@ function App() {
   const [mods, setMods] = useState<ModWithInfo[]>([]);
   const [selectedMod, setSelectedMod] = useState<ModWithInfo | null>(null);
   const [loading, setLoading] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [, setLogs] = useState<string[]>([]);
   const [appVersion, setAppVersion] = useState('');
   const [blockingMessage, setBlockingMessage] = useState<string | null>(null);
 
@@ -1447,8 +1447,9 @@ function App() {
           <Tabs defaultValue="mods" className="h-full flex flex-col">
             <TabsList className="mx-4 mt-4">
               <TabsTrigger value="mods">Mods</TabsTrigger>
-              <TabsTrigger value="utilities">Utilities</TabsTrigger>
-              <TabsTrigger value="logs">Logs</TabsTrigger>
+              <TabsTrigger value="graphics">Graphics</TabsTrigger>
+              <TabsTrigger value="namefix">Name Fix</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
 
             <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
@@ -1527,28 +1528,6 @@ function App() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {graphicsPacks.map((pack) => (
-                          <TableRow key={pack.id} className="hover:bg-muted/50">
-                            <TableCell>
-                              <CheckCircle2 className="h-5 w-5 text-green-600" />
-                            </TableCell>
-                            <TableCell className="font-medium">{pack.name}</TableCell>
-                            <TableCell>
-                              <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
-                                {pack.pack_type}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-xs">
-                              {pack.file_count} files
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-xs">
-                              {new Date(pack.install_date).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-xs text-muted-foreground">Always Active</span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
                       </TableBody>
                     </Table>
                   </CardContent>
@@ -1556,16 +1535,113 @@ function App() {
               </div>
             </TabsContent>
 
-            <TabsContent value="utilities" className="flex-1 overflow-hidden m-4 mt-2">
+            <TabsContent value="graphics" className="flex-1 overflow-hidden m-4 mt-2">
+              <Card className="h-full flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Graphics Packs</CardTitle>
+                      <CardDescription>{graphicsPacks.length} packs installed</CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => void handleImportGraphicsPack()}
+                        disabled={importingGraphics || !config?.user_dir_path}
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Import Graphics Pack
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => void handleValidateGraphics()}
+                        disabled={validatingGraphics || !config?.user_dir_path}
+                      >
+                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                        Validate Graphics
+                      </Button>
+                    </div>
+                  </div>
+                  {importingGraphics && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Importing...
+                    </div>
+                  )}
+                  {graphicsProgress && (
+                    <div className="text-sm bg-muted p-3 rounded-md space-y-2">
+                      <div className="flex justify-between">
+                        <strong>Progress:</strong>
+                        <span>
+                          {Math.round((graphicsProgress.current / graphicsProgress.total) * 100)}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {graphicsProgress.current} / {graphicsProgress.total} files
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all"
+                          style={{
+                            width: `${(graphicsProgress.current / graphicsProgress.total) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {!config?.user_dir_path && (
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                      User directory is required for graphics pack installation
+                    </p>
+                  )}
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Files</TableHead>
+                        <TableHead>Installed</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {graphicsPacks.map((pack) => (
+                        <TableRow key={pack.id} className="hover:bg-muted/50">
+                          <TableCell className="font-medium">{pack.name}</TableCell>
+                          <TableCell>
+                            <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
+                              {pack.pack_type}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {pack.file_count} files
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {new Date(pack.install_date).toLocaleDateString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {graphicsPacks.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center text-muted-foreground">
+                            No graphics packs installed yet.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="namefix" className="flex-1 overflow-hidden m-4 mt-2">
               <Card className="h-full flex flex-col">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Wrench className="h-5 w-5" />
-                    FM Utilities
+                    Name Fix
                   </CardTitle>
-                  <CardDescription>
-                    Additional tools and utilities for Football Manager
-                  </CardDescription>
+                  <CardDescription>Manage FM Name Fix</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto space-y-4">
                   {/* FM Name Fix */}
@@ -1733,113 +1809,72 @@ function App() {
                       </p>
                     </CardContent>
                   </Card>
-
-                  {/* Graphics Packs */}
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">Graphics Packs</CardTitle>
-                          <CardDescription className="mt-1">
-                            Import large graphics packs including faces, logos, and kits
-                          </CardDescription>
-                        </div>
-                        {importingGraphics && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <RefreshCw className="h-4 w-4 animate-spin" />
-                            Importing...
-                          </div>
-                        )}
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="text-sm text-muted-foreground space-y-2">
-                        <p>
-                          <strong>What it does:</strong>
-                        </p>
-                        <ul className="list-disc list-inside space-y-1 ml-2">
-                          <li>Imports player faces, club logos, and team kits</li>
-                          <li>Supports large packs (5GB+)</li>
-                          <li>Shows real-time progress during import</li>
-                          <li>Automatically routes files to correct directories</li>
-                        </ul>
-                      </div>
-
-                      {graphicsProgress && (
-                        <div className="text-sm bg-muted p-3 rounded-md space-y-2">
-                          <div className="flex justify-between">
-                            <strong>Progress:</strong>
-                            <span>
-                              {Math.round(
-                                (graphicsProgress.current / graphicsProgress.total) * 100
-                              )}
-                              %
-                            </span>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {graphicsProgress.current} / {graphicsProgress.total} files
-                          </div>
-                          <div className="w-full bg-secondary rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full transition-all"
-                              style={{
-                                width: `${(graphicsProgress.current / graphicsProgress.total) * 100}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          onClick={() => void handleImportGraphicsPack()}
-                          disabled={importingGraphics || !config?.user_dir_path}
-                        >
-                          <Upload className="mr-2 h-4 w-4" />
-                          Import Graphics Pack
-                        </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => void handleValidateGraphics()}
-                          disabled={validatingGraphics || !config?.user_dir_path}
-                        >
-                          <CheckCircle2 className="mr-2 h-4 w-4" />
-                          Validate Graphics
-                        </Button>
-                      </div>
-
-                      {!config?.user_dir_path && (
-                        <p className="text-sm text-amber-600 dark:text-amber-400">
-                          User directory is required for graphics pack installation
-                        </p>
-                      )}
-
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Graphics packs are installed to your FM user directory and require a full
-                        game restart to take effect
-                      </p>
-                    </CardContent>
-                  </Card>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="logs" className="flex-1 overflow-hidden m-4 mt-2">
+            <TabsContent value="settings" className="flex-1 overflow-hidden m-4 mt-2">
               <Card className="h-full flex flex-col">
                 <CardHeader>
-                  <CardTitle>Activity Logs</CardTitle>
-                  <CardDescription>Recent activity and operations</CardDescription>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Settings
+                  </CardTitle>
+                  <CardDescription>Theme and storage preferences</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-1 overflow-auto">
-                  <div className="font-mono text-xs space-y-1">
-                    {logs.map((log, i) => (
-                      <div key={i} className="text-muted-foreground">
-                        {log}
+                <CardContent className="flex-1 overflow-auto space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium">Dark Mode</div>
+                      <div className="text-sm text-muted-foreground">
+                        Toggle dark theme for the app window.
                       </div>
-                    ))}
-                    {logs.length === 0 && (
-                      <p className="text-sm text-muted-foreground">No logs yet</p>
-                    )}
+                    </div>
+                    <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+                  </div>
+
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="text-sm font-medium">Application Logs</div>
+                    <div className="text-sm text-muted-foreground">
+                      Opens the folder where recent app logs are stored.
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={async () => {
+                        try {
+                          await tauriCommands.openLogsFolder();
+                          addLog('Opened logs folder');
+                        } catch (error) {
+                          addLog(`Failed to open logs folder: ${formatError(error)}`);
+                        }
+                      }}
+                    >
+                      <FolderOpen className="mr-2 h-4 w-4" />
+                      Open Logs Folder
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="text-sm font-medium">Mods Storage</div>
+                    <div className="text-sm text-muted-foreground">
+                      Opens the folder where imported mods are stored.
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={async () => {
+                        try {
+                          await tauriCommands.openModsFolder();
+                          addLog('Opened mods folder');
+                        } catch (error) {
+                          addLog(`Failed to open mods folder: ${formatError(error)}`);
+                        }
+                      }}
+                    >
+                      <FolderOpen className="mr-2 h-4 w-4" />
+                      Open Mods Folder
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

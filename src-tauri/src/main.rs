@@ -27,6 +27,7 @@ use mod_manager::{
 };
 use restore::{create_restore_point, list_restore_points, rollback_to_restore_point};
 use std::path::{Path, PathBuf};
+use tauri::AppHandle;
 use tauri::{Emitter, Manager};
 use types::{
     Config, ConflictInfo, ExtractionProgress, FileEntry, GraphicsConflictInfo,
@@ -348,6 +349,19 @@ fn create_backup_point(name: String) -> Result<String, String> {
     let point_dir = create_restore_point(&name, &[target])?;
 
     Ok(point_dir.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+async fn open_app_management_settings() -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        Command::new("open")
+            .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_AppManagement")
+            .output()
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -1515,13 +1529,18 @@ fn main() {
     tracing::info!("Application version: {}", app_version);
     tracing::info!("Updater endpoint: https://github.com/justinlevinedotme/FMMLoader-26/releases/latest/download/latest.json");
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build());
+
+    #[cfg(target_os = "macos")]
+    let builder = builder.plugin(tauri_plugin_macos_permissions::init());
+
+    builder
         .invoke_handler(tauri::generate_handler![
             init_app,
             get_app_version,
@@ -1562,6 +1581,7 @@ fn main() {
             migrate_graphics_pack,
             check_graphics_conflicts,
             preview_mod_install,
+            open_app_management_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
