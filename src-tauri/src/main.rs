@@ -537,7 +537,7 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_locale::init())
-        .plugin(tauri_plugin_i18n::init())
+        .plugin(tauri_plugin_i18n::init("locales", None))
         .plugin(tauri_plugin_updater::Builder::new().build());
 
     #[cfg(target_os = "macos")]
