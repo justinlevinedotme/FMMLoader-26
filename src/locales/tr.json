@@ -1,7 +1,5 @@
 {
-  "app": {
-    "title": "FMMLoader26"
-  },
+  "_version": 2,
   "nav": {
     "mods": "Modlar",
     "graphics": "Grafikler",
@@ -27,11 +25,11 @@
       "title": "Dil",
       "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.",
       "options": {
-        "en": "English",
-        "ko": "한국어",
+        "en": "Turkish",
+        "ko": "터키어",
         "tr": "Türkçe",
-        "pt-PT": "Português (Portugal)",
-        "de": "Deutsch"
+        "pt-PT": "Turco",
+        "de": "Türkisch"
       }
     }
   },

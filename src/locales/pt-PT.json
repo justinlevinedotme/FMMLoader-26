@@ -1,7 +1,5 @@
 {
-  "app": {
-    "title": "FMMLoader26"
-  },
+  "_version": 2,
   "nav": {
     "mods": "Mods",
     "graphics": "Gráficos",
@@ -27,11 +25,11 @@
       "title": "Idioma",
       "description": "Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.",
       "options": {
-        "en": "English",
-        "ko": "한국어",
-        "tr": "Türkçe",
+        "en": "Portuguese (Portugal)",
+        "ko": "포르투갈어(포르투갈)",
+        "tr": "Portekizce (Portekiz)",
         "pt-PT": "Português (Portugal)",
-        "de": "Deutsch"
+        "de": "Portugiesisch (Portugal)"
       }
     }
   },

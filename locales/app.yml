@@ -1,0 +1,181 @@
+_version: 2
+
+nav:
+  mods:
+    en: Mods
+    ko: 모드
+    tr: Modlar
+    pt-PT: Mods
+    de: Mods
+  graphics:
+    en: Graphics
+    ko: 그래픽
+    tr: Grafikler
+    pt-PT: Gráficos
+    de: Grafiken
+  nameFix:
+    en: Name Fix
+    ko: 이름 수정
+    tr: İsim Düzeltme
+    pt-PT: Correção de nomes
+    de: Namensfix
+  settings:
+    en: Settings
+    ko: 설정
+    tr: Ayarlar
+    pt-PT: Definições
+    de: Einstellungen
+
+settings:
+  title:
+    en: Settings
+    ko: 설정
+    tr: Ayarlar
+    pt-PT: Definições
+    de: Einstellungen
+  description:
+    en: Theme and storage preferences
+    ko: 테마 및 저장소 기본 설정
+    tr: Tema ve depolama tercihleri
+    pt-PT: Preferências de tema e armazenamento
+    de: Design- und Speicheroptionen
+  darkMode:
+    en: Dark Mode
+    ko: 다크 모드
+    tr: Koyu Mod
+    pt-PT: Modo escuro
+    de: Dunkelmodus
+  darkModeDescription:
+    en: Toggle dark theme for the app window.
+    ko: 앱 창의 다크 테마를 전환합니다.
+    tr: Uygulama penceresi için koyu temayı aç/kapat.
+    pt-PT: Alternar o tema escuro na janela da aplicação.
+    de: Dunkles Design für das App-Fenster umschalten.
+  logs:
+    title:
+      en: Application Logs
+      ko: 애플리케이션 로그
+      tr: Uygulama Günlükleri
+      pt-PT: Registos da aplicação
+      de: Anwendungsprotokolle
+    description:
+      en: Opens the folder where recent app logs are stored.
+      ko: 최근 앱 로그가 저장된 폴더를 엽니다.
+      tr: Son uygulama günlüklerinin bulunduğu klasörü açar.
+      pt-PT: Abre a pasta onde os registos recentes são guardados.
+      de: Öffnet den Ordner, in dem aktuelle Logs gespeichert sind.
+    open:
+      en: Open Logs Folder
+      ko: 로그 폴더 열기
+      tr: Günlük Klasörünü Aç
+      pt-PT: Abrir pasta de registos
+      de: Log-Ordner öffnen
+  modsStorage:
+    title:
+      en: Mods Storage
+      ko: 모드 저장소
+      tr: Mod Deposu
+      pt-PT: Armazenamento de mods
+      de: Mods-Speicher
+    description:
+      en: Opens the folder where imported mods are stored.
+      ko: 가져온 모드가 저장된 폴더를 엽니다.
+      tr: İçe aktarılan modların saklandığı klasörü açar.
+      pt-PT: Abre a pasta onde os mods importados são guardados.
+      de: Öffnet den Ordner, in dem importierte Mods gespeichert sind.
+    open:
+      en: Open Mods Folder
+      ko: 모드 폴더 열기
+      tr: Modlar Klasörünü Aç
+      pt-PT: Abrir pasta de mods
+      de: Mods-Ordner öffnen
+  language:
+    title:
+      en: Language
+      ko: 언어
+      tr: Dil
+      pt-PT: Idioma
+      de: Sprache
+    description:
+      en: Choose your preferred language. Overrides system detection on restart.
+      ko: 선호하는 언어를 선택하세요. 재시작 시 시스템 감지를 덮어씁니다.
+      tr: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
+      pt-PT: Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.
+      de: Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.
+    options:
+      en:
+        en: English
+        ko: 영어
+        tr: İngilizce
+        pt-PT: Inglês
+        de: Englisch
+      ko:
+        en: Korean
+        ko: 한국어
+        tr: Korece
+        pt-PT: Coreano
+        de: Koreanisch
+      tr:
+        en: Turkish
+        ko: 터키어
+        tr: Türkçe
+        pt-PT: Turco
+        de: Türkisch
+      pt-PT:
+        en: Portuguese (Portugal)
+        ko: 포르투갈어(포르투갈)
+        tr: Portekizce (Portekiz)
+        pt-PT: Português (Portugal)
+        de: Portugiesisch (Portugal)
+      de:
+        en: German
+        ko: 독일어
+        tr: Almanca
+        pt-PT: Alemão
+        de: Deutsch
+
+common:
+  open:
+    en: Open
+    ko: 열기
+    tr: Aç
+    pt-PT: Abrir
+    de: Öffnen
+  close:
+    en: Close
+    ko: 닫기
+    tr: Kapat
+    pt-PT: Fechar
+    de: Schließen
+  language:
+    en: Language
+    ko: 언어
+    tr: Dil
+    pt-PT: Idioma
+    de: Sprache
+  apply:
+    en: Apply
+    ko: 적용
+    tr: Uygula
+    pt-PT: Aplicar
+    de: Anwenden
+  cancel:
+    en: Cancel
+    ko: 취소
+    tr: İptal
+    pt-PT: Cancelar
+    de: Abbrechen
+
+errors:
+  generic:
+    en: Something went wrong.
+    ko: 문제가 발생했습니다.
+    tr: Bir sorun oluştu.
+    pt-PT: Ocorreu um problema.
+    de: Etwas ist schiefgelaufen.
+  missingKey:
+    en: "Missing translation: {key}"
+    ko: "번역이 없습니다: {key}"
+    tr: "Eksik çeviri: {key}"
+    pt-PT: "Tradução em falta: {key}"
+    de: "Fehlende Übersetzung: {key}"

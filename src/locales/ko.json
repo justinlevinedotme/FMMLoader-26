@@ -1,7 +1,5 @@
 {
-  "app": {
-    "title": "FMMLoader26"
-  },
+  "_version": 2,
   "nav": {
     "mods": "모드",
     "graphics": "그래픽",
@@ -27,11 +25,11 @@
       "title": "언어",
       "description": "선호하는 언어를 선택하세요. 재시작 시 시스템 감지를 덮어씁니다.",
       "options": {
-        "en": "English",
+        "en": "Korean",
         "ko": "한국어",
-        "tr": "Türkçe",
-        "pt-PT": "Português (Portugal)",
-        "de": "Deutsch"
+        "tr": "Korece",
+        "pt-PT": "Coreano",
+        "de": "Koreanisch"
       }
     }
   },
