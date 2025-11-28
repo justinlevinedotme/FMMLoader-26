@@ -254,19 +254,19 @@ modMeta:
         tr: Opsiyonel açıklama
         pt-PT: Descrição opcional
         de: Optionale Beschreibung
-    actions:
-      cancel:
-        en: Cancel
-        ko: 취소
-        tr: İptal
-        pt-PT: Cancelar
-        de: Abbrechen
-      submit:
-        en: Save
-        ko: 저장
-        tr: Kaydet
-        pt-PT: Guardar
-        de: Speichern
+  actions:
+    cancel:
+      en: Cancel
+      ko: 취소
+      tr: İptal
+      pt-PT: Cancelar
+      de: Abbrechen
+    submit:
+      en: Save
+      ko: 저장
+      tr: Kaydet
+      pt-PT: Guardar
+      de: Speichern
 
 common:
   open:

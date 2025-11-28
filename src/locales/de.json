@@ -63,11 +63,11 @@
       "description": {
         "label": "Beschreibung",
         "placeholder": "Optionale Beschreibung"
-      },
-      "actions": {
-        "cancel": "Abbrechen",
-        "submit": "Speichern"
       }
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "submit": "Speichern"
     }
   },
   "common": {

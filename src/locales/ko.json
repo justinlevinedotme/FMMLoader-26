@@ -63,11 +63,11 @@
       "description": {
         "label": "설명",
         "placeholder": "선택 사항 (설명)"
-      },
-      "actions": {
-        "cancel": "취소",
-        "submit": "저장"
       }
+    },
+    "actions": {
+      "cancel": "취소",
+      "submit": "저장"
     }
   },
   "common": {
