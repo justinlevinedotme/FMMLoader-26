@@ -224,6 +224,9 @@ function App() {
   const [locale, setLocale] = useState<SupportedLocale>('en');
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
+  const txRef = useRef<
+    (key: string, params?: Record<string, string | number | undefined>) => string
+  >(() => '');
   const localeOptions: { value: SupportedLocale; emoji: string; label: string }[] = [
     { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
     { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
@@ -530,23 +533,24 @@ function App() {
   const applyMods = async () => {
     if (!config?.target_path) {
       addLog('Please set game target first');
-      toast.warning('Please set game target first');
+      toast.warning(txRef.current('toasts.needGameTarget'));
       return;
     }
 
     try {
       setLoading(true);
-      await runWithBlockingMessage('Applying mods...', async () => {
+      await runWithBlockingMessage(txRef.current('toasts.applyingMods'), async () => {
         addLog('Applying mods...');
-        toast.loading('Applying mods...', { id: 'apply-mods' });
+        toast.loading(txRef.current('toasts.applyingMods'), { id: 'apply-mods' });
         const result = await tauriCommands.applyMods();
         addLog(result);
         addLog('Mods applied successfully');
-        toast.success('Mods applied successfully!', { id: 'apply-mods' });
+        toast.success(txRef.current('toasts.applySuccess'), { id: 'apply-mods' });
       });
     } catch (error) {
-      addLog(`Error applying mods: ${formatError(error)}`);
-      toast.error(`Failed to apply mods: ${formatError(error)}`, {
+      const message = formatError(error);
+      addLog(`Error applying mods: ${message}`);
+      toast.error(txRef.current('toasts.applyError', { message }), {
         id: 'apply-mods',
       });
     } finally {
@@ -558,7 +562,7 @@ function App() {
     try {
       await tauriCommands.removeMod(modId);
       addLog(`Removed ${modId}`);
-      toast.success(`Successfully removed ${modId}`);
+      toast.success(txRef.current('toasts.removeSuccess', { name: modId }));
 
       // Clear selection if we removed the selected mod
       if (selectedMod?.id === modId) {
@@ -568,8 +572,9 @@ function App() {
 
       await loadMods();
     } catch (error) {
-      addLog(`Error removing mod: ${formatError(error)}`);
-      toast.error(`Failed to remove mod: ${formatError(error)}`);
+      const message = formatError(error);
+      addLog(`Error removing mod: ${message}`);
+      toast.error(txRef.current('toasts.removeError', { message }));
     } finally {
       setConfirmDeleteMod(null);
     }
@@ -610,7 +615,7 @@ function App() {
         // Route to graphics pack analysis and confirmation
         addLog(`Detected graphics pack: ${sourcePath}`);
         await runWithBlockingMessage(
-          'Analyzing graphics pack (this may take a few minutes)...',
+          txRef.current('graphicsTab.progress.importing'),
           async () => {
             try {
               const analysis = await tauriCommands.analyzeGraphicsPack(sourcePath);
@@ -620,7 +625,7 @@ function App() {
             } catch (error) {
               const errorMsg = formatError(error);
               addLog(`Error analyzing graphics pack: ${errorMsg}`);
-              toast.error(`Failed to analyze graphics pack: ${errorMsg}`, {
+              toast.error(txRef.current('toasts.graphicsImportError', { message: errorMsg }), {
                 id: 'analyze-graphics',
               });
             }
@@ -633,12 +638,14 @@ function App() {
       // Otherwise, import as regular mod
       addLog(`Importing from: ${sourcePath}`);
       await runWithBlockingMessage(
-        'Importing mod...',
+        txRef.current('toasts.importLoading'),
         async () => {
-          toast.loading('Importing mod...', { id: 'import-mod' });
+          toast.loading(txRef.current('toasts.importLoading'), { id: 'import-mod' });
           const result = await tauriCommands.importMod(sourcePath);
           addLog(`Successfully imported: ${result}`);
-          toast.success(`Successfully imported: ${result}`, { id: 'import-mod' });
+          toast.success(txRef.current('toasts.importSuccess', { name: result }), {
+            id: 'import-mod',
+          });
           await loadMods();
         },
         0
@@ -651,10 +658,11 @@ function App() {
         // Mod needs metadata - show dialog
         setPendingImportPath(sourcePath);
         setMetadataDialogOpen(true);
-        toast.info('Please provide mod metadata');
+        toast.info(txRef.current('toasts.importNeedMetadata'));
       } else {
-        addLog(`Import failed: ${formatError(error)}`);
-        toast.error(`Import failed: ${formatError(error)}`, { id: 'import-mod' });
+        const message = formatError(error);
+        addLog(`Import failed: ${message}`);
+        toast.error(txRef.current('toasts.importError', { message }), { id: 'import-mod' });
       }
     }
   };
@@ -665,12 +673,14 @@ function App() {
     try {
       addLog(`Importing with metadata...`);
       await runWithBlockingMessage(
-        'Importing mod with metadata...',
+        txRef.current('toasts.importLoading'),
         async () => {
-          toast.loading('Importing mod...', { id: 'import-mod' });
+          toast.loading(txRef.current('toasts.importLoading'), { id: 'import-mod' });
           const result = await tauriCommands.importMod(pendingImportPath, metadata);
           addLog(`Successfully imported: ${result}`);
-          toast.success(`Successfully imported: ${result}`, { id: 'import-mod' });
+          toast.success(txRef.current('toasts.importSuccess', { name: result }), {
+            id: 'import-mod',
+          });
           setMetadataDialogOpen(false);
           setPendingImportPath(null);
           await loadMods();
@@ -678,8 +688,9 @@ function App() {
         0
       );
     } catch (error) {
-      addLog(`Import failed: ${formatError(error)}`);
-      toast.error(`Import failed: ${formatError(error)}`, { id: 'import-mod' });
+      const message = formatError(error);
+      addLog(`Import failed: ${message}`);
+      toast.error(txRef.current('toasts.importError', { message }), { id: 'import-mod' });
     }
   };
 
@@ -766,7 +777,7 @@ function App() {
 
   const installSelectedNameFix = async () => {
     if (!selectedNameFixId) {
-      toast.error('Please select a name fix to install');
+      toast.error(txRef.current('toasts.nameFixNeedSelection'));
       return;
     }
 
@@ -776,13 +787,13 @@ function App() {
       addLog(`Installing ${selectedSource?.name || 'name fix'}...`);
       const result = await tauriCommands.installNameFixById(selectedNameFixId);
       addLog(result);
-      toast.success('Name fix installed successfully!');
+      toast.success(txRef.current('toasts.nameFixInstalled'));
       setNameFixInstalled(true);
       await checkNameFixStatus();
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error installing name fix: ${errorMsg}`);
-      toast.error(`Failed to install name fix: ${errorMsg}`);
+      toast.error(txRef.current('toasts.nameFixInstallError', { message: errorMsg }));
     } finally {
       setInstallingNameFix(false);
     }
@@ -830,7 +841,7 @@ function App() {
 
   const confirmImportNameFix = async () => {
     if (!pendingImportFilePath || !importNameFixName.trim()) {
-      toast.error('Please enter a name for the name fix');
+      toast.error(txRef.current('toasts.nameFixNeedSelection'));
       return;
     }
 
@@ -851,7 +862,7 @@ function App() {
       console.log('Import completed successfully. Result:', result);
 
       addLog(result);
-      toast.success(result);
+      toast.success(txRef.current('toasts.nameFixImportSuccess', { message: result }));
 
       // Reload sources
       console.log('Reloading name fix sources...');
@@ -870,7 +881,7 @@ function App() {
       const errorMsg = formatError(error);
       console.error('Formatted error message:', errorMsg);
       addLog(`Error importing name fix: ${errorMsg}`);
-      toast.error(`Failed to import name fix: ${errorMsg}`);
+      toast.error(txRef.current('toasts.nameFixImportError', { message: errorMsg }));
     }
   };
 
@@ -894,7 +905,7 @@ function App() {
       // Analyze the pack first
       addLog('Analyzing graphics pack...');
       await runWithBlockingMessage(
-        'Analyzing graphics pack (this may take a few minutes)...',
+        txRef.current('graphicsTab.progress.importing'),
         async () => {
           const analysis = await tauriCommands.analyzeGraphicsPack(selected);
           addLog(`Detected pack type: ${JSON.stringify(analysis.pack_type)}`);
@@ -906,7 +917,9 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error analyzing graphics pack: ${errorMsg}`);
-      toast.error(`Failed to analyze graphics pack: ${errorMsg}`, { id: 'analyze-graphics' });
+      toast.error(txRef.current('toasts.graphicsImportError', { message: errorMsg }), {
+        id: 'analyze-graphics',
+      });
     }
   };
 
@@ -964,7 +977,9 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error importing graphics pack: ${errorMsg}`);
-      toast.error(`Failed to import graphics pack: ${errorMsg}`, { id: 'graphics-import' });
+      toast.error(txRef.current('toasts.graphicsImportError', { message: errorMsg }), {
+        id: 'graphics-import',
+      });
       setGraphicsProgress(null);
     } finally {
       setImportingGraphics(false);
@@ -1300,6 +1315,8 @@ function App() {
 
   const TranslatedUI = () => {
     const { t } = useI18n();
+    txRef.current = (key: string, params?: Record<string, string | number | undefined>) =>
+      t ? t(key, params) : key;
     const contributors = [
       { name: 'Justin Levine', role: 'Lead / Creator' },
       { name: 'Tom (LotsGon)', role: 'Advice and Expertise' },

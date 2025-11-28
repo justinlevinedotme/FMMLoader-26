@@ -57,6 +57,43 @@
       "refresh": "Reload mod list and state"
     }
   },
+  "toasts": {
+    "needGameTarget": "Please set game target first",
+    "applyingMods": "Applying mods...",
+    "applySuccess": "Mods applied successfully!",
+    "applyError": "Failed to apply mods: {message}",
+    "removeSuccess": "Successfully removed {name}",
+    "removeError": "Failed to remove mod: {message}",
+    "importLoading": "Importing mod...",
+    "importSuccess": "Successfully imported: {name}",
+    "importNeedMetadata": "Please provide mod metadata",
+    "importError": "Import failed: {message}",
+    "nameFixNeedSelection": "Please select a name fix to install",
+    "nameFixInstalled": "Name fix installed successfully!",
+    "nameFixInstallError": "Failed to install name fix: {message}",
+    "nameFixImportSuccess": {
+      "message": null
+    },
+    "nameFixImportError": "Failed to import name fix: {message}",
+    "graphicsImporting": "Importing graphics...",
+    "graphicsImportError": "Failed to import graphics pack: {message}",
+    "validateGraphics": {
+      "loading": "Validating graphics...",
+      "success": "All graphics packs are correctly placed!",
+      "issues": "Found {count} issue(s). Click to review.",
+      "error": "Failed to validate graphics: {message}"
+    },
+    "migrateGraphics": {
+      "loading": "Moving {name}...",
+      "success": "Graphics pack moved successfully!",
+      "error": "Failed to migrate pack: {message}"
+    },
+    "migrateAll": {
+      "loading": "Migrating all packs...",
+      "success": "All packs migrated successfully!",
+      "error": "Failed to migrate packs: {message}"
+    }
+  },
   "paths": {
     "gameDir": {
       "label": "Game Directory:",

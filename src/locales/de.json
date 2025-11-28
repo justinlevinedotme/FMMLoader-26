@@ -57,6 +57,43 @@
       "refresh": "Modliste und Status neu laden"
     }
   },
+  "toasts": {
+    "needGameTarget": "Bitte zuerst den Spielpfad setzen",
+    "applyingMods": "Mods werden angewendet...",
+    "applySuccess": "Mods erfolgreich angewendet!",
+    "applyError": "Mods konnten nicht angewendet werden: {message}",
+    "removeSuccess": "{name} erfolgreich entfernt",
+    "removeError": "Mod konnte nicht entfernt werden: {message}",
+    "importLoading": "Mod wird importiert...",
+    "importSuccess": "Erfolgreich importiert: {name}",
+    "importNeedMetadata": "Bitte Mod-Metadaten angeben",
+    "importError": "Import fehlgeschlagen: {message}",
+    "nameFixNeedSelection": "Bitte wähle einen Namensfix zur Installation",
+    "nameFixInstalled": "Namensfix erfolgreich installiert!",
+    "nameFixInstallError": "Namensfix konnte nicht installiert werden: {message}",
+    "nameFixImportSuccess": {
+      "message": null
+    },
+    "nameFixImportError": "Import des Namensfixes fehlgeschlagen: {message}",
+    "graphicsImporting": "Grafiken werden importiert...",
+    "graphicsImportError": "Grafik-Pack konnte nicht importiert werden: {message}",
+    "validateGraphics": {
+      "loading": "Grafiken werden überprüft...",
+      "success": "Alle Grafik-Packs sind korrekt platziert!",
+      "issues": "{count} Problem(e) gefunden. Zum Prüfen klicken.",
+      "error": "Grafiken konnten nicht validiert werden: {message}"
+    },
+    "migrateGraphics": {
+      "loading": "{name} wird verschoben...",
+      "success": "Grafik-Pack erfolgreich verschoben!",
+      "error": "Paket konnte nicht migriert werden: {message}"
+    },
+    "migrateAll": {
+      "loading": "Alle Packs werden migriert...",
+      "success": "Alle Packs erfolgreich migriert!",
+      "error": "Pakete konnten nicht migriert werden: {message}"
+    }
+  },
   "paths": {
     "gameDir": {
       "label": "Spielverzeichnis:",

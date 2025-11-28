@@ -57,6 +57,43 @@
       "refresh": "Mod listesi ve durumunu yenile"
     }
   },
+  "toasts": {
+    "needGameTarget": "Lütfen önce oyun dizinini ayarlayın",
+    "applyingMods": "Modlar uygulanıyor...",
+    "applySuccess": "Modlar başarıyla uygulandı!",
+    "applyError": "Modlar uygulanamadı: {message}",
+    "removeSuccess": "{name} başarıyla kaldırıldı",
+    "removeError": "Mod kaldırılamadı: {message}",
+    "importLoading": "Mod içe aktarılıyor...",
+    "importSuccess": "Başarıyla içe aktarıldı: {name}",
+    "importNeedMetadata": "Lütfen mod metadata bilgilerini girin",
+    "importError": "İçe aktarma başarısız: {message}",
+    "nameFixNeedSelection": "Lütfen kurulacak isim düzeltmesini seçin",
+    "nameFixInstalled": "İsim düzeltme başarıyla yüklendi!",
+    "nameFixInstallError": "İsim düzeltme yüklenemedi: {message}",
+    "nameFixImportSuccess": {
+      "message": null
+    },
+    "nameFixImportError": "İsim düzeltme içe aktarılamadı: {message}",
+    "graphicsImporting": "Grafikler içe aktarılıyor...",
+    "graphicsImportError": "Grafik paketi içe aktarılamadı: {message}",
+    "validateGraphics": {
+      "loading": "Grafikler doğrulanıyor...",
+      "success": "Tüm grafik paketleri doğru konumda!",
+      "issues": "{count} sorun bulundu. İncelemek için tıklayın.",
+      "error": "Grafikler doğrulanamadı: {message}"
+    },
+    "migrateGraphics": {
+      "loading": "{name} taşınıyor...",
+      "success": "Grafik paketi başarıyla taşındı!",
+      "error": "Paket taşınamadı: {message}"
+    },
+    "migrateAll": {
+      "loading": "Tüm paketler taşınıyor...",
+      "success": "Tüm paketler başarıyla taşındı!",
+      "error": "Paketler taşınamadı: {message}"
+    }
+  },
   "paths": {
     "gameDir": {
       "label": "Oyun Dizini:",
