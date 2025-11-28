@@ -67,7 +67,6 @@ import { ConflictsDialog } from '@/components/ConflictsDialog';
 import { RestorePointsDialog } from '@/components/RestorePointsDialog';
 import { GraphicsPackConfirmDialog } from '@/components/GraphicsPackConfirmDialog';
 import { TitleBar } from '@/components/TitleBar';
-import { Toaster } from '@/components/ui/sonner';
 import { UpdateBanner } from '@/components/UpdateBanner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ModsTab, GraphicsTab, NameFixTab, SettingsTab, type ModWithInfo } from '@/components/tabs';
@@ -221,6 +220,7 @@ function App() {
   const [gameTargetInput, setGameTargetInput] = useState('');
   const [userDirInput, setUserDirInput] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'mods' | 'graphics' | 'namefix' | 'settings'>('mods');
   const [locale, setLocale] = useState<SupportedLocale>('en');
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
@@ -270,14 +270,12 @@ function App() {
   };
 
   const triggerToastTests = () => {
-    toast.success(txRef.current('toasts.validateGraphics.success'), { id: 'test-validate' });
-    toast.info(txRef.current('toasts.validateGraphics.issues', { count: 2 }));
-    toast.loading(txRef.current('toasts.migrateGraphics.loading', { name: 'Test Pack' }), {
-      id: 'test-migrate',
-    });
-    toast.success(txRef.current('toasts.migrateGraphics.success'), { id: 'test-migrate' });
-    toast.error(txRef.current('toasts.migrateGraphics.error', { message: 'Example error' }));
-    toast.success(txRef.current('toasts.nameFixUninstallSuccess'), { id: 'test-namefix' });
+    toast.success('Toast test: success', { id: 'test-validate' });
+    toast.info('Toast test: info');
+    toast.loading('Toast test: loading...', { id: 'test-migrate' });
+    toast.success('Toast test: success (migrate)', { id: 'test-migrate' });
+    toast.error('Toast test: error example');
+    toast.success('Toast test: name-fix success', { id: 'test-namefix' });
   };
 
   // Dialog states
@@ -1576,7 +1574,13 @@ function App() {
 
           {/* Main Content */}
           <div className="flex-1 overflow-hidden">
-            <Tabs defaultValue="mods" className="h-full flex flex-col">
+            <Tabs
+              value={activeTab}
+              onValueChange={(val) =>
+                setActiveTab((val as 'mods' | 'graphics' | 'namefix' | 'settings') ?? 'mods')
+              }
+              className="h-full flex flex-col"
+            >
               <TabsHeader />
 
               <TabsContent value="mods" className="flex-1 overflow-hidden m-4 mt-2">
@@ -2020,8 +2024,6 @@ function App() {
               )}
             </div>
           )}
-          <Toaster />
-
           {/* Import Name Fix Dialog */}
           <Dialog open={importNameFixDialogOpen} onOpenChange={setImportNameFixDialogOpen}>
             <DialogContent>
