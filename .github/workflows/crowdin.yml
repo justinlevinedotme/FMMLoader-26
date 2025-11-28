@@ -1,0 +1,85 @@
+name: Crowdin Sync
+
+on:
+  # Upload source files to Crowdin when translations change
+  push:
+    branches: [main]
+    paths:
+      - 'src/locales/en.json'
+      - 'locales/app.yml'
+      - 'crowdin.yml'
+
+  # Download translations from Crowdin on schedule
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight UTC
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Sync mode'
+        required: true
+        type: choice
+        options:
+          - upload # Upload source files to Crowdin
+          - download # Download translations from Crowdin
+        default: 'download'
+
+concurrency:
+  group: crowdin-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Crowdin Upload (Push to main)
+        if: github.event_name == 'push'
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: true
+          upload_translations: false
+          download_translations: false
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Crowdin Download (Scheduled/Manual)
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'download')
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+          create_pull_request: true
+          pull_request_title: 'chore: update translations from Crowdin'
+          pull_request_body: |
+            New translations downloaded from Crowdin.
+
+            Please review the changes and merge if everything looks correct.
+          pull_request_labels: 'i18n, translations'
+          pull_request_base_branch_name: 'main'
+          localization_branch_name: 'i18n/crowdin-translations'
+          commit_message: 'chore: update translations from Crowdin'
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Crowdin Upload (Manual)
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'upload'
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: true
+          upload_translations: false
+          download_translations: false
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

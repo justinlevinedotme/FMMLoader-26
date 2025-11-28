@@ -1,0 +1,182 @@
+_version: 2
+nav:
+  mods: Mods
+  graphics: Gráficos
+  nameFix: Correção de nomes
+  settings: Definições
+settings:
+  title: Definições
+  description: Preferências de tema e armazenamento
+  darkMode: Modo escuro
+  darkModeDescription: Alternar o tema escuro na janela da aplicação.
+  logs:
+    title: Registos da aplicação
+    description: Abre a pasta onde os registos recentes são guardados.
+    open: Abrir pasta de registos
+  modsStorage:
+    title: Armazenamento de mods
+    description: Abre a pasta onde os mods importados são guardados.
+    open: Abrir pasta de mods
+  language:
+    title: Idioma
+    description: Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.
+  updates:
+    title: Atualizações
+    current: 'Atual: v{version}'
+    available: 'Atualização disponível: v{version}'
+    check: Procurar atualizações
+    checking: A verificar...
+    modalTitle: Atualização disponível
+    modalBody: 'Versão v{latest} disponível. Atual: v{current}.'
+    downloadInstall: Transferir e instalar
+    downloading: A transferir...
+    installing: A instalar...
+    later: Mais tarde
+modMeta:
+  title: Adicionar metadados do mod
+  description: Forneça os metadados deste mod para que possa ser gerido corretamente.
+  fields:
+    name:
+      label: Nome
+      placeholder: Introduza o nome do mod
+    version:
+      label: Versão
+      placeholder: 1.0.0
+    type:
+      label: Tipo
+      placeholder: Selecione um tipo de mod
+      detecting: A detetar tipo de mod...
+    author:
+      label: Autor
+      placeholder: Nome do autor (opcional)
+    description:
+      label: Descrição
+      placeholder: Descrição opcional
+  actions:
+    cancel: Cancelar
+    submit: Guardar
+common:
+  open: Abrir
+  close: Fechar
+  language: Idioma
+  apply: Aplicar
+  cancel: Cancelar
+errors:
+  generic: Ocorreu um problema.
+  missingKey: 'Tradução em falta: {key}'
+overlay:
+  dropTitle: Largue o ficheiro de mod para importar
+footer:
+  createdBy: FMMLoader26 v{version} | Criado por JALCO / Justin Levine
+  supportKofi: Apoiar no Ko-Fi
+  joinDiscord: Entrar no Discord
+toolbar:
+  import: Importar
+  conflicts: Conflitos
+  restore: Restaurar
+  refresh: Atualizar
+  tooltips:
+    import: Importar novo pacote de mod
+    conflicts: Verificar conflitos de ficheiros entre mods
+    restore: Reverter para um backup anterior
+    refresh: Recarregar lista e estado de mods
+paths:
+  gameDir:
+    label: 'Diretório do Jogo:'
+    tooltip: A pasta de instalação do FM26 com os ficheiros .bundle
+    placeholder: Não definido - clique em Selecionar ou Detetar Jogo
+    detect: Detetar
+  userDir:
+    label: 'Diretório do Utilizador:'
+    tooltip: Diretório do Utilizador do FM26 onde ficam saves e definições
+    placeholder: Detetado automaticamente pelo sistema
+    detect: Detetar
+modsTab:
+  tabs:
+    mods: Mods
+    graphics: Gráficos
+    namefix: Correção de nomes
+    settings: Definições
+  primaryActions:
+    apply: Aplicar mods selecionados
+    enable: Ativar
+    disable: Desativar
+  table:
+    name: Nome
+    type: Tipo
+    author: Autor
+    status: Estado
+    version: Versão
+    actions: Ações
+  empty: Nenhum mod encontrado. Importe um mod para começar.
+graphicsTab:
+  title: Pacotes de gráficos
+  subtitle: '{count} pacotes instalados'
+  import:
+    button: Importar pacote de gráficos
+    disabledTip: Diretório do utilizador necessário para importar
+  validate:
+    button: Validar gráficos
+    disabledTip: Diretório do utilizador necessário para validar
+  progress:
+    heading: 'Progresso:'
+    files: '{current} / {total} ficheiros'
+    importing: A importar...
+  warnings:
+    needUserDir: Diretório do utilizador é necessário para instalar pacotes de gráficos
+  table: Ainda não há pacotes de gráficos instalados.
+credits:
+  title: Créditos
+  description: Obrigado a todos os que ajudam a construir e traduzir o FMMLoader.
+  sections:
+    contributors:
+      title: Contribuidores principais
+    translators:
+      title: Tradutores e localização
+    languages:
+      title: Idiomas suportados
+    crowdin:
+      title: Contribuidores CrowdIn
+      note: Agradecimento especial aos membros da comunidade que mantêm as traduções
+        atualizadas.
+nameFix:
+  title: Correção de Nomes
+  subtitle: Gerir correção de nomes FM
+  sectionTitle: Correção de nomes FM
+  sectionDescription: Corrige licenças e ativa nomes reais para clubes, jogadores
+    e competições
+  status:
+    checking: A verificar...
+    installed: Instalado
+    notInstalled: Não instalado
+  whatItDoes:
+    heading: 'O que faz:'
+    bullets:
+    - Desbloqueia nomes reais para clubes como AC Milan, Inter e Lazio
+    - Corrige nomes de jogadores japoneses
+    - Remove conteúdo falso/não licenciado
+    - Funciona com todas as ligas e competições
+  active:
+    heading: 'Atualmente ativo:'
+    unknown: Desconhecido
+  selectLabel: 'Selecionar fonte de correção:'
+  selectPlaceholder: Selecione uma fonte de correção de nomes
+  activeSuffix: ' - Ativo'
+  noSources: Sem fontes de correção. Importe um ZIP para começar.
+  buttons:
+    install: Instalar
+    reinstall: Reinstalar
+    uninstall: Desinstalar do jogo
+    importZip: Importar de ZIP
+    checkStatus: Verificar estado
+    deleteSource: Apagar fonte
+  warnings:
+    needGameDir: Defina primeiro o Diretório do Jogo
+  notes:
+    community: Pode descarregar correções da comunidade ou criar as suas. Recomendamos
+      as correções do SortItOutSI ou FMScout.
+  userDir:
+    label: 'Diretório do Utilizador:'
+    tooltip: Diretório do Utilizador do FM26 onde ficam saves e definições
+    placeholder: Detetado automaticamente pelo sistema
+    detect: Detetar
