@@ -4,8 +4,8 @@ preserve_hierarchy: true
 
 files:
   # Frontend JSON translations
-  - source: /src/locales/en.json
-    translation: /src/locales/%locale_with_underscore%.json
+  - source: ../src/locales/en.json
+    translation: ../src/locales/%locale_with_underscore%.json
     update_option: update_as_unapproved
     languages_mapping:
       locale_with_underscore:
@@ -16,8 +16,8 @@ files:
         it: it
 
   # Backend YAML translations
-  - source: /locales/en.yml
-    translation: /locales/%locale_with_underscore%.yml
+  - source: ../locales/en.yml
+    translation: ../locales/%locale_with_underscore%.yml
     update_option: update_as_unapproved
     languages_mapping:
       locale_with_underscore:
