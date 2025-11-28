@@ -90,8 +90,7 @@
     "migrateGraphics": {
       "loading": "Moving {name}...",
       "success": "Graphics pack moved successfully!",
-      "error": "Failed to migrate pack: {message}",
-      "progress": "Migrating: {current}/{total} files ({percent}%)"
+      "error": "Failed to migrate pack: {message}"
     },
     "migrateAll": {
       "loading": "Migrating all packs...",

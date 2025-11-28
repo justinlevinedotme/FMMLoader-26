@@ -90,8 +90,7 @@
     "migrateGraphics": {
       "loading": "{name} 이동 중...",
       "success": "그래픽 팩이 성공적으로 이동되었습니다!",
-      "error": "팩 이동 실패: {message}",
-      "progress": "마이그레이션 중: {current}/{total} 파일 ({percent}%)"
+      "error": "팩 이동 실패: {message}"
     },
     "migrateAll": {
       "loading": "모든 팩 이동 중...",
