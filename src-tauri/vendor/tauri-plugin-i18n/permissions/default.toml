@@ -1,0 +1,9 @@
+[default]
+description = "Default permissions for the i18n plugin."
+permissions = [
+    "allow-load-translations",
+    "allow-translate",
+    "allow-get-locale",
+    "allow-set-locale",
+    "allow-get-available-locales"
+]

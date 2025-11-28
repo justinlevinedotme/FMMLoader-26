@@ -1,0 +1,52 @@
+{
+  "name": "@razein97/tauri-plugin-i18n",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A wrapper around rust_i18n",
+  "main": "./dist-js/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "require": "./dist-js/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razein97/tauri-plugin-i18n.git"
+  },
+  "keywords": [
+    "tauri-plugin",
+    "tauri",
+    "i18n",
+    "internationalization"
+  ],
+  "authors": [
+    "Rohit Singh"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@tauri-apps/api": "^2.8.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.8.0",
+    "typescript": "^5.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/razein97/tauri-plugin-i18n/issues"
+  },
+  "homepage": "https://github.com/razein97/tauri-plugin-i18n#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}

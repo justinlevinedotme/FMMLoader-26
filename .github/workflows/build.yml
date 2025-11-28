@@ -31,8 +31,6 @@ jobs:
       changed: ${{ steps.sync.outputs.changed }}
     steps:
       - uses: actions/checkout@v6
-        with:
-          submodules: recursive
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -152,8 +150,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          submodules: recursive
 
       - name: Download synced version files
         uses: actions/download-artifact@v6
