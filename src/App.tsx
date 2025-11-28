@@ -1488,13 +1488,10 @@ function App() {
                   onValueChange={(val) => handleLocaleChange(val as SupportedLocale)}
                 >
                   <SelectTrigger className="w-[80px] h-9 justify-center">
-                    <SelectValue
-                      renderValue={(selected) => {
-                        const opt = localeOptions.find((o) => o.value === (selected as string));
-                        if (!opt) return selected;
-                        return opt.emoji;
-                      }}
-                    />
+                    <div className="w-full text-center" aria-hidden>
+                      {localeOptions.find((o) => o.value === locale)?.emoji ?? locale}
+                    </div>
+                    <SelectValue className="sr-only" />
                   </SelectTrigger>
                   <SelectContent className="w-[40px]">
                     {localeOptions.map((option) => (
