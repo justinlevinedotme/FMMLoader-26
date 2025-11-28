@@ -226,7 +226,12 @@ function App() {
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const localeOptions: { value: SupportedLocale; emoji: string; label: string }[] = [
+  const localeOptions: {
+    value: SupportedLocale;
+    emoji: string;
+    label: string;
+    contributor?: string;
+  }[] = [
     { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
     { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
     { value: 'tr', emoji: '🇹🇷', label: 'Türkçe', contributor: 'AI' },
@@ -265,17 +270,20 @@ function App() {
       'loading',
     ];
 
+    const toastMap = toast as unknown as Record<
+      string,
+      ((message: unknown, options?: { id?: string }) => unknown) & { __instrumented?: boolean }
+    >;
+
     kinds.forEach((kind) => {
-      const original = (toast as { [key: string]: ((...args: unknown[]) => unknown) | undefined })[
-        kind
-      ];
-      if (!original || (original as { __instrumented?: boolean }).__instrumented) return;
+      const original = toastMap[kind];
+      if (!original || original.__instrumented) return;
       const wrapped = (message: unknown, options?: { id?: string }) => {
         console.log(`[toast:${kind}]`, { id: options?.id, message });
         return original(message, options);
       };
-      (wrapped as { __instrumented?: boolean }).__instrumented = true;
-      (toast as { [key: string]: unknown })[kind] = wrapped;
+      wrapped.__instrumented = true;
+      toastMap[kind] = wrapped;
     });
   }, []);
 

@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { invoke } from '@tauri-apps/api/core';
-import React, {
+import {
   PropsWithChildren,
   createContext,
   useCallback,
