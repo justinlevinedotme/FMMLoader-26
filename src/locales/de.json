@@ -1,0 +1,239 @@
+{
+  "_version": 2,
+  "nav": {
+    "mods": "Mods",
+    "graphics": "Grafiken",
+    "nameFix": "Namensfix",
+    "settings": "Einstellungen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "description": "Design- und Speicheroptionen",
+    "darkMode": "Dunkelmodus",
+    "darkModeDescription": "Dunkles Design für das App-Fenster umschalten.",
+    "logs": {
+      "title": "Anwendungsprotokolle",
+      "description": "Öffnet den Ordner, in dem aktuelle Logs gespeichert sind.",
+      "open": "Log-Ordner öffnen"
+    },
+    "modsStorage": {
+      "title": "Mods-Speicher",
+      "description": "Öffnet den Ordner, in dem importierte Mods gespeichert sind.",
+      "open": "Mods-Ordner öffnen"
+    },
+    "language": {
+      "title": "Sprache",
+      "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
+    },
+    "updates": {
+      "title": "Updates",
+      "current": "Aktuell: v{version}",
+      "available": "Update verfügbar: v{version}",
+      "check": "Nach Updates suchen",
+      "checking": "Prüfe...",
+      "modalTitle": "Update verfügbar",
+      "modalBody": "Version v{latest} ist verfügbar. Aktuell: v{current}.",
+      "downloadInstall": "Herunterladen & Installieren",
+      "downloading": "Lädt herunter...",
+      "installing": "Installiere...",
+      "later": "Später"
+    }
+  },
+  "modMeta": {
+    "title": "Mod-Metadaten hinzufügen",
+    "description": "Gib Metadaten für diesen Mod an, damit er korrekt verwaltet werden kann.",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Mod-Namen eingeben"
+      },
+      "version": {
+        "label": "Version",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Typ",
+        "placeholder": "Mod-Typ auswählen",
+        "detecting": "Mod-Typ wird erkannt..."
+      },
+      "author": {
+        "label": "Autor",
+        "placeholder": "Optionaler Autorenname"
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Optionale Beschreibung"
+      }
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "submit": "Speichern"
+    }
+  },
+  "common": {
+    "open": "Öffnen",
+    "close": "Schließen",
+    "language": "Sprache",
+    "apply": "Anwenden",
+    "cancel": "Abbrechen"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen.",
+    "missingKey": "Fehlende Übersetzung: {key}"
+  },
+  "overlay": {
+    "dropTitle": "Mod-Datei zum Import hier ablegen"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | Erstellt von JALCO / Justin Levine",
+    "supportKofi": "Auf Ko-Fi unterstützen",
+    "joinDiscord": "Discord beitreten"
+  },
+  "toolbar": {
+    "import": "Importieren",
+    "conflicts": "Konflikte",
+    "restore": "Wiederherstellen",
+    "refresh": "Aktualisieren",
+    "tooltips": {
+      "import": "Neues Mod-Paket importieren",
+      "conflicts": "Dateikonflikte zwischen Mods prüfen",
+      "restore": "Auf ein vorheriges Backup zurücksetzen",
+      "refresh": "Modliste und Status neu laden"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "Spielverzeichnis:",
+      "tooltip": "Der FM26-Installationsordner mit den .bundle-Dateien",
+      "placeholder": "Nicht gesetzt – auf Auswählen oder Spiel erkennen klicken",
+      "detect": "Erkennen"
+    },
+    "userDir": {
+      "label": "Benutzerverzeichnis:",
+      "tooltip": "Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen",
+      "placeholder": "Automatisch vom System erkannt",
+      "detect": "Erkennen"
+    }
+  },
+  "modsTab": {
+    "tabs": {
+      "mods": "Mods",
+      "graphics": "Grafiken",
+      "namefix": "Namensfix",
+      "settings": "Einstellungen"
+    },
+    "primaryActions": {
+      "apply": "Ausgewählte Mods anwenden",
+      "enable": "Aktivieren",
+      "disable": "Deaktivieren"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Typ",
+      "author": "Autor",
+      "status": "Status",
+      "version": "Version",
+      "actions": "Aktionen"
+    },
+    "empty": "Keine Mods gefunden. Importiere ein Mod, um zu starten."
+  },
+  "graphicsTab": {
+    "title": "Grafik-Packs",
+    "subtitle": "{count} Packs installiert",
+    "import": {
+      "button": "Grafik-Pack importieren",
+      "disabledTip": "Benutzerverzeichnis erforderlich zum Import"
+    },
+    "validate": {
+      "button": "Grafiken validieren",
+      "disabledTip": "Benutzerverzeichnis erforderlich zur Validierung"
+    },
+    "progress": {
+      "heading": "Fortschritt:",
+      "files": "{current} / {total} Dateien",
+      "importing": "Importiere..."
+    },
+    "warnings": {
+      "needUserDir": "Benutzerverzeichnis wird für die Installation von Grafik-Packs benötigt"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Typ",
+      "files": "Dateien",
+      "installed": "Installiert",
+      "empty": null,
+      "en": "No graphics packs installed yet.",
+      "ko": "아직 설치된 그래픽 팩이 없습니다.",
+      "tr": "Henüz grafik paketi kurulmadı.",
+      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
+      "de": "Noch keine Grafik-Packs installiert."
+    }
+  },
+  "credits": {
+    "title": "Danksagungen",
+    "description": "Danke an alle, die FMMLoader entwickeln und übersetzen.",
+    "sections": {
+      "contributors": {
+        "title": "Kernbeitragende"
+      },
+      "translators": {
+        "title": "Übersetzer & Lokalisierung"
+      },
+      "languages": {
+        "title": "Unterstützte Sprachen"
+      },
+      "crowdin": {
+        "title": "CrowdIn-Beitragende",
+        "note": "Besonderer Dank an die Community, die die Übersetzungen aktuell hält."
+      }
+    }
+  },
+  "nameFix": {
+    "title": "Namensfix",
+    "subtitle": "FM-Namensfix verwalten",
+    "sectionTitle": "FM-Namensfix",
+    "sectionDescription": "Behebt Lizenzprobleme und schaltet echte Namen für Vereine, Spieler und Wettbewerbe frei",
+    "status": {
+      "checking": "Prüfe...",
+      "installed": "Installiert",
+      "notInstalled": "Nicht installiert"
+    },
+    "whatItDoes": {
+      "heading": "Was es macht:",
+      "bullets": [
+        "Schaltet echte Namen für Vereine wie AC Milan, Inter und Lazio frei",
+        "Korrigiert japanische Spielernamen",
+        "Entfernt gefälschte/lizenzlose Inhalte",
+        "Funktioniert in allen Ligen und Wettbewerben"
+      ]
+    },
+    "active": {
+      "heading": "Aktuell aktiv:",
+      "unknown": "Unbekannt"
+    },
+    "selectLabel": "Namensfix-Quelle wählen:",
+    "selectPlaceholder": "Wähle eine Namensfix-Quelle",
+    "activeSuffix": " - Aktiv",
+    "noSources": "Keine Namensfix-Quellen verfügbar. Importiere eine ZIP, um zu starten.",
+    "buttons": {
+      "install": "Installieren",
+      "reinstall": "Neu installieren",
+      "uninstall": "Aus Spiel entfernen",
+      "importZip": "Aus ZIP importieren",
+      "checkStatus": "Status prüfen",
+      "deleteSource": "Quelle löschen"
+    },
+    "warnings": {
+      "needGameDir": "Bitte zuerst das Spielverzeichnis festlegen"
+    },
+    "notes": {
+      "community": "Du kannst Namensfixes aus der Community laden oder eigene erstellen. Wir empfehlen Fixes von SortItOutSI oder FMScout."
+    },
+    "userDir": {
+      "label": "Benutzerverzeichnis:",
+      "tooltip": "Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen",
+      "placeholder": "Automatisch vom System erkannt",
+      "detect": "Erkennen"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+[package]
+name = "tauri-plugin-i18n"
+version = "1.0.0"
+authors = ["Rohit Singh <razein@wizql.com>"]
+description = "Internationalization plugin using rust_i18n for tauri apps."
+edition = "2021"
+rust-version = "1.77.2"
+repository = "https://github.com/razein97/tauri-plugin-i18n"
+license = "MIT OR Apache-2.0"
+exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
+links = "tauri-plugin-i18n"
+
+
+
+[dependencies]
+tauri = { version = "2" }
+serde = "1.0"
+thiserror = "2"
+rust-i18n-support = "3"
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }
+
+

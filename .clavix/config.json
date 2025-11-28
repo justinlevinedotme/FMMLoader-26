@@ -1,0 +1,17 @@
+{
+  "version": "5.4.0",
+  "integrations": ["claude-code", "codex", "gemini", "agents-md", "copilot-instructions"],
+  "templates": {
+    "prdQuestions": "default",
+    "fullPrd": "default",
+    "quickPrd": "default"
+  },
+  "outputs": {
+    "path": ".clavix/outputs",
+    "format": "markdown"
+  },
+  "preferences": {
+    "autoOpenOutputs": false,
+    "verboseLogging": false
+  }
+}

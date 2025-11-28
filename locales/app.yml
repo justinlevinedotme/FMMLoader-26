@@ -1,0 +1,867 @@
+_version: 2
+
+nav:
+  mods:
+    en: Mods
+    ko: 모드
+    tr: Modlar
+    pt-PT: Mods
+    de: Mods
+  graphics:
+    en: Graphics
+    ko: 그래픽
+    tr: Grafikler
+    pt-PT: Gráficos
+    de: Grafiken
+  nameFix:
+    en: Name Fix
+    ko: 이름 수정
+    tr: İsim Düzeltme
+    pt-PT: Correção de nomes
+    de: Namensfix
+  settings:
+    en: Settings
+    ko: 설정
+    tr: Ayarlar
+    pt-PT: Definições
+    de: Einstellungen
+
+settings:
+  title:
+    en: Settings
+    ko: 설정
+    tr: Ayarlar
+    pt-PT: Definições
+    de: Einstellungen
+  description:
+    en: Theme and storage preferences
+    ko: 테마 및 저장소 기본 설정
+    tr: Tema ve depolama tercihleri
+    pt-PT: Preferências de tema e armazenamento
+    de: Design- und Speicheroptionen
+  darkMode:
+    en: Dark Mode
+    ko: 다크 모드
+    tr: Koyu Mod
+    pt-PT: Modo escuro
+    de: Dunkelmodus
+  darkModeDescription:
+    en: Toggle dark theme for the app window.
+    ko: 앱 창의 다크 테마를 전환합니다.
+    tr: Uygulama penceresi için koyu temayı aç/kapat.
+    pt-PT: Alternar o tema escuro na janela da aplicação.
+    de: Dunkles Design für das App-Fenster umschalten.
+  logs:
+    title:
+      en: Application Logs
+      ko: 애플리케이션 로그
+      tr: Uygulama Günlükleri
+      pt-PT: Registos da aplicação
+      de: Anwendungsprotokolle
+    description:
+      en: Opens the folder where recent app logs are stored.
+      ko: 최근 앱 로그가 저장된 폴더를 엽니다.
+      tr: Son uygulama günlüklerinin bulunduğu klasörü açar.
+      pt-PT: Abre a pasta onde os registos recentes são guardados.
+      de: Öffnet den Ordner, in dem aktuelle Logs gespeichert sind.
+    open:
+      en: Open Logs Folder
+      ko: 로그 폴더 열기
+      tr: Günlük Klasörünü Aç
+      pt-PT: Abrir pasta de registos
+      de: Log-Ordner öffnen
+  modsStorage:
+    title:
+      en: Mods Storage
+      ko: 모드 저장소
+      tr: Mod Deposu
+      pt-PT: Armazenamento de mods
+      de: Mods-Speicher
+    description:
+      en: Opens the folder where imported mods are stored.
+      ko: 가져온 모드가 저장된 폴더를 엽니다.
+      tr: İçe aktarılan modların saklandığı klasörü açar.
+      pt-PT: Abre a pasta onde os mods importados são guardados.
+      de: Öffnet den Ordner, in dem importierte Mods gespeichert sind.
+    open:
+      en: Open Mods Folder
+      ko: 모드 폴더 열기
+      tr: Modlar Klasörünü Aç
+      pt-PT: Abrir pasta de mods
+      de: Mods-Ordner öffnen
+  language:
+    title:
+      en: Language
+      ko: 언어
+      tr: Dil
+      pt-PT: Idioma
+      de: Sprache
+    description:
+      en: Choose your preferred language. Overrides system detection on restart.
+      ko: 선호하는 언어를 선택하세요. 재시작 시 시스템 감지를 덮어씁니다.
+      tr: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
+      pt-PT: Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.
+      de: Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.
+  updates:
+    title:
+      en: Updates
+      ko: 업데이트
+      tr: Güncellemeler
+      pt-PT: Atualizações
+      de: Updates
+    current:
+      en: "Current: v{version}"
+      ko: "현재 버전: v{version}"
+      tr: "Mevcut: v{version}"
+      pt-PT: "Atual: v{version}"
+      de: "Aktuell: v{version}"
+    available:
+      en: "Update available: v{version}"
+      ko: "업데이트 가능: v{version}"
+      tr: "Güncelleme mevcut: v{version}"
+      pt-PT: "Atualização disponível: v{version}"
+      de: "Update verfügbar: v{version}"
+    check:
+      en: Check for updates
+      ko: 업데이트 확인
+      tr: Güncellemeleri kontrol et
+      pt-PT: Procurar atualizações
+      de: Nach Updates suchen
+    checking:
+      en: Checking...
+      ko: 확인 중...
+      tr: Kontrol ediliyor...
+      pt-PT: A verificar...
+      de: Prüfe...
+    modalTitle:
+      en: Update Available
+      ko: 업데이트 사용 가능
+      tr: Güncelleme mevcut
+      pt-PT: Atualização disponível
+      de: Update verfügbar
+    modalBody:
+      en: "Version v{latest} is available. Current: v{current}."
+      ko: "버전 v{latest}을(를) 사용할 수 있습니다. 현재: v{current}."
+      tr: "v{latest} sürümü mevcut. Mevcut: v{current}."
+      pt-PT: "Versão v{latest} disponível. Atual: v{current}."
+      de: "Version v{latest} ist verfügbar. Aktuell: v{current}."
+    downloadInstall:
+      en: Download & Install
+      ko: 다운로드 및 설치
+      tr: İndir ve Yükle
+      pt-PT: Transferir e instalar
+      de: Herunterladen & Installieren
+    downloading:
+      en: Downloading...
+      ko: 다운로드 중...
+      tr: İndiriliyor...
+      pt-PT: A transferir...
+      de: Lädt herunter...
+    installing:
+      en: Installing...
+      ko: 설치 중...
+      tr: Yükleniyor...
+      pt-PT: A instalar...
+      de: Installiere...
+    later:
+      en: Later
+      ko: 나중에
+      tr: Sonra
+      pt-PT: Mais tarde
+      de: Später
+modMeta:
+  title:
+    en: Add Mod Metadata
+    ko: 모드 메타데이터 추가
+    tr: Mod metadatası ekle
+    pt-PT: Adicionar metadados do mod
+    de: Mod-Metadaten hinzufügen
+  description:
+    en: Provide metadata for this mod so it can be managed correctly.
+    ko: 모드를 올바르게 관리할 수 있도록 메타데이터를 입력하세요.
+    tr: Modun doğru yönetilebilmesi için metadatasını girin.
+    pt-PT: Forneça os metadados deste mod para que possa ser gerido corretamente.
+    de: Gib Metadaten für diesen Mod an, damit er korrekt verwaltet werden kann.
+  fields:
+    name:
+      label:
+        en: Name
+        ko: 이름
+        tr: İsim
+        pt-PT: Nome
+        de: Name
+      placeholder:
+        en: Enter a mod name
+        ko: 모드 이름을 입력하세요
+        tr: Mod adını girin
+        pt-PT: Introduza o nome do mod
+        de: Mod-Namen eingeben
+    version:
+      label:
+        en: Version
+        ko: 버전
+        tr: Sürüm
+        pt-PT: Versão
+        de: Version
+      placeholder:
+        en: 1.0.0
+        ko: 1.0.0
+        tr: 1.0.0
+        pt-PT: 1.0.0
+        de: 1.0.0
+    type:
+      label:
+        en: Type
+        ko: 타입
+        tr: Tür
+        pt-PT: Tipo
+        de: Typ
+      placeholder:
+        en: Select a mod type
+        ko: 모드 타입을 선택하세요
+        tr: Mod türü seçin
+        pt-PT: Selecione um tipo de mod
+        de: Mod-Typ auswählen
+      detecting:
+        en: Detecting mod type...
+        ko: 모드 타입 감지 중...
+        tr: Mod türü algılanıyor...
+        pt-PT: A detetar tipo de mod...
+        de: Mod-Typ wird erkannt...
+    author:
+      label:
+        en: Author
+        ko: 작성자
+        tr: Yazar
+        pt-PT: Autor
+        de: Autor
+      placeholder:
+        en: Optional author name
+        ko: 선택 사항 (작성자명)
+        tr: Opsiyonel yazar adı
+        pt-PT: Nome do autor (opcional)
+        de: Optionaler Autorenname
+    description:
+      label:
+        en: Description
+        ko: 설명
+        tr: Açıklama
+        pt-PT: Descrição
+        de: Beschreibung
+      placeholder:
+        en: Optional description
+        ko: 선택 사항 (설명)
+        tr: Opsiyonel açıklama
+        pt-PT: Descrição opcional
+        de: Optionale Beschreibung
+  actions:
+    cancel:
+      en: Cancel
+      ko: 취소
+      tr: İptal
+      pt-PT: Cancelar
+      de: Abbrechen
+    submit:
+      en: Save
+      ko: 저장
+      tr: Kaydet
+      pt-PT: Guardar
+      de: Speichern
+
+common:
+  open:
+    en: Open
+    ko: 열기
+    tr: Aç
+    pt-PT: Abrir
+    de: Öffnen
+  close:
+    en: Close
+    ko: 닫기
+    tr: Kapat
+    pt-PT: Fechar
+    de: Schließen
+  language:
+    en: Language
+    ko: 언어
+    tr: Dil
+    pt-PT: Idioma
+    de: Sprache
+  apply:
+    en: Apply
+    ko: 적용
+    tr: Uygula
+    pt-PT: Aplicar
+    de: Anwenden
+  cancel:
+    en: Cancel
+    ko: 취소
+    tr: İptal
+    pt-PT: Cancelar
+    de: Abbrechen
+
+errors:
+  generic:
+    en: Something went wrong.
+    ko: 문제가 발생했습니다.
+    tr: Bir sorun oluştu.
+    pt-PT: Ocorreu um problema.
+    de: Etwas ist schiefgelaufen.
+  missingKey:
+    en: "Missing translation: {key}"
+    ko: "번역이 없습니다: {key}"
+    tr: "Eksik çeviri: {key}"
+    pt-PT: "Tradução em falta: {key}"
+    de: "Fehlende Übersetzung: {key}"
+
+overlay:
+  dropTitle:
+    en: Drop mod file to import
+    ko: 모드 파일을 끌어다 놓아 가져오기
+    tr: Mod dosyasını içe aktarmak için bırakın
+    pt-PT: Largue o ficheiro de mod para importar
+    de: Mod-Datei zum Import hier ablegen
+
+footer:
+  createdBy:
+    en: "FMMLoader26 v{version} | Created by JALCO / Justin Levine"
+    ko: "FMMLoader26 v{version} | 제작: JALCO / Justin Levine"
+    tr: "FMMLoader26 v{version} | Yapan: JALCO / Justin Levine"
+    pt-PT: "FMMLoader26 v{version} | Criado por JALCO / Justin Levine"
+    de: "FMMLoader26 v{version} | Erstellt von JALCO / Justin Levine"
+  supportKofi:
+    en: Support on Ko-Fi
+    ko: Ko-Fi에서 후원하기
+    tr: Ko-Fi'da destekle
+    pt-PT: Apoiar no Ko-Fi
+    de: Auf Ko-Fi unterstützen
+  joinDiscord:
+    en: Join Discord
+    ko: Discord 참여
+    tr: Discord'a katıl
+    pt-PT: Entrar no Discord
+    de: Discord beitreten
+
+toolbar:
+  import:
+    en: Import
+    ko: 가져오기
+    tr: İçe Aktar
+    pt-PT: Importar
+    de: Importieren
+  conflicts:
+    en: Conflicts
+    ko: 충돌
+    tr: Çakışmalar
+    pt-PT: Conflitos
+    de: Konflikte
+  restore:
+    en: Restore
+    ko: 복원
+    tr: Geri Yükle
+    pt-PT: Restaurar
+    de: Wiederherstellen
+  refresh:
+    en: Refresh
+    ko: 새로고침
+    tr: Yenile
+    pt-PT: Atualizar
+    de: Aktualisieren
+  tooltips:
+    import:
+      en: Import a new mod package
+      ko: 새 모드 패키지 가져오기
+      tr: Yeni mod paketi içe aktar
+      pt-PT: Importar novo pacote de mod
+      de: Neues Mod-Paket importieren
+    conflicts:
+      en: Check for file conflicts between mods
+      ko: 모드 간 파일 충돌 확인
+      tr: Modlar arasındaki dosya çakışmalarını kontrol et
+      pt-PT: Verificar conflitos de ficheiros entre mods
+      de: Dateikonflikte zwischen Mods prüfen
+    restore:
+      en: Roll back to a previous backup
+      ko: 이전 백업으로 복원
+      tr: Önceki yedeğe geri dön
+      pt-PT: Reverter para um backup anterior
+      de: Auf ein vorheriges Backup zurücksetzen
+    refresh:
+      en: Reload mod list and state
+      ko: 모드 목록 및 상태 새로고침
+      tr: Mod listesi ve durumunu yenile
+      pt-PT: Recarregar lista e estado de mods
+      de: Modliste und Status neu laden
+
+paths:
+  gameDir:
+    label:
+      en: "Game Directory:"
+      ko: "게임 디렉터리:"
+      tr: "Oyun Dizini:"
+      pt-PT: "Diretório do Jogo:"
+      de: "Spielverzeichnis:"
+    tooltip:
+      en: The FM26 installation folder containing the .bundle files
+      ko: .bundle 파일이 있는 FM26 설치 폴더
+      tr: .bundle dosyalarını içeren FM26 kurulum klasörü
+      pt-PT: A pasta de instalação do FM26 com os ficheiros .bundle
+      de: Der FM26-Installationsordner mit den .bundle-Dateien
+    placeholder:
+      en: Not set - click Select or Detect Game
+      ko: 설정되지 않음 - 선택 또는 게임 감지 클릭
+      tr: Ayarlanmadı - Seç veya Oyunu Algıla'ya tıkla
+      pt-PT: Não definido - clique em Selecionar ou Detetar Jogo
+      de: Nicht gesetzt – auf Auswählen oder Spiel erkennen klicken
+    detect:
+      en: Detect
+      ko: 감지
+      tr: Algıla
+      pt-PT: Detetar
+      de: Erkennen
+  userDir:
+    label:
+      en: "User Directory:"
+      ko: "사용자 디렉터리:"
+      tr: "Kullanıcı Dizini:"
+      pt-PT: "Diretório do Utilizador:"
+      de: "Benutzerverzeichnis:"
+    tooltip:
+      en: The FM26 User Directory where saves and settings are stored
+      ko: 저장 및 설정이 저장되는 FM26 사용자 디렉터리
+      tr: Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini
+      pt-PT: Diretório do Utilizador do FM26 onde ficam saves e definições
+      de: Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen
+    placeholder:
+      en: Auto-detected from system
+      ko: 시스템에서 자동 감지됨
+      tr: Sistemden otomatik algılandı
+      pt-PT: Detetado automaticamente pelo sistema
+      de: Automatisch vom System erkannt
+    detect:
+      en: Detect
+      ko: 감지
+      tr: Algıla
+      pt-PT: Detetar
+      de: Erkennen
+
+modsTab:
+  tabs:
+    mods:
+      en: Mods
+      ko: 모드
+      tr: Modlar
+      pt-PT: Mods
+      de: Mods
+    graphics:
+      en: Graphics
+      ko: 그래픽
+      tr: Grafikler
+      pt-PT: Gráficos
+      de: Grafiken
+    namefix:
+      en: Name Fix
+      ko: 이름 수정
+      tr: İsim Düzeltme
+      pt-PT: Correção de nomes
+      de: Namensfix
+    settings:
+      en: Settings
+      ko: 설정
+      tr: Ayarlar
+      pt-PT: Definições
+      de: Einstellungen
+  primaryActions:
+    apply:
+      en: Apply Selected Mods
+      ko: 선택된 모드 적용
+      tr: Seçili Modları Uygula
+      pt-PT: Aplicar mods selecionados
+      de: Ausgewählte Mods anwenden
+    enable:
+      en: Enable
+      ko: 활성화
+      tr: Etkinleştir
+      pt-PT: Ativar
+      de: Aktivieren
+    disable:
+      en: Disable
+      ko: 비활성화
+      tr: Devre dışı bırak
+      pt-PT: Desativar
+      de: Deaktivieren
+  table:
+    name:
+      en: Name
+      ko: 이름
+      tr: İsim
+      pt-PT: Nome
+      de: Name
+    type:
+      en: Type
+      ko: 유형
+      tr: Tür
+      pt-PT: Tipo
+      de: Typ
+    author:
+      en: Author
+      ko: 제작자
+      tr: Yazar
+      pt-PT: Autor
+      de: Autor
+    status:
+      en: Status
+      ko: 상태
+      tr: Durum
+      pt-PT: Estado
+      de: Status
+    version:
+      en: Version
+      ko: 버전
+      tr: Sürüm
+      pt-PT: Versão
+      de: Version
+    actions:
+      en: Actions
+      ko: 작업
+      tr: İşlemler
+      pt-PT: Ações
+      de: Aktionen
+  empty:
+    en: No mods found. Import a mod to get started.
+    ko: 모드를 찾을 수 없습니다. 모드를 가져와 시작하세요.
+    tr: Mod bulunamadı. Başlamak için bir mod içe aktarın.
+    pt-PT: Nenhum mod encontrado. Importe um mod para começar.
+    de: Keine Mods gefunden. Importiere ein Mod, um zu starten.
+
+graphicsTab:
+  title:
+    en: Graphics Packs
+    ko: 그래픽 팩
+    tr: Grafik Paketleri
+    pt-PT: Pacotes de gráficos
+    de: Grafik-Packs
+  subtitle:
+    en: "{count} packs installed"
+    ko: "{count}개 팩 설치됨"
+    tr: "{count} paket yüklü"
+    pt-PT: "{count} pacotes instalados"
+    de: "{count} Packs installiert"
+  import:
+    button:
+      en: Import Graphics Pack
+      ko: 그래픽 팩 가져오기
+      tr: Grafik Paketi İçe Aktar
+      pt-PT: Importar pacote de gráficos
+      de: Grafik-Pack importieren
+    disabledTip:
+      en: User directory required to import
+      ko: 가져오려면 사용자 디렉터리가 필요합니다
+      tr: İçe aktarmak için kullanıcı dizini gerekli
+      pt-PT: Diretório do utilizador necessário para importar
+      de: Benutzerverzeichnis erforderlich zum Import
+  validate:
+    button:
+      en: Validate Graphics
+      ko: 그래픽 검증
+      tr: Grafikleri Doğrula
+      pt-PT: Validar gráficos
+      de: Grafiken validieren
+    disabledTip:
+      en: User directory required to validate
+      ko: 검증하려면 사용자 디렉터리가 필요합니다
+      tr: Doğrulamak için kullanıcı dizini gerekli
+      pt-PT: Diretório do utilizador necessário para validar
+      de: Benutzerverzeichnis erforderlich zur Validierung
+  progress:
+    heading:
+      en: "Progress:"
+      ko: "진행 상황:"
+      tr: "İlerleme:"
+      pt-PT: "Progresso:"
+      de: "Fortschritt:"
+    files:
+      en: "{current} / {total} files"
+      ko: "{current} / {total} 파일"
+      tr: "{current} / {total} dosya"
+      pt-PT: "{current} / {total} ficheiros"
+      de: "{current} / {total} Dateien"
+    importing:
+      en: Importing...
+      ko: 가져오는 중...
+      tr: İçe aktarılıyor...
+      pt-PT: A importar...
+      de: Importiere...
+  warnings:
+    needUserDir:
+      en: User directory is required for graphics pack installation
+      ko: 그래픽 팩 설치에 사용자 디렉터리가 필요합니다
+      tr: Grafik paketi kurulumu için kullanıcı dizini gereklidir
+      pt-PT: Diretório do utilizador é necessário para instalar pacotes de gráficos
+      de: Benutzerverzeichnis wird für die Installation von Grafik-Packs benötigt
+  table:
+    name:
+      en: Name
+      ko: 이름
+      tr: İsim
+      pt-PT: Nome
+      de: Name
+    type:
+      en: Type
+      ko: 유형
+      tr: Tür
+      pt-PT: Tipo
+      de: Typ
+    files:
+      en: Files
+      ko: 파일
+      tr: Dosyalar
+      pt-PT: Ficheiros
+      de: Dateien
+    installed:
+      en: Installed
+      ko: 설치됨
+      tr: Kurulum Tarihi
+      pt-PT: Instalado
+      de: Installiert
+    empty:
+    en: No graphics packs installed yet.
+    ko: 아직 설치된 그래픽 팩이 없습니다.
+    tr: Henüz grafik paketi kurulmadı.
+    pt-PT: Ainda não há pacotes de gráficos instalados.
+    de: Noch keine Grafik-Packs installiert.
+
+credits:
+  title:
+    en: Credits
+    ko: 크레딧
+    tr: Katkıda Bulunanlar
+    pt-PT: Créditos
+    de: Danksagungen
+  description:
+    en: Thanks to everyone who helps build and translate FMMLoader.
+    ko: FMMLoader를 만들고 번역해 주신 모든 분께 감사드립니다.
+    tr: FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.
+    pt-PT: Obrigado a todos os que ajudam a construir e traduzir o FMMLoader.
+    de: Danke an alle, die FMMLoader entwickeln und übersetzen.
+  sections:
+    contributors:
+      title:
+        en: Core Contributors
+        ko: 핵심 기여자
+        tr: Temel Katkıcılar
+        pt-PT: Contribuidores principais
+        de: Kernbeitragende
+    translators:
+      title:
+        en: Translators & Localization
+        ko: 번역 및 현지화
+        tr: Çevirmenler ve Yerelleştirme
+        pt-PT: Tradutores e localização
+        de: Übersetzer & Lokalisierung
+    languages:
+      title:
+        en: Supported Languages
+        ko: 지원 언어
+        tr: Desteklenen Diller
+        pt-PT: Idiomas suportados
+        de: Unterstützte Sprachen
+    crowdin:
+      title:
+        en: CrowdIn Contributors
+        ko: CrowdIn 기여자
+        tr: CrowdIn Katkıcıları
+        pt-PT: Contribuidores CrowdIn
+        de: CrowdIn-Beitragende
+      note:
+        en: Special thanks to the community members who keep translations fresh.
+        ko: 최신 번역을 유지해 주시는 커뮤니티 여러분께 특별히 감사드립니다.
+        tr: Çevirileri güncel tutan topluluk üyelerine özel teşekkürler.
+        pt-PT: Agradecimento especial aos membros da comunidade que mantêm as traduções atualizadas.
+        de: Besonderer Dank an die Community, die die Übersetzungen aktuell hält.
+
+nameFix:
+  title:
+    en: Name Fix
+    ko: 이름 수정
+    tr: İsim Düzeltme
+    pt-PT: Correção de Nomes
+    de: Namensfix
+  subtitle:
+    en: Manage FM Name Fix
+    ko: FM 이름 수정 관리
+    tr: FM İsim Düzeltmesini yönet
+    pt-PT: Gerir correção de nomes FM
+    de: FM-Namensfix verwalten
+  sectionTitle:
+    en: FM Name Fix
+    ko: FM 이름 수정
+    tr: FM İsim Düzeltme
+    pt-PT: Correção de nomes FM
+    de: FM-Namensfix
+  sectionDescription:
+    en: Fixes licensing issues and unlocks real names for clubs, players, and competitions
+    ko: 라이선스 문제를 해결하고 구단, 선수, 대회 이름을 실제 이름으로 표시합니다
+    tr: Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek isimlerini açar
+    pt-PT: Corrige licenças e ativa nomes reais para clubes, jogadores e competições
+    de: Behebt Lizenzprobleme und schaltet echte Namen für Vereine, Spieler und Wettbewerbe frei
+  status:
+    checking:
+      en: Checking...
+      ko: 확인 중...
+      tr: Kontrol ediliyor...
+      pt-PT: A verificar...
+      de: Prüfe...
+    installed:
+      en: Installed
+      ko: 설치됨
+      tr: Kurulu
+      pt-PT: Instalado
+      de: Installiert
+    notInstalled:
+      en: Not installed
+      ko: 미설치
+      tr: Kurulu değil
+      pt-PT: Não instalado
+      de: Nicht installiert
+  whatItDoes:
+    heading:
+      en: "What it does:"
+      ko: "기능:"
+      tr: "Ne yapar:"
+      pt-PT: "O que faz:"
+      de: "Was es macht:"
+    bullets:
+      - en: Unlocks real names for clubs like AC Milan, Inter, and Lazio
+        ko: AC 밀란, 인테르, 라치오 등 구단의 실제 이름을 표시
+        tr: AC Milan, Inter, Lazio gibi kulüplerin gerçek isimlerini açar
+        pt-PT: Desbloqueia nomes reais para clubes como AC Milan, Inter e Lazio
+        de: Schaltet echte Namen für Vereine wie AC Milan, Inter und Lazio frei
+      - en: Fixes Japanese player names
+        ko: 일본 선수 이름을 수정
+        tr: Japon oyuncu isimlerini düzeltir
+        pt-PT: Corrige nomes de jogadores japoneses
+        de: Korrigiert japanische Spielernamen
+      - en: Removes fake/unlicensed content
+        ko: 가짜/라이선스 없는 콘텐츠 제거
+        tr: Sahte/lisanssız içeriği kaldırır
+        pt-PT: Remove conteúdo falso/não licenciado
+        de: Entfernt gefälschte/lizenzlose Inhalte
+      - en: Works with all leagues and competitions
+        ko: 모든 리그 및 대회에서 작동
+        tr: Tüm lig ve turnuvalarda çalışır
+        pt-PT: Funciona com todas as ligas e competições
+        de: Funktioniert in allen Ligen und Wettbewerben
+  active:
+    heading:
+      en: "Currently Active:"
+      ko: "현재 활성:"
+      tr: "Şu an etkin:"
+      pt-PT: "Atualmente ativo:"
+      de: "Aktuell aktiv:"
+    unknown:
+      en: Unknown
+      ko: 알 수 없음
+      tr: Bilinmiyor
+      pt-PT: Desconhecido
+      de: Unbekannt
+  selectLabel:
+    en: "Select Name Fix Source:"
+    ko: "이름 수정 소스 선택:"
+    tr: "İsim düzeltme kaynağını seç:"
+    pt-PT: "Selecionar fonte de correção:"
+    de: "Namensfix-Quelle wählen:"
+  selectPlaceholder:
+    en: Select a name fix source
+    ko: 이름 수정 소스를 선택하세요
+    tr: Bir isim düzeltme kaynağı seçin
+    pt-PT: Selecione uma fonte de correção de nomes
+    de: Wähle eine Namensfix-Quelle
+  activeSuffix:
+    en: " - Active"
+    ko: " - 활성"
+    tr: " - Etkin"
+    pt-PT: " - Ativo"
+    de: " - Aktiv"
+  noSources:
+    en: No name fix sources available. Import a name fix ZIP file to get started.
+    ko: 사용할 이름 수정 소스가 없습니다. ZIP 파일을 가져와 시작하세요.
+    tr: İsim düzeltme kaynağı yok. Başlamak için bir ZIP içe aktarın.
+    pt-PT: Sem fontes de correção. Importe um ZIP para começar.
+    de: Keine Namensfix-Quellen verfügbar. Importiere eine ZIP, um zu starten.
+  buttons:
+    install:
+      en: Install
+      ko: 설치
+      tr: Yükle
+      pt-PT: Instalar
+      de: Installieren
+    reinstall:
+      en: Reinstall
+      ko: 재설치
+      tr: Yeniden Yükle
+      pt-PT: Reinstalar
+      de: Neu installieren
+    uninstall:
+      en: Uninstall from Game
+      ko: 게임에서 제거
+      tr: Oyundan Kaldır
+      pt-PT: Desinstalar do jogo
+      de: Aus Spiel entfernen
+    importZip:
+      en: Import from ZIP
+      ko: ZIP에서 가져오기
+      tr: ZIP'ten içe aktar
+      pt-PT: Importar de ZIP
+      de: Aus ZIP importieren
+    checkStatus:
+      en: Check Status
+      ko: 상태 확인
+      tr: Durumu Kontrol Et
+      pt-PT: Verificar estado
+      de: Status prüfen
+    deleteSource:
+      en: Delete Source
+      ko: 소스 삭제
+      tr: Kaynağı Sil
+      pt-PT: Apagar fonte
+      de: Quelle löschen
+  warnings:
+    needGameDir:
+      en: Please set your Game Directory first
+      ko: 먼저 게임 디렉터리를 설정하세요
+      tr: Önce Oyun Dizininizi ayarlayın
+      pt-PT: Defina primeiro o Diretório do Jogo
+      de: Bitte zuerst das Spielverzeichnis festlegen
+  notes:
+    community:
+      en: You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout
+      ko: 커뮤니티에서 이름 수정을 다운로드하거나 직접 만들 수 있습니다. SortItOutSI 또는 FMScout의 수정을 권장합니다.
+      tr: Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz. SortItOutSI veya FMScout düzeltmelerini öneririz.
+      pt-PT: Pode descarregar correções da comunidade ou criar as suas. Recomendamos as correções do SortItOutSI ou FMScout.
+      de: Du kannst Namensfixes aus der Community laden oder eigene erstellen. Wir empfehlen Fixes von SortItOutSI oder FMScout.
+  userDir:
+    label:
+      en: "User Directory:"
+      ko: "사용자 디렉터리:"
+      tr: "Kullanıcı Dizini:"
+      pt-PT: "Diretório do Utilizador:"
+      de: "Benutzerverzeichnis:"
+    tooltip:
+      en: The FM26 User Directory where saves and settings are stored
+      ko: 저장 및 설정이 저장되는 FM26 사용자 디렉터리
+      tr: Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini
+      pt-PT: Diretório do Utilizador do FM26 onde ficam saves e definições
+      de: Das FM26-Benutzerverzeichnis für Spielstände und Einstellungen
+    placeholder:
+      en: Auto-detected from system
+      ko: 시스템에서 자동 감지됨
+      tr: Sistemden otomatik algılandı
+      pt-PT: Detetado automaticamente pelo sistema
+      de: Automatisch vom System erkannt
+    detect:
+      en: Detect
+      ko: 감지
+      tr: Algıla
+      pt-PT: Detetar
+      de: Erkennen

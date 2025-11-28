@@ -7,6 +7,7 @@ mod graphics;
 mod graphics_analyzer;
 mod import;
 mod logging;
+mod messages;
 mod mod_manager;
 mod name_fix;
 mod restore;
@@ -16,6 +17,11 @@ mod utils;
 use config::{get_mods_dir, init_storage, load_config, save_config};
 use game_detection::get_default_candidates;
 use import::{auto_detect_mod_type, extract_zip, find_mod_root, generate_manifest, has_manifest};
+use messages::{
+    code_error, code_only, CODE_GAME_TARGET_INVALID, CODE_GAME_TARGET_NOT_SET,
+    CODE_METADATA_REQUIRED, CODE_MOD_ALREADY_EXISTS, CODE_MOD_NOT_FOUND, CODE_PATH_NOT_FOUND,
+    CODE_SOURCE_PATH_MISSING,
+};
 use mod_manager::{
     cleanup_old_backups, cleanup_old_restore_points, find_conflicts, get_mod_info, install_mod,
     list_mods, preview_mod_install as compute_preview,
@@ -82,7 +88,7 @@ fn preview_mod_install(
     let config = load_config()?;
     let target_path = game_target
         .or(config.target_path.clone())
-        .ok_or("Game target not set")?;
+        .ok_or_else(|| code_only(CODE_GAME_TARGET_NOT_SET))?;
 
     let preview = compute_preview(
         &mod_type,
@@ -130,12 +136,18 @@ fn disable_mod(mod_name: String) -> Result<(), String> {
 fn apply_mods() -> Result<String, String> {
     let config = load_config()?;
 
-    let target_path = config.target_path.as_ref().ok_or("Game target not set")?;
+    let target_path = config
+        .target_path
+        .as_ref()
+        .ok_or_else(|| code_only(CODE_GAME_TARGET_NOT_SET))?;
 
     let target = std::path::PathBuf::from(target_path);
 
     if !target.exists() {
-        return Err("Game target path does not exist".to_string());
+        return Err(code_error(
+            CODE_GAME_TARGET_INVALID,
+            "Game target path does not exist",
+        ));
     }
 
     let mut results = Vec::new();
@@ -155,7 +167,7 @@ fn remove_mod(mod_name: String) -> Result<(), String> {
     let mod_dir = get_mods_dir().join(&mod_name);
 
     if !mod_dir.exists() {
-        return Err(format!("Mod not found: {}", mod_name));
+        return Err(code_error(CODE_MOD_NOT_FOUND, mod_name));
     }
 
     // First disable it
@@ -192,7 +204,10 @@ fn import_mod(
 
     if !source.exists() {
         tracing::error!("Source path does not exist: {}", source_path);
-        return Err("Source path does not exist".to_string());
+        return Err(code_error(
+            CODE_SOURCE_PATH_MISSING,
+            "Source path does not exist",
+        ));
     }
 
     tracing::info!(
@@ -254,7 +269,7 @@ fn import_mod(
         if mod_name.is_none() || version.is_none() || mod_type.is_none() {
             tracing::warn!("Manifest needed but metadata not provided");
             // Return special error code indicating we need metadata
-            return Err("NEEDS_METADATA".to_string());
+            return Err(CODE_METADATA_REQUIRED.to_string());
         }
 
         tracing::info!("Generating manifest with provided metadata");
@@ -281,7 +296,10 @@ fn import_mod(
 
     if dest_dir.exists() {
         tracing::error!("Mod already exists: {}", final_mod_name);
-        return Err(format!("Mod '{}' already exists", final_mod_name));
+        return Err(code_error(
+            CODE_MOD_ALREADY_EXISTS,
+            format!("Mod '{}' already exists", final_mod_name),
+        ));
     }
 
     // Copy the mod files
@@ -297,7 +315,7 @@ fn detect_mod_type(path: String) -> Result<String, String> {
     let mod_path = PathBuf::from(path);
 
     if !mod_path.exists() {
-        return Err("Path does not exist".to_string());
+        return Err(code_error(CODE_PATH_NOT_FOUND, "Path does not exist"));
     }
 
     Ok(auto_detect_mod_type(&mod_path))
@@ -307,7 +325,10 @@ fn detect_mod_type(path: String) -> Result<String, String> {
 fn check_conflicts() -> Result<Vec<ConflictInfo>, String> {
     let config = load_config()?;
 
-    let target_path = config.target_path.as_ref().ok_or("Game target not set")?;
+    let target_path = config
+        .target_path
+        .as_ref()
+        .ok_or_else(|| code_only(CODE_GAME_TARGET_NOT_SET))?;
 
     let target = PathBuf::from(target_path);
 
@@ -333,7 +354,10 @@ fn restore_from_point(point_path: String) -> Result<String, String> {
 fn create_backup_point(name: String) -> Result<String, String> {
     let config = load_config()?;
 
-    let target_path = config.target_path.as_ref().ok_or("Game target not set")?;
+    let target_path = config
+        .target_path
+        .as_ref()
+        .ok_or_else(|| code_only(CODE_GAME_TARGET_NOT_SET))?;
 
     let target = PathBuf::from(target_path);
     let point_dir = create_restore_point(&name, &[target])?;
@@ -512,6 +536,8 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_locale::init())
+        .plugin(tauri_plugin_i18n::init("locales", None))
         .plugin(tauri_plugin_updater::Builder::new().build());
 
     #[cfg(target_os = "macos")]

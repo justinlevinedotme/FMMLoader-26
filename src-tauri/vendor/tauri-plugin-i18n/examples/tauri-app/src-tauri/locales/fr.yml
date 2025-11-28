@@ -1,0 +1,14 @@
+_version: 1
+
+root:
+  select_language: "Sélectionner La Langue:"
+  native_menu: "Menu Natif"
+  language: "Français"
+  para: "LES SCIENTIFIQUES ONT APPRIS À COMPLÉTER LE SENS DE LA VUE DE NOMBREUSES FAÇONS. Devant la petite pupille de l'œil, ils placent, sur le mont Palomar, un grand monocle de 200 pouces de diamètre, et avec lui, ils voient 2000 fois plus loin dans les profondeurs de l'espace. Ou bien ils examinent à travers une petite paire de lentilles disposées comme un microscope une goutte d’eau ou de sang et grossissent jusqu’à 2000 diamètres les créatures vivantes qui s’y trouvent, dont beaucoup comptent parmi les ennemis les plus dangereux de l’homme. Ou bien, si nous voulons voir des événements lointains sur Terre, ils utilisent certaines des ondes électromagnétiques précédemment gaspillées pour transporter des images télévisées qu'ils recréent sous forme de lumière en fouettant de minuscules cristaux sur un écran avec des électrons dans le vide. Ou encore, ils peuvent évoquer des événements anciens et lointains sous forme de films colorés, en disposant des atomes d'argent et des molécules absorbant les couleurs pour forcer les ondes lumineuses à s'insérer dans les modèles de la réalité originale. Ou si nous voulons voir le centre d'une pièce moulée en acier ou la poitrine d'un enfant blessé, ils envoient l'information sur un faisceau de rayons X pénétrants à ondes courtes, puis la reconvertissent en images que nous pouvons voir sur un écran ou une photographie. AINSI, PRESQUE TOUS LES TYPES DE RAYONNEMENTS ÉLECTROMAGNÉTIQUES JUSQU'À DÉCOUVERTS ONT ÉTÉ UTILISÉS POUR ÉLARGIR NOTRE SENS DE LA VUE D'UNE QUELQUE MANIÈRE."
+
+menu:
+  icon_menu: "Menu d'icônes"
+  text_menu: "Changer de langue"
+  submenu: "Sous-menu"
+  submenu_item_1: "Élément de sous-menu 1"
+  submenu_item_2: "Élément de sous-menu 2"

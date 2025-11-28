@@ -65,7 +65,7 @@
   }
   body {
     @apply bg-background text-foreground border-border;
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: Geist, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -102,4 +102,57 @@
   height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+/* Minimal Sonner toast styling (avoids missing dist/style.css) */
+[data-sonner-toaster] {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 20000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+[data-sonner-toast] {
+  pointer-events: auto;
+  min-width: 240px;
+  max-width: 360px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #111827;
+  color: #f9fafb;
+  border: 1px solid #1f2937;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-weight: 500;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+[data-sonner-toast][data-type='success'] {
+  background: #166534;
+  border-color: #16a34a;
+}
+
+[data-sonner-toast][data-type='error'] {
+  background: #7f1d1d;
+  border-color: #ef4444;
+}
+
+[data-sonner-toast][data-type='warning'] {
+  background: #fcd34d;
+  color: #1f2937;
+  border-color: #fbbf24;
+}
+
+[data-sonner-toast] [data-title] {
+  font-weight: 700;
+}
+
+[data-sonner-toast] [data-description] {
+  opacity: 0.85;
 }

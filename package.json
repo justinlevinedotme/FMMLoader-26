@@ -18,7 +18,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run generate:locales && tsc && vite build",
+    "generate:locales": "node scripts/generate-locales.ts",
     "build:debug": "npm run build && tauri build --debug",
     "build:release": "npm run build && tauri build",
     "preview": "vite preview",
@@ -55,7 +56,9 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "tauri-plugin-locale-api": "^2.0.1",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

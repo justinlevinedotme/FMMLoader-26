@@ -76,6 +76,7 @@ pub fn load_config() -> Result<Config, String> {
             user_dir_path: None,
             enabled_mods: Vec::new(),
             dark_mode: false,
+            language: None,
             active_name_fix: None,
         });
     }

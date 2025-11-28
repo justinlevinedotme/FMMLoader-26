@@ -1,0 +1,239 @@
+{
+  "_version": 2,
+  "nav": {
+    "mods": "모드",
+    "graphics": "그래픽",
+    "nameFix": "이름 수정",
+    "settings": "설정"
+  },
+  "settings": {
+    "title": "설정",
+    "description": "테마 및 저장소 기본 설정",
+    "darkMode": "다크 모드",
+    "darkModeDescription": "앱 창의 다크 테마를 전환합니다.",
+    "logs": {
+      "title": "애플리케이션 로그",
+      "description": "최근 앱 로그가 저장된 폴더를 엽니다.",
+      "open": "로그 폴더 열기"
+    },
+    "modsStorage": {
+      "title": "모드 저장소",
+      "description": "가져온 모드가 저장된 폴더를 엽니다.",
+      "open": "모드 폴더 열기"
+    },
+    "language": {
+      "title": "언어",
+      "description": "선호하는 언어를 선택하세요. 재시작 시 시스템 감지를 덮어씁니다."
+    },
+    "updates": {
+      "title": "업데이트",
+      "current": "현재 버전: v{version}",
+      "available": "업데이트 가능: v{version}",
+      "check": "업데이트 확인",
+      "checking": "확인 중...",
+      "modalTitle": "업데이트 사용 가능",
+      "modalBody": "버전 v{latest}을(를) 사용할 수 있습니다. 현재: v{current}.",
+      "downloadInstall": "다운로드 및 설치",
+      "downloading": "다운로드 중...",
+      "installing": "설치 중...",
+      "later": "나중에"
+    }
+  },
+  "modMeta": {
+    "title": "모드 메타데이터 추가",
+    "description": "모드를 올바르게 관리할 수 있도록 메타데이터를 입력하세요.",
+    "fields": {
+      "name": {
+        "label": "이름",
+        "placeholder": "모드 이름을 입력하세요"
+      },
+      "version": {
+        "label": "버전",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "타입",
+        "placeholder": "모드 타입을 선택하세요",
+        "detecting": "모드 타입 감지 중..."
+      },
+      "author": {
+        "label": "작성자",
+        "placeholder": "선택 사항 (작성자명)"
+      },
+      "description": {
+        "label": "설명",
+        "placeholder": "선택 사항 (설명)"
+      }
+    },
+    "actions": {
+      "cancel": "취소",
+      "submit": "저장"
+    }
+  },
+  "common": {
+    "open": "열기",
+    "close": "닫기",
+    "language": "언어",
+    "apply": "적용",
+    "cancel": "취소"
+  },
+  "errors": {
+    "generic": "문제가 발생했습니다.",
+    "missingKey": "번역이 없습니다: {key}"
+  },
+  "overlay": {
+    "dropTitle": "모드 파일을 끌어다 놓아 가져오기"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | 제작: JALCO / Justin Levine",
+    "supportKofi": "Ko-Fi에서 후원하기",
+    "joinDiscord": "Discord 참여"
+  },
+  "toolbar": {
+    "import": "가져오기",
+    "conflicts": "충돌",
+    "restore": "복원",
+    "refresh": "새로고침",
+    "tooltips": {
+      "import": "새 모드 패키지 가져오기",
+      "conflicts": "모드 간 파일 충돌 확인",
+      "restore": "이전 백업으로 복원",
+      "refresh": "모드 목록 및 상태 새로고침"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "게임 디렉터리:",
+      "tooltip": ".bundle 파일이 있는 FM26 설치 폴더",
+      "placeholder": "설정되지 않음 - 선택 또는 게임 감지 클릭",
+      "detect": "감지"
+    },
+    "userDir": {
+      "label": "사용자 디렉터리:",
+      "tooltip": "저장 및 설정이 저장되는 FM26 사용자 디렉터리",
+      "placeholder": "시스템에서 자동 감지됨",
+      "detect": "감지"
+    }
+  },
+  "modsTab": {
+    "tabs": {
+      "mods": "모드",
+      "graphics": "그래픽",
+      "namefix": "이름 수정",
+      "settings": "설정"
+    },
+    "primaryActions": {
+      "apply": "선택된 모드 적용",
+      "enable": "활성화",
+      "disable": "비활성화"
+    },
+    "table": {
+      "name": "이름",
+      "type": "유형",
+      "author": "제작자",
+      "status": "상태",
+      "version": "버전",
+      "actions": "작업"
+    },
+    "empty": "모드를 찾을 수 없습니다. 모드를 가져와 시작하세요."
+  },
+  "graphicsTab": {
+    "title": "그래픽 팩",
+    "subtitle": "{count}개 팩 설치됨",
+    "import": {
+      "button": "그래픽 팩 가져오기",
+      "disabledTip": "가져오려면 사용자 디렉터리가 필요합니다"
+    },
+    "validate": {
+      "button": "그래픽 검증",
+      "disabledTip": "검증하려면 사용자 디렉터리가 필요합니다"
+    },
+    "progress": {
+      "heading": "진행 상황:",
+      "files": "{current} / {total} 파일",
+      "importing": "가져오는 중..."
+    },
+    "warnings": {
+      "needUserDir": "그래픽 팩 설치에 사용자 디렉터리가 필요합니다"
+    },
+    "table": {
+      "name": "이름",
+      "type": "유형",
+      "files": "파일",
+      "installed": "설치됨",
+      "empty": null,
+      "en": "No graphics packs installed yet.",
+      "ko": "아직 설치된 그래픽 팩이 없습니다.",
+      "tr": "Henüz grafik paketi kurulmadı.",
+      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
+      "de": "Noch keine Grafik-Packs installiert."
+    }
+  },
+  "credits": {
+    "title": "크레딧",
+    "description": "FMMLoader를 만들고 번역해 주신 모든 분께 감사드립니다.",
+    "sections": {
+      "contributors": {
+        "title": "핵심 기여자"
+      },
+      "translators": {
+        "title": "번역 및 현지화"
+      },
+      "languages": {
+        "title": "지원 언어"
+      },
+      "crowdin": {
+        "title": "CrowdIn 기여자",
+        "note": "최신 번역을 유지해 주시는 커뮤니티 여러분께 특별히 감사드립니다."
+      }
+    }
+  },
+  "nameFix": {
+    "title": "이름 수정",
+    "subtitle": "FM 이름 수정 관리",
+    "sectionTitle": "FM 이름 수정",
+    "sectionDescription": "라이선스 문제를 해결하고 구단, 선수, 대회 이름을 실제 이름으로 표시합니다",
+    "status": {
+      "checking": "확인 중...",
+      "installed": "설치됨",
+      "notInstalled": "미설치"
+    },
+    "whatItDoes": {
+      "heading": "기능:",
+      "bullets": [
+        "AC 밀란, 인테르, 라치오 등 구단의 실제 이름을 표시",
+        "일본 선수 이름을 수정",
+        "가짜/라이선스 없는 콘텐츠 제거",
+        "모든 리그 및 대회에서 작동"
+      ]
+    },
+    "active": {
+      "heading": "현재 활성:",
+      "unknown": "알 수 없음"
+    },
+    "selectLabel": "이름 수정 소스 선택:",
+    "selectPlaceholder": "이름 수정 소스를 선택하세요",
+    "activeSuffix": " - 활성",
+    "noSources": "사용할 이름 수정 소스가 없습니다. ZIP 파일을 가져와 시작하세요.",
+    "buttons": {
+      "install": "설치",
+      "reinstall": "재설치",
+      "uninstall": "게임에서 제거",
+      "importZip": "ZIP에서 가져오기",
+      "checkStatus": "상태 확인",
+      "deleteSource": "소스 삭제"
+    },
+    "warnings": {
+      "needGameDir": "먼저 게임 디렉터리를 설정하세요"
+    },
+    "notes": {
+      "community": "커뮤니티에서 이름 수정을 다운로드하거나 직접 만들 수 있습니다. SortItOutSI 또는 FMScout의 수정을 권장합니다."
+    },
+    "userDir": {
+      "label": "사용자 디렉터리:",
+      "tooltip": "저장 및 설정이 저장되는 FM26 사용자 디렉터리",
+      "placeholder": "시스템에서 자동 감지됨",
+      "detect": "감지"
+    }
+  }
+}

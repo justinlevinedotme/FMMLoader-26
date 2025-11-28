@@ -1,0 +1,239 @@
+{
+  "_version": 2,
+  "nav": {
+    "mods": "Modlar",
+    "graphics": "Grafikler",
+    "nameFix": "İsim Düzeltme",
+    "settings": "Ayarlar"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "description": "Tema ve depolama tercihleri",
+    "darkMode": "Koyu Mod",
+    "darkModeDescription": "Uygulama penceresi için koyu temayı aç/kapat.",
+    "logs": {
+      "title": "Uygulama Günlükleri",
+      "description": "Son uygulama günlüklerinin bulunduğu klasörü açar.",
+      "open": "Günlük Klasörünü Aç"
+    },
+    "modsStorage": {
+      "title": "Mod Deposu",
+      "description": "İçe aktarılan modların saklandığı klasörü açar.",
+      "open": "Modlar Klasörünü Aç"
+    },
+    "language": {
+      "title": "Dil",
+      "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar."
+    },
+    "updates": {
+      "title": "Güncellemeler",
+      "current": "Mevcut: v{version}",
+      "available": "Güncelleme mevcut: v{version}",
+      "check": "Güncellemeleri kontrol et",
+      "checking": "Kontrol ediliyor...",
+      "modalTitle": "Güncelleme mevcut",
+      "modalBody": "v{latest} sürümü mevcut. Mevcut: v{current}.",
+      "downloadInstall": "İndir ve Yükle",
+      "downloading": "İndiriliyor...",
+      "installing": "Yükleniyor...",
+      "later": "Sonra"
+    }
+  },
+  "modMeta": {
+    "title": "Mod metadatası ekle",
+    "description": "Modun doğru yönetilebilmesi için metadatasını girin.",
+    "fields": {
+      "name": {
+        "label": "İsim",
+        "placeholder": "Mod adını girin"
+      },
+      "version": {
+        "label": "Sürüm",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Tür",
+        "placeholder": "Mod türü seçin",
+        "detecting": "Mod türü algılanıyor..."
+      },
+      "author": {
+        "label": "Yazar",
+        "placeholder": "Opsiyonel yazar adı"
+      },
+      "description": {
+        "label": "Açıklama",
+        "placeholder": "Opsiyonel açıklama"
+      }
+    },
+    "actions": {
+      "cancel": "İptal",
+      "submit": "Kaydet"
+    }
+  },
+  "common": {
+    "open": "Aç",
+    "close": "Kapat",
+    "language": "Dil",
+    "apply": "Uygula",
+    "cancel": "İptal"
+  },
+  "errors": {
+    "generic": "Bir sorun oluştu.",
+    "missingKey": "Eksik çeviri: {key}"
+  },
+  "overlay": {
+    "dropTitle": "Mod dosyasını içe aktarmak için bırakın"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | Yapan: JALCO / Justin Levine",
+    "supportKofi": "Ko-Fi'da destekle",
+    "joinDiscord": "Discord'a katıl"
+  },
+  "toolbar": {
+    "import": "İçe Aktar",
+    "conflicts": "Çakışmalar",
+    "restore": "Geri Yükle",
+    "refresh": "Yenile",
+    "tooltips": {
+      "import": "Yeni mod paketi içe aktar",
+      "conflicts": "Modlar arasındaki dosya çakışmalarını kontrol et",
+      "restore": "Önceki yedeğe geri dön",
+      "refresh": "Mod listesi ve durumunu yenile"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "Oyun Dizini:",
+      "tooltip": ".bundle dosyalarını içeren FM26 kurulum klasörü",
+      "placeholder": "Ayarlanmadı - Seç veya Oyunu Algıla'ya tıkla",
+      "detect": "Algıla"
+    },
+    "userDir": {
+      "label": "Kullanıcı Dizini:",
+      "tooltip": "Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini",
+      "placeholder": "Sistemden otomatik algılandı",
+      "detect": "Algıla"
+    }
+  },
+  "modsTab": {
+    "tabs": {
+      "mods": "Modlar",
+      "graphics": "Grafikler",
+      "namefix": "İsim Düzeltme",
+      "settings": "Ayarlar"
+    },
+    "primaryActions": {
+      "apply": "Seçili Modları Uygula",
+      "enable": "Etkinleştir",
+      "disable": "Devre dışı bırak"
+    },
+    "table": {
+      "name": "İsim",
+      "type": "Tür",
+      "author": "Yazar",
+      "status": "Durum",
+      "version": "Sürüm",
+      "actions": "İşlemler"
+    },
+    "empty": "Mod bulunamadı. Başlamak için bir mod içe aktarın."
+  },
+  "graphicsTab": {
+    "title": "Grafik Paketleri",
+    "subtitle": "{count} paket yüklü",
+    "import": {
+      "button": "Grafik Paketi İçe Aktar",
+      "disabledTip": "İçe aktarmak için kullanıcı dizini gerekli"
+    },
+    "validate": {
+      "button": "Grafikleri Doğrula",
+      "disabledTip": "Doğrulamak için kullanıcı dizini gerekli"
+    },
+    "progress": {
+      "heading": "İlerleme:",
+      "files": "{current} / {total} dosya",
+      "importing": "İçe aktarılıyor..."
+    },
+    "warnings": {
+      "needUserDir": "Grafik paketi kurulumu için kullanıcı dizini gereklidir"
+    },
+    "table": {
+      "name": "İsim",
+      "type": "Tür",
+      "files": "Dosyalar",
+      "installed": "Kurulum Tarihi",
+      "empty": null,
+      "en": "No graphics packs installed yet.",
+      "ko": "아직 설치된 그래픽 팩이 없습니다.",
+      "tr": "Henüz grafik paketi kurulmadı.",
+      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
+      "de": "Noch keine Grafik-Packs installiert."
+    }
+  },
+  "credits": {
+    "title": "Katkıda Bulunanlar",
+    "description": "FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.",
+    "sections": {
+      "contributors": {
+        "title": "Temel Katkıcılar"
+      },
+      "translators": {
+        "title": "Çevirmenler ve Yerelleştirme"
+      },
+      "languages": {
+        "title": "Desteklenen Diller"
+      },
+      "crowdin": {
+        "title": "CrowdIn Katkıcıları",
+        "note": "Çevirileri güncel tutan topluluk üyelerine özel teşekkürler."
+      }
+    }
+  },
+  "nameFix": {
+    "title": "İsim Düzeltme",
+    "subtitle": "FM İsim Düzeltmesini yönet",
+    "sectionTitle": "FM İsim Düzeltme",
+    "sectionDescription": "Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek isimlerini açar",
+    "status": {
+      "checking": "Kontrol ediliyor...",
+      "installed": "Kurulu",
+      "notInstalled": "Kurulu değil"
+    },
+    "whatItDoes": {
+      "heading": "Ne yapar:",
+      "bullets": [
+        "AC Milan, Inter, Lazio gibi kulüplerin gerçek isimlerini açar",
+        "Japon oyuncu isimlerini düzeltir",
+        "Sahte/lisanssız içeriği kaldırır",
+        "Tüm lig ve turnuvalarda çalışır"
+      ]
+    },
+    "active": {
+      "heading": "Şu an etkin:",
+      "unknown": "Bilinmiyor"
+    },
+    "selectLabel": "İsim düzeltme kaynağını seç:",
+    "selectPlaceholder": "Bir isim düzeltme kaynağı seçin",
+    "activeSuffix": " - Etkin",
+    "noSources": "İsim düzeltme kaynağı yok. Başlamak için bir ZIP içe aktarın.",
+    "buttons": {
+      "install": "Yükle",
+      "reinstall": "Yeniden Yükle",
+      "uninstall": "Oyundan Kaldır",
+      "importZip": "ZIP'ten içe aktar",
+      "checkStatus": "Durumu Kontrol Et",
+      "deleteSource": "Kaynağı Sil"
+    },
+    "warnings": {
+      "needGameDir": "Önce Oyun Dizininizi ayarlayın"
+    },
+    "notes": {
+      "community": "Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz. SortItOutSI veya FMScout düzeltmelerini öneririz."
+    },
+    "userDir": {
+      "label": "Kullanıcı Dizini:",
+      "tooltip": "Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini",
+      "placeholder": "Sistemden otomatik algılandı",
+      "detect": "Algıla"
+    }
+  }
+}
