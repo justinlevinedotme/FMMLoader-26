@@ -171,7 +171,7 @@ export const tauriCommands = {
   listGraphicsPacks: () => safeInvoke<GraphicsPackMetadata[]>('list_graphics_packs'),
 
   analyzeGraphicsPack: (sourcePath: string) =>
-    safeInvoke<GraphicsPackAnalysis>('analyze_graphics_pack', { sourcePath }),
+    safeInvoke<GraphicsPackAnalysis>('analyze_graphics_pack_cmd', { sourcePath }),
 
   validateGraphics: () => safeInvoke<GraphicsPackIssue[]>('validate_graphics'),
 
