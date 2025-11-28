@@ -1,3 +1,0 @@
-[submodule "src-tauri/vendor/tauri-plugin-i18n"]
-	path = src-tauri/vendor/tauri-plugin-i18n
-	url = https://github.com/razein97/tauri-plugin-i18n.git
