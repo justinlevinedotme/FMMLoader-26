@@ -19,7 +19,7 @@ tauri-plugin-os = "2.0.0"
 tauri-plugin-process = "2.0.0"
 tauri-plugin-shell = "2.0.0"
 tauri-plugin-updater = "2.0.0"
-tauri-plugin-i18n = { path = "vendor/tauri-plugin-i18n" }
+tauri-plugin-i18n = "1.0.0"
 tauri-plugin-locale = "2.0.1"
 rust-i18n-support = "3.1.2"
 serde = { version = "1", features = ["derive"] }
@@ -47,3 +47,6 @@ custom-protocol = ["tauri/custom-protocol"]
 
 [target.'cfg(target_os = "macos")'.dependencies]
 tauri-plugin-macos-permissions = "2.3.0"
+
+[patch.crates-io]
+tauri-plugin-i18n = { path = "vendor/tauri-plugin-i18n" }
