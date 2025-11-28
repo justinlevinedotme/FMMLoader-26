@@ -248,6 +248,17 @@ function App() {
     }
   };
 
+  const triggerToastTests = () => {
+    toast.success(txRef.current('toasts.validateGraphics.success'), { id: 'test-validate' });
+    toast.info(txRef.current('toasts.validateGraphics.issues', { count: 2 }));
+    toast.loading(txRef.current('toasts.migrateGraphics.loading', { name: 'Test Pack' }), {
+      id: 'test-migrate',
+    });
+    toast.success(txRef.current('toasts.migrateGraphics.success'), { id: 'test-migrate' });
+    toast.error(txRef.current('toasts.migrateGraphics.error', { message: 'Example error' }));
+    toast.success(txRef.current('toasts.nameFixUninstallSuccess'), { id: 'test-namefix' });
+  };
+
   // Dialog states
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const [conflictsDialogOpen, setConflictsDialogOpen] = useState(false);
@@ -1438,6 +1449,11 @@ function App() {
                   <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                   {t('toolbar.refresh')}
                 </Button>
+                {process.env.NODE_ENV !== 'production' && (
+                  <Button variant="ghost" size="sm" onClick={triggerToastTests}>
+                    🔔 Toast test
+                  </Button>
+                )}
                 <Select
                   value={locale}
                   onValueChange={(val) => handleLocaleChange(val as SupportedLocale)}
