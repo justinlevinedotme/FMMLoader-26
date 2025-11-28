@@ -102,6 +102,73 @@ settings:
       tr: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
       pt-PT: Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.
       de: Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.
+  updates:
+    title:
+      en: Updates
+      ko: 업데이트
+      tr: Güncellemeler
+      pt-PT: Atualizações
+      de: Updates
+    current:
+      en: "Current: v{version}"
+      ko: "현재 버전: v{version}"
+      tr: "Mevcut: v{version}"
+      pt-PT: "Atual: v{version}"
+      de: "Aktuell: v{version}"
+    available:
+      en: "Update available: v{version}"
+      ko: "업데이트 가능: v{version}"
+      tr: "Güncelleme mevcut: v{version}"
+      pt-PT: "Atualização disponível: v{version}"
+      de: "Update verfügbar: v{version}"
+    check:
+      en: Check for updates
+      ko: 업데이트 확인
+      tr: Güncellemeleri kontrol et
+      pt-PT: Procurar atualizações
+      de: Nach Updates suchen
+    checking:
+      en: Checking...
+      ko: 확인 중...
+      tr: Kontrol ediliyor...
+      pt-PT: A verificar...
+      de: Prüfe...
+    modalTitle:
+      en: Update Available
+      ko: 업데이트 사용 가능
+      tr: Güncelleme mevcut
+      pt-PT: Atualização disponível
+      de: Update verfügbar
+    modalBody:
+      en: "Version v{latest} is available. Current: v{current}."
+      ko: "버전 v{latest}을(를) 사용할 수 있습니다. 현재: v{current}."
+      tr: "v{latest} sürümü mevcut. Mevcut: v{current}."
+      pt-PT: "Versão v{latest} disponível. Atual: v{current}."
+      de: "Version v{latest} ist verfügbar. Aktuell: v{current}."
+    downloadInstall:
+      en: Download & Install
+      ko: 다운로드 및 설치
+      tr: İndir ve Yükle
+      pt-PT: Transferir e instalar
+      de: Herunterladen & Installieren
+    downloading:
+      en: Downloading...
+      ko: 다운로드 중...
+      tr: İndiriliyor...
+      pt-PT: A transferir...
+      de: Lädt herunter...
+    installing:
+      en: Installing...
+      ko: 설치 중...
+      tr: Yükleniyor...
+      pt-PT: A instalar...
+      de: Installiere...
+    later:
+      en: Later
+      ko: 나중에
+      tr: Sonra
+      pt-PT: Mais tarde
+      de: Später
 modMeta:
   title:
     en: Add Mod Metadata
@@ -187,86 +254,19 @@ modMeta:
         tr: Opsiyonel açıklama
         pt-PT: Descrição opcional
         de: Optionale Beschreibung
-  actions:
-    cancel:
-      en: Cancel
-      ko: 취소
-      tr: İptal
-      pt-PT: Cancelar
-      de: Abbrechen
-    submit:
-      en: Save
-      ko: 저장
-      tr: Kaydet
-      pt-PT: Guardar
-      de: Speichern
-  updates:
-    title:
-      en: Updates
-      ko: 업데이트
-      tr: Güncellemeler
-      pt-PT: Atualizações
-      de: Updates
-    current:
-      en: "Current: v{version}"
-      ko: "현재 버전: v{version}"
-      tr: "Mevcut: v{version}"
-      pt-PT: "Atual: v{version}"
-      de: "Aktuell: v{version}"
-    available:
-      en: "Update available: v{version}"
-      ko: "업데이트 가능: v{version}"
-      tr: "Güncelleme mevcut: v{version}"
-      pt-PT: "Atualização disponível: v{version}"
-      de: "Update verfügbar: v{version}"
-    check:
-      en: Check for updates
-      ko: 업데이트 확인
-      tr: Güncellemeleri kontrol et
-      pt-PT: Procurar atualizações
-      de: Nach Updates suchen
-    checking:
-      en: Checking...
-      ko: 확인 중...
-      tr: Kontrol ediliyor...
-      pt-PT: A verificar...
-      de: Prüfe...
-    modalTitle:
-      en: Update Available
-      ko: 업데이트 사용 가능
-      tr: Güncelleme mevcut
-      pt-PT: Atualização disponível
-      de: Update verfügbar
-    modalBody:
-      en: "Version v{latest} is available. Current: v{current}."
-      ko: "버전 v{latest}을(를) 사용할 수 있습니다. 현재: v{current}."
-      tr: "v{latest} sürümü mevcut. Mevcut: v{current}."
-      pt-PT: "Versão v{latest} disponível. Atual: v{current}."
-      de: "Version v{latest} ist verfügbar. Aktuell: v{current}."
-    downloadInstall:
-      en: Download & Install
-      ko: 다운로드 및 설치
-      tr: İndir ve Yükle
-      pt-PT: Transferir e instalar
-      de: Herunterladen & Installieren
-    downloading:
-      en: Downloading...
-      ko: 다운로드 중...
-      tr: İndiriliyor...
-      pt-PT: A transferir...
-      de: Lädt herunter...
-    installing:
-      en: Installing...
-      ko: 설치 중...
-      tr: Yükleniyor...
-      pt-PT: A instalar...
-      de: Installiere...
-    later:
-      en: Later
-      ko: 나중에
-      tr: Sonra
-      pt-PT: Mais tarde
-      de: Später
+    actions:
+      cancel:
+        en: Cancel
+        ko: 취소
+        tr: İptal
+        pt-PT: Cancelar
+        de: Abbrechen
+      submit:
+        en: Save
+        ko: 저장
+        tr: Kaydet
+        pt-PT: Guardar
+        de: Speichern
 
 common:
   open:

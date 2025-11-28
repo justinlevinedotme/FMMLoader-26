@@ -24,6 +24,19 @@
     "language": {
       "title": "Sprache",
       "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
+    },
+    "updates": {
+      "title": "Updates",
+      "current": "Aktuell: v{version}",
+      "available": "Update verfügbar: v{version}",
+      "check": "Nach Updates suchen",
+      "checking": "Prüfe...",
+      "modalTitle": "Update verfügbar",
+      "modalBody": "Version v{latest} ist verfügbar. Aktuell: v{current}.",
+      "downloadInstall": "Herunterladen & Installieren",
+      "downloading": "Lädt herunter...",
+      "installing": "Installiere...",
+      "later": "Später"
     }
   },
   "modMeta": {
@@ -50,24 +63,11 @@
       "description": {
         "label": "Beschreibung",
         "placeholder": "Optionale Beschreibung"
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "submit": "Speichern"
       }
-    },
-    "actions": {
-      "cancel": "Abbrechen",
-      "submit": "Speichern"
-    },
-    "updates": {
-      "title": "Updates",
-      "current": "Aktuell: v{version}",
-      "available": "Update verfügbar: v{version}",
-      "check": "Nach Updates suchen",
-      "checking": "Prüfe...",
-      "modalTitle": "Update verfügbar",
-      "modalBody": "Version v{latest} ist verfügbar. Aktuell: v{current}.",
-      "downloadInstall": "Herunterladen & Installieren",
-      "downloading": "Lädt herunter...",
-      "installing": "Installiere...",
-      "later": "Später"
     }
   },
   "common": {

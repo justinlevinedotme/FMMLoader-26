@@ -24,6 +24,19 @@
     "language": {
       "title": "Dil",
       "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar."
+    },
+    "updates": {
+      "title": "Güncellemeler",
+      "current": "Mevcut: v{version}",
+      "available": "Güncelleme mevcut: v{version}",
+      "check": "Güncellemeleri kontrol et",
+      "checking": "Kontrol ediliyor...",
+      "modalTitle": "Güncelleme mevcut",
+      "modalBody": "v{latest} sürümü mevcut. Mevcut: v{current}.",
+      "downloadInstall": "İndir ve Yükle",
+      "downloading": "İndiriliyor...",
+      "installing": "Yükleniyor...",
+      "later": "Sonra"
     }
   },
   "modMeta": {
@@ -50,24 +63,11 @@
       "description": {
         "label": "Açıklama",
         "placeholder": "Opsiyonel açıklama"
+      },
+      "actions": {
+        "cancel": "İptal",
+        "submit": "Kaydet"
       }
-    },
-    "actions": {
-      "cancel": "İptal",
-      "submit": "Kaydet"
-    },
-    "updates": {
-      "title": "Güncellemeler",
-      "current": "Mevcut: v{version}",
-      "available": "Güncelleme mevcut: v{version}",
-      "check": "Güncellemeleri kontrol et",
-      "checking": "Kontrol ediliyor...",
-      "modalTitle": "Güncelleme mevcut",
-      "modalBody": "v{latest} sürümü mevcut. Mevcut: v{current}.",
-      "downloadInstall": "İndir ve Yükle",
-      "downloading": "İndiriliyor...",
-      "installing": "Yükleniyor...",
-      "later": "Sonra"
     }
   },
   "common": {

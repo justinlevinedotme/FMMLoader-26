@@ -24,6 +24,19 @@
     "language": {
       "title": "Idioma",
       "description": "Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar."
+    },
+    "updates": {
+      "title": "Atualizações",
+      "current": "Atual: v{version}",
+      "available": "Atualização disponível: v{version}",
+      "check": "Procurar atualizações",
+      "checking": "A verificar...",
+      "modalTitle": "Atualização disponível",
+      "modalBody": "Versão v{latest} disponível. Atual: v{current}.",
+      "downloadInstall": "Transferir e instalar",
+      "downloading": "A transferir...",
+      "installing": "A instalar...",
+      "later": "Mais tarde"
     }
   },
   "modMeta": {
@@ -50,24 +63,11 @@
       "description": {
         "label": "Descrição",
         "placeholder": "Descrição opcional"
+      },
+      "actions": {
+        "cancel": "Cancelar",
+        "submit": "Guardar"
       }
-    },
-    "actions": {
-      "cancel": "Cancelar",
-      "submit": "Guardar"
-    },
-    "updates": {
-      "title": "Atualizações",
-      "current": "Atual: v{version}",
-      "available": "Atualização disponível: v{version}",
-      "check": "Procurar atualizações",
-      "checking": "A verificar...",
-      "modalTitle": "Atualização disponível",
-      "modalBody": "Versão v{latest} disponível. Atual: v{current}.",
-      "downloadInstall": "Transferir e instalar",
-      "downloading": "A transferir...",
-      "installing": "A instalar...",
-      "later": "Mais tarde"
     }
   },
   "common": {

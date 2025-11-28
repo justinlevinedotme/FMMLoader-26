@@ -18,8 +18,6 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const FALLBACK_LOCALE: SupportedLocale = 'en';
 
-const localeCache = new Map<string, Messages>();
-
 export const normalizeLocale = (input?: string | null): SupportedLocale | null => {
   if (!input) return null;
   const lower = input.toLowerCase();
@@ -32,18 +30,12 @@ export const normalizeLocale = (input?: string | null): SupportedLocale | null =
 };
 
 const loadLocale = async (locale: SupportedLocale): Promise<Messages> => {
-  if (localeCache.has(locale)) {
-    return localeCache.get(locale)!;
-  }
-
   try {
     const mod = await import(/* @vite-ignore */ `../locales/${locale}.json`);
     const messages = mod.default ?? mod;
-    localeCache.set(locale, messages);
     return messages;
   } catch (error) {
     console.warn(`[i18n] Failed to load locale '${locale}':`, error);
-    localeCache.set(locale, {});
     return {};
   }
 };
