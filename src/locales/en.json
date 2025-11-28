@@ -156,18 +156,7 @@
     "warnings": {
       "needUserDir": "User directory is required for graphics pack installation"
     },
-    "table": {
-      "name": "Name",
-      "type": "Type",
-      "files": "Files",
-      "installed": "Installed",
-      "empty": null,
-      "en": "No graphics packs installed yet.",
-      "ko": "아직 설치된 그래픽 팩이 없습니다.",
-      "tr": "Henüz grafik paketi kurulmadı.",
-      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
-      "de": "Noch keine Grafik-Packs installiert."
-    }
+    "table": "No graphics packs installed yet."
   },
   "credits": {
     "title": "Credits",

@@ -156,18 +156,7 @@
     "warnings": {
       "needUserDir": "Grafik paketi kurulumu için kullanıcı dizini gereklidir"
     },
-    "table": {
-      "name": "İsim",
-      "type": "Tür",
-      "files": "Dosyalar",
-      "installed": "Kurulum Tarihi",
-      "empty": null,
-      "en": "No graphics packs installed yet.",
-      "ko": "아직 설치된 그래픽 팩이 없습니다.",
-      "tr": "Henüz grafik paketi kurulmadı.",
-      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
-      "de": "Noch keine Grafik-Packs installiert."
-    }
+    "table": "Henüz grafik paketi kurulmadı."
   },
   "credits": {
     "title": "Katkıda Bulunanlar",
