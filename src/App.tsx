@@ -869,7 +869,7 @@ function App() {
       const errorMsg = formatError(error);
       console.error('Formatted error message:', errorMsg);
       addLog(`Error importing name fix: ${errorMsg}`);
-      toast.error(txRef.current('toasts.nameFixImportError', { message: errorMsg }));
+      toast.error(`Failed to import name fix: ${errorMsg}`);
     }
     console.log('=== handleImportNameFix END ===');
   };
@@ -962,7 +962,7 @@ function App() {
     if (!pendingGraphicsPath || !pendingGraphicsAnalysis) return;
 
     try {
-      await runWithBlockingMessage(txRef.current('graphicsTab.progress.importing'), async () => {
+      await runWithBlockingMessage('Checking graphics pack conflicts...', async () => {
         // Check for conflicts before installing
         const packName = pendingGraphicsPath.split('/').pop()?.replace('.zip', '') || 'Unknown';
         const conflict = await tauriCommands.checkGraphicsConflicts(
@@ -985,7 +985,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error checking conflicts: ${errorMsg}`);
-      toast.error(txRef.current('toasts.graphicsImportError', { message: errorMsg }));
+      toast.error(`Failed to check conflicts: ${errorMsg}`);
     }
   };
 
@@ -1051,21 +1051,17 @@ function App() {
     try {
       setValidatingGraphics(true);
       addLog('Validating installed graphics packs...');
-      toast.loading(txRef.current('toasts.validateGraphics.loading'), {
-        id: 'validate-graphics',
-      });
+      toast.loading('Validating graphics...', { id: 'validate-graphics' });
 
       const issues = await tauriCommands.validateGraphics();
       setGraphicsIssues(issues);
 
       if (issues.length === 0) {
         addLog('No issues found - all graphics packs are correctly placed');
-        toast.success(txRef.current('toasts.validateGraphics.success'), {
-          id: 'validate-graphics',
-        });
+        toast.success('All graphics packs are correctly placed!', { id: 'validate-graphics' });
       } else {
         addLog(`Found ${issues.length} graphics pack issue(s)`);
-        toast.info(txRef.current('toasts.validateGraphics.issues', { count: issues.length }), {
+        toast.info(`Found ${issues.length} issue(s). Click to review.`, {
           id: 'validate-graphics',
         });
         setShowValidationDialog(true);
@@ -1073,9 +1069,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error validating graphics: ${errorMsg}`);
-      toast.error(txRef.current('toasts.validateGraphics.error', { message: errorMsg }), {
-        id: 'validate-graphics',
-      });
+      toast.error(`Failed to validate graphics: ${errorMsg}`, { id: 'validate-graphics' });
     } finally {
       setValidatingGraphics(false);
     }
@@ -1085,13 +1079,11 @@ function App() {
     try {
       setMigratingPack(true);
       addLog(`Migrating ${packName} to ${targetSubdir}/...`);
-      toast.loading(txRef.current('toasts.migrateGraphics.loading', { name: packName }), {
-        id: 'migrate-graphics',
-      });
+      toast.loading(`Moving ${packName}...`, { id: 'migrate-graphics' });
 
       const result = await tauriCommands.migrateGraphicsPack(packName, targetSubdir);
       addLog(result);
-      toast.success(txRef.current('toasts.migrateGraphics.success'), { id: 'migrate-graphics' });
+      toast.success('Graphics pack moved successfully!', { id: 'migrate-graphics' });
 
       // Clear progress and reload validation
       setMigrationProgress(null);
@@ -1099,9 +1091,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error migrating graphics pack: ${errorMsg}`);
-      toast.error(txRef.current('toasts.migrateGraphics.error', { message: errorMsg }), {
-        id: 'migrate-graphics',
-      });
+      toast.error(`Failed to migrate pack: ${errorMsg}`, { id: 'migrate-graphics' });
       setMigrationProgress(null);
     } finally {
       setMigratingPack(false);
@@ -1113,14 +1103,14 @@ function App() {
 
     try {
       addLog(`Migrating ${graphicsIssues.length} graphics pack(s)...`);
-      toast.loading(txRef.current('toasts.migrateAll.loading'), { id: 'migrate-all' });
+      toast.loading('Migrating all packs...', { id: 'migrate-all' });
 
       for (const issue of graphicsIssues) {
         await tauriCommands.migrateGraphicsPack(issue.pack_name, issue.pack_type);
         addLog(`Migrated ${issue.pack_name}`);
       }
 
-      toast.success(txRef.current('toasts.migrateAll.success'), { id: 'migrate-all' });
+      toast.success('All packs migrated successfully!', { id: 'migrate-all' });
       setShowValidationDialog(false);
 
       // Reload validation
@@ -1128,9 +1118,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error migrating packs: ${errorMsg}`);
-      toast.error(txRef.current('toasts.migrateAll.error', { message: errorMsg }), {
-        id: 'migrate-all',
-      });
+      toast.error(`Failed to migrate packs: ${errorMsg}`, { id: 'migrate-all' });
     }
   };
 
@@ -1139,7 +1127,7 @@ function App() {
       addLog(`Deleting ${source.name}...`);
       const result = await tauriCommands.deleteNameFix(source.id);
       addLog(result);
-      toast.success(txRef.current('toasts.nameFixDeleteSuccess', { name: source.name }));
+      toast.success(result);
 
       // Reload sources
       await loadNameFixSources();
@@ -1152,7 +1140,7 @@ function App() {
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error deleting name fix: ${errorMsg}`);
-      toast.error(txRef.current('toasts.nameFixDeleteError', { message: errorMsg }));
+      toast.error(`Failed to delete name fix: ${errorMsg}`);
     } finally {
       setConfirmDeleteNameFix(null);
     }
@@ -1164,14 +1152,14 @@ function App() {
       addLog('Uninstalling FM Name Fix...');
       const result = await tauriCommands.uninstallNameFix();
       addLog(result);
-      toast.success(txRef.current('toasts.nameFixUninstallSuccess'));
+      toast.success('FM Name Fix uninstalled successfully!');
       setNameFixInstalled(false);
       setActiveNameFixId(null);
       await checkNameFixStatus();
     } catch (error) {
       const errorMsg = formatError(error);
       addLog(`Error uninstalling FM Name Fix: ${errorMsg}`);
-      toast.error(txRef.current('toasts.nameFixUninstallError', { message: errorMsg }));
+      toast.error(`Failed to uninstall FM Name Fix: ${errorMsg}`);
     } finally {
       setInstallingNameFix(false);
     }

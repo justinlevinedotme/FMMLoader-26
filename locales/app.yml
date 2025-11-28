@@ -319,30 +319,6 @@ toasts:
     tr: "İsim düzeltme içe aktarılamadı: {message}"
     pt-PT: "Falha ao importar correção de nomes: {message}"
     de: "Import des Namensfixes fehlgeschlagen: {message}"
-  nameFixDeleteSuccess:
-    en: "{name} deleted successfully!"
-    ko: "{name} 삭제 완료!"
-    tr: "{name} başarıyla silindi!"
-    pt-PT: "{name} eliminado com sucesso!"
-    de: "{name} erfolgreich gelöscht!"
-  nameFixDeleteError:
-    en: "Failed to delete name fix: {message}"
-    ko: "이름 수정 삭제 실패: {message}"
-    tr: "İsim düzeltmesi silinemedi: {message}"
-    pt-PT: "Falha ao eliminar correção de nomes: {message}"
-    de: "Namensfix konnte nicht gelöscht werden: {message}"
-  nameFixUninstallSuccess:
-    en: FM Name Fix uninstalled successfully!
-    ko: FM 이름 수정이 성공적으로 제거되었습니다!
-    tr: FM Name Fix başarıyla kaldırıldı!
-    pt-PT: FM Name Fix desinstalado com sucesso!
-    de: FM Namensfix erfolgreich deinstalliert!
-  nameFixUninstallError:
-    en: "Failed to uninstall FM Name Fix: {message}"
-    ko: "FM 이름 수정 제거 실패: {message}"
-    tr: "FM Name Fix kaldırılamadı: {message}"
-    pt-PT: "Falha ao desinstalar FM Name Fix: {message}"
-    de: "FM Namensfix konnte nicht deinstalliert werden: {message}"
   graphicsImporting:
     en: Importing graphics...
     ko: 그래픽 가져오는 중...

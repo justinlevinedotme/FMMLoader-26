@@ -75,10 +75,6 @@
       "message": null
     },
     "nameFixImportError": "Import des Namensfixes fehlgeschlagen: {message}",
-    "nameFixDeleteSuccess": "{name} erfolgreich gelöscht!",
-    "nameFixDeleteError": "Namensfix konnte nicht gelöscht werden: {message}",
-    "nameFixUninstallSuccess": "FM Namensfix erfolgreich deinstalliert!",
-    "nameFixUninstallError": "FM Namensfix konnte nicht deinstalliert werden: {message}",
     "graphicsImporting": "Grafiken werden importiert...",
     "graphicsImportError": "Grafik-Pack konnte nicht importiert werden: {message}",
     "validateGraphics": {
