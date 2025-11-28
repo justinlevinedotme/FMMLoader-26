@@ -530,14 +530,19 @@ function App() {
       if (enable) {
         await tauriCommands.enableMod(modId);
         addLog(`Enabled ${modId}`);
+        toast.success(txRef.current('toasts.enableModSuccess', { name: modId }));
       } else {
         await tauriCommands.disableMod(modId);
         addLog(`Disabled ${modId}`);
+        toast.success(txRef.current('toasts.disableModSuccess', { name: modId }));
       }
       await loadConfig();
       await loadMods();
     } catch (error) {
       addLog(`Error toggling mod: ${formatError(error)}`);
+      toast.error(
+        txRef.current('toasts.toggleModError', { name: modId, message: formatError(error) })
+      );
     }
   };
 
