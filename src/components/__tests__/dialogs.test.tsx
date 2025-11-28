@@ -4,6 +4,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ModMetadataDialog } from '@/components/ModMetadataDialog';
 import { ConflictsDialog } from '@/components/ConflictsDialog';
 import { GraphicsPackConfirmDialog } from '@/components/GraphicsPackConfirmDialog';
+import { I18nProvider } from '@/lib/i18n';
 import type { GraphicsPackAnalysis } from '@/types';
 
 const { mockDetectModType, mockCheckConflicts } = vi.hoisted(() => {
@@ -33,23 +34,25 @@ describe('Dialog components', () => {
     const onSubmit = vi.fn();
 
     render(
-      <ModMetadataDialog
-        open
-        onOpenChange={() => {}}
-        sourcePath="/mods/sample.zip"
-        onSubmit={onSubmit}
-      />
+      <I18nProvider locale="en">
+        <ModMetadataDialog
+          open
+          onOpenChange={() => {}}
+          sourcePath="/mods/sample.zip"
+          onSubmit={onSubmit}
+        />
+      </I18nProvider>
     );
 
     // Auto-detect sets mod type; ensure inputs are fillable
     await waitFor(() => expect(mockDetectModType).toHaveBeenCalled());
 
-    await userEvent.clear(screen.getByLabelText(/Mod Name/i));
-    await userEvent.type(screen.getByLabelText(/Mod Name/i), 'My Cool Mod');
+    await userEvent.clear(screen.getByLabelText(/Name/i));
+    await userEvent.type(screen.getByLabelText(/Name/i), 'My Cool Mod');
     await userEvent.clear(screen.getByLabelText(/Version/i));
     await userEvent.type(screen.getByLabelText(/Version/i), '2.0.0');
 
-    await userEvent.click(screen.getByRole('button', { name: /Import Mod/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Save/i }));
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
