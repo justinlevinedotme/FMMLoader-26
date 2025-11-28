@@ -24,6 +24,19 @@
     "language": {
       "title": "언어",
       "description": "선호하는 언어를 선택하세요. 재시작 시 시스템 감지를 덮어씁니다."
+    },
+    "updates": {
+      "title": "업데이트",
+      "current": "현재 버전: v{version}",
+      "available": "업데이트 가능: v{version}",
+      "check": "업데이트 확인",
+      "checking": "확인 중...",
+      "modalTitle": "업데이트 사용 가능",
+      "modalBody": "버전 v{latest}을(를) 사용할 수 있습니다. 현재: v{current}.",
+      "downloadInstall": "다운로드 및 설치",
+      "downloading": "다운로드 중...",
+      "installing": "설치 중...",
+      "later": "나중에"
     }
   },
   "common": {

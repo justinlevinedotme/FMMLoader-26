@@ -18,6 +18,13 @@ interface SettingsTabProps {
   addLog: (message: string) => void;
   locale: SupportedLocale;
   onLocaleChange: (locale: SupportedLocale) => void;
+  updateStatus: {
+    checking: boolean;
+    available: boolean;
+    currentVersion: string | null;
+    latestVersion: string | null;
+  };
+  onCheckForUpdates: () => void;
 }
 
 const formatError = (error: unknown): string => {
@@ -32,6 +39,8 @@ export function SettingsTab({
   addLog,
   locale,
   onLocaleChange,
+  updateStatus,
+  onCheckForUpdates,
 }: SettingsTabProps) {
   const { t } = useI18n();
   const localeOptions: { value: SupportedLocale; label: string }[] = [
@@ -100,6 +109,31 @@ export function SettingsTab({
             <FolderOpen className="mr-2 h-4 w-4" />
             {t('settings.modsStorage.open')}
           </Button>
+        </div>
+
+        <div className="space-y-2 border-t pt-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="text-sm font-medium">{t('settings.updates.title')}</div>
+              <div className="text-sm text-muted-foreground">
+                {updateStatus.available
+                  ? t('settings.updates.available', {
+                      version: updateStatus.latestVersion ?? 'unknown',
+                    })
+                  : t('settings.updates.current', {
+                      version: updateStatus.currentVersion ?? 'unknown',
+                    })}
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={updateStatus.checking}
+              onClick={onCheckForUpdates}
+            >
+              {updateStatus.checking ? t('settings.updates.checking') : t('settings.updates.check')}
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2 border-t pt-4">

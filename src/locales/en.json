@@ -24,6 +24,19 @@
     "language": {
       "title": "Language",
       "description": "Choose your preferred language. Overrides system detection on restart."
+    },
+    "updates": {
+      "title": "Updates",
+      "current": "Current: v{version}",
+      "available": "Update available: v{version}",
+      "check": "Check for updates",
+      "checking": "Checking...",
+      "modalTitle": "Update Available",
+      "modalBody": "Version v{latest} is available. Current: v{current}.",
+      "downloadInstall": "Download & Install",
+      "downloading": "Downloading...",
+      "installing": "Installing...",
+      "later": "Later"
     }
   },
   "common": {

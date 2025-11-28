@@ -221,9 +221,8 @@ export const useUpdater = () => {
 
   // Check for updates on mount
   useEffect(() => {
-    // Delay initial check to let the app fully load
     const timer = setTimeout(() => {
-      checkForUpdates(false);
+      void checkForUpdates(false);
     }, 3000);
     return () => clearTimeout(timer);
   }, [checkForUpdates]);

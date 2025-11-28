@@ -67,7 +67,6 @@ import { ConflictsDialog } from '@/components/ConflictsDialog';
 import { RestorePointsDialog } from '@/components/RestorePointsDialog';
 import { GraphicsPackConfirmDialog } from '@/components/GraphicsPackConfirmDialog';
 import { TitleBar } from '@/components/TitleBar';
-import { UpdateBanner } from '@/components/UpdateBanner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ModsTab, GraphicsTab, NameFixTab, SettingsTab, type ModWithInfo } from '@/components/tabs';
 import {
@@ -77,6 +76,7 @@ import {
   useI18n,
   type SupportedLocale,
 } from '@/lib/i18n';
+import { useUpdater } from '@/hooks/useUpdater';
 
 type DebugUIProps = {
   metadataDialogOpen: boolean;
@@ -92,6 +92,52 @@ type DebugUIProps = {
   setSelectedMod: (mod: ModWithInfo | null) => void;
   setPendingGraphicsAnalysis: (analysis: GraphicsPackAnalysis | null) => void;
   setPendingGraphicsPath: (path: string | null) => void;
+};
+
+const UpdateModal = ({
+  open,
+  onOpenChange,
+  status,
+  appVersion,
+  onDownload,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  status: UpdateStatusShape;
+  appVersion: string;
+  onDownload: () => void;
+}) => {
+  const { t } = useI18n();
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('settings.updates.modalTitle')}</DialogTitle>
+          <DialogDescription>
+            {status.latestVersion
+              ? t('settings.updates.modalBody', {
+                  latest: status.latestVersion,
+                  current: (status.currentVersion ?? appVersion) || 'unknown',
+                })
+              : t('settings.updates.modalTitle')}
+          </DialogDescription>
+        </DialogHeader>
+        {status.error && <p className="text-sm text-red-500">{status.error}</p>}
+        <div className="flex justify-end gap-2 pt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t('settings.updates.later')}
+          </Button>
+          <Button onClick={onDownload} disabled={status.downloading || status.installing}>
+            {status.downloading
+              ? t('settings.updates.downloading')
+              : status.installing
+                ? t('settings.updates.installing')
+                : t('settings.updates.downloadInstall')}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 function DebugUI({
@@ -224,6 +270,7 @@ function App() {
   const [locale, setLocale] = useState<SupportedLocale>('en');
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const localeOptions: { value: SupportedLocale; emoji: string; label: string }[] = [
     { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
     { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
@@ -231,6 +278,27 @@ function App() {
     { value: 'pt-PT', emoji: '🇵🇹', label: 'Português (Portugal)', contributor: 'AI' },
     { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
   ];
+  const updater = useUpdater();
+  useEffect(() => {
+    if (updater.status.available) {
+      setShowUpdateModal(true);
+    }
+  }, [updater.status.available]);
+  useEffect(() => {
+    if (updater.status.available) {
+      setShowUpdateModal(true);
+    }
+  }, [updater.status.available]);
+  useEffect(() => {
+    if (updater.status.available) {
+      setShowUpdateModal(true);
+    }
+  }, [updater.status.available]);
+  useEffect(() => {
+    if (updater.status.available) {
+      setShowUpdateModal(true);
+    }
+  }, [updater.status.available]);
 
   // Log toast emissions to help debug visibility issues in dev
   useEffect(() => {
@@ -1347,9 +1415,6 @@ function App() {
           {/* Custom TitleBar */}
           <TitleBar />
 
-          {/* Update Banner */}
-          <UpdateBanner />
-
           {/* File Drop Zone - covers everything below titlebar */}
           {/* This invisible overlay catches file drops without blocking interactions */}
           <div className="fixed top-12 left-0 right-0 bottom-0 z-[1] pointer-events-none">
@@ -1635,6 +1700,13 @@ function App() {
                   addLog={addLog}
                   locale={locale}
                   onLocaleChange={handleLocaleChange}
+                  updateStatus={updater.status}
+                  onCheckForUpdates={async () => {
+                    const update = await updater.checkForUpdates(true);
+                    if (update) {
+                      setShowUpdateModal(true);
+                    }
+                  }}
                 />
               </TabsContent>
             </Tabs>
@@ -2024,6 +2096,13 @@ function App() {
               )}
             </div>
           )}
+          <UpdateModal
+            open={showUpdateModal && updater.status.available}
+            onOpenChange={setShowUpdateModal}
+            status={updater.status}
+            appVersion={appVersion}
+            onDownload={() => void updater.downloadAndInstall()}
+          />
           {/* Import Name Fix Dialog */}
           <Dialog open={importNameFixDialogOpen} onOpenChange={setImportNameFixDialogOpen}>
             <DialogContent>
