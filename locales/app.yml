@@ -253,24 +253,6 @@ toasts:
     tr: "Modlar uygulanamadı: {message}"
     pt-PT: "Falha ao aplicar mods: {message}"
     de: "Mods konnten nicht angewendet werden: {message}"
-  enableModSuccess:
-    en: "{name} enabled"
-    ko: "{name} 활성화됨"
-    tr: "{name} etkinleştirildi"
-    pt-PT: "{name} ativado"
-    de: "{name} aktiviert"
-  disableModSuccess:
-    en: "{name} disabled"
-    ko: "{name} 비활성화됨"
-    tr: "{name} devre dışı bırakıldı"
-    pt-PT: "{name} desativado"
-    de: "{name} deaktiviert"
-  toggleModError:
-    en: "Failed to update {name}: {message}"
-    ko: "{name} 업데이트 실패: {message}"
-    tr: "{name} güncellenemedi: {message}"
-    pt-PT: "Falha ao atualizar {name}: {message}"
-    de: "{name} konnte nicht aktualisiert werden: {message}"
   removeSuccess:
     en: "Successfully removed {name}"
     ko: "{name} 제거 완료"
