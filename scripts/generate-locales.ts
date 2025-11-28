@@ -57,7 +57,8 @@ const main = () => {
     for (const locale of SUPPORTED) {
       const bundle = flattenLocales(parsed, locale);
       const outPath = path.join(OUT_DIR, `${locale}.json`);
-      fs.writeFileSync(outPath, JSON.stringify(bundle, null, 2), 'utf8');
+      // Prettier-compatible output (2-space indent + trailing newline)
+      fs.writeFileSync(outPath, `${JSON.stringify(bundle, null, 2)}\n`, 'utf8');
       console.log(`Generated ${outPath}`);
     }
   }
