@@ -75,6 +75,10 @@
       "message": null
     },
     "nameFixImportError": "Failed to import name fix: {message}",
+    "nameFixDeleteSuccess": "{name} deleted successfully!",
+    "nameFixDeleteError": "Failed to delete name fix: {message}",
+    "nameFixUninstallSuccess": "FM Name Fix uninstalled successfully!",
+    "nameFixUninstallError": "Failed to uninstall FM Name Fix: {message}",
     "graphicsImporting": "Importing graphics...",
     "graphicsImportError": "Failed to import graphics pack: {message}",
     "validateGraphics": {

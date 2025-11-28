@@ -75,6 +75,10 @@
       "message": null
     },
     "nameFixImportError": "Falha ao importar correção de nomes: {message}",
+    "nameFixDeleteSuccess": "{name} eliminado com sucesso!",
+    "nameFixDeleteError": "Falha ao eliminar correção de nomes: {message}",
+    "nameFixUninstallSuccess": "FM Name Fix desinstalado com sucesso!",
+    "nameFixUninstallError": "Falha ao desinstalar FM Name Fix: {message}",
     "graphicsImporting": "A importar gráficos...",
     "graphicsImportError": "Falha ao importar pacote de gráficos: {message}",
     "validateGraphics": {

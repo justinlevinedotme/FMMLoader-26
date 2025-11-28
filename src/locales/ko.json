@@ -75,6 +75,10 @@
       "message": null
     },
     "nameFixImportError": "이름 수정 가져오기 실패: {message}",
+    "nameFixDeleteSuccess": "{name} 삭제 완료!",
+    "nameFixDeleteError": "이름 수정 삭제 실패: {message}",
+    "nameFixUninstallSuccess": "FM 이름 수정이 성공적으로 제거되었습니다!",
+    "nameFixUninstallError": "FM 이름 수정 제거 실패: {message}",
     "graphicsImporting": "그래픽 가져오는 중...",
     "graphicsImportError": "그래픽 팩 가져오기 실패: {message}",
     "validateGraphics": {

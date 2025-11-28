@@ -75,6 +75,10 @@
       "message": null
     },
     "nameFixImportError": "İsim düzeltme içe aktarılamadı: {message}",
+    "nameFixDeleteSuccess": "{name} başarıyla silindi!",
+    "nameFixDeleteError": "İsim düzeltmesi silinemedi: {message}",
+    "nameFixUninstallSuccess": "FM Name Fix başarıyla kaldırıldı!",
+    "nameFixUninstallError": "FM Name Fix kaldırılamadı: {message}",
     "graphicsImporting": "Grafikler içe aktarılıyor...",
     "graphicsImportError": "Grafik paketi içe aktarılamadı: {message}",
     "validateGraphics": {
