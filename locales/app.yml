@@ -399,6 +399,12 @@ toasts:
       tr: "Paket taşınamadı: {message}"
       pt-PT: "Falha ao migrar pacote: {message}"
       de: "Paket konnte nicht migriert werden: {message}"
+    progress:
+      en: "Migrating: {current}/{total} files ({percent}%)"
+      ko: "마이그레이션 중: {current}/{total} 파일 ({percent}%)"
+      tr: "Taşınıyor: {current}/{total} dosya (%{percent})"
+      pt-PT: "A migrar: {current}/{total} ficheiros ({percent}%)"
+      de: "Migration: {current}/{total} Dateien ({percent}%)"
   migrateAll:
     loading:
       en: Migrating all packs...

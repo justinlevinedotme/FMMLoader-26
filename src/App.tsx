@@ -1208,7 +1208,11 @@ function App() {
               // Update progress state
               const percent = Math.round((event.payload.current / event.payload.total) * 100);
               toast.loading(
-                `Migrating: ${event.payload.current}/${event.payload.total} files (${percent}%)`,
+                txRef.current('toasts.migrateGraphics.progress', {
+                  current: event.payload.current,
+                  total: event.payload.total,
+                  percent,
+                }),
                 { id: 'migrate-graphics' }
               );
             }

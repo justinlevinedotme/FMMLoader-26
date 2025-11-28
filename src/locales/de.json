@@ -90,7 +90,8 @@
     "migrateGraphics": {
       "loading": "{name} wird verschoben...",
       "success": "Grafik-Pack erfolgreich verschoben!",
-      "error": "Paket konnte nicht migriert werden: {message}"
+      "error": "Paket konnte nicht migriert werden: {message}",
+      "progress": "Migration: {current}/{total} Dateien ({percent}%)"
     },
     "migrateAll": {
       "loading": "Alle Packs werden migriert...",

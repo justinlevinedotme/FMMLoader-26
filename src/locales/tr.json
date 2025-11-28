@@ -90,7 +90,8 @@
     "migrateGraphics": {
       "loading": "{name} taşınıyor...",
       "success": "Grafik paketi başarıyla taşındı!",
-      "error": "Paket taşınamadı: {message}"
+      "error": "Paket taşınamadı: {message}",
+      "progress": "Taşınıyor: {current}/{total} dosya (%{percent})"
     },
     "migrateAll": {
       "loading": "Tüm paketler taşınıyor...",
