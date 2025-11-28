@@ -237,6 +237,7 @@ function App() {
     { value: 'tr', emoji: '🇹🇷', label: 'Türkçe', contributor: 'AI' },
     { value: 'pt-PT', emoji: '🇵🇹', label: 'Português (Portugal)', contributor: 'AI' },
     { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
+    { value: 'it', emoji: '🇮🇹', label: 'Italiano', contributor: 'AI' },
   ];
   const updater = useUpdater();
   useEffect(() => {

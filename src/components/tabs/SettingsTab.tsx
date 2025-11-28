@@ -49,6 +49,7 @@ export function SettingsTab({
     { value: 'tr', label: 'Türkçe' },
     { value: 'pt-PT', label: 'Português (Portugal)' },
     { value: 'de', label: 'Deutsch' },
+    { value: 'it', label: 'Italiano' },
   ];
 
   return (

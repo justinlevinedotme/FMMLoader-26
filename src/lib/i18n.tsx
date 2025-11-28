@@ -13,7 +13,7 @@ import {
 
 type Messages = Record<string, unknown>;
 
-export const SUPPORTED_LOCALES = ['en', 'ko', 'tr', 'pt-PT', 'de'] as const;
+export const SUPPORTED_LOCALES = ['en', 'ko', 'tr', 'pt-PT', 'de', 'it'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const FALLBACK_LOCALE: SupportedLocale = 'en';
@@ -26,6 +26,7 @@ export const normalizeLocale = (input?: string | null): SupportedLocale | null =
   if (lower === 'tr' || lower.startsWith('tr-')) return 'tr';
   if (lower === 'de' || lower.startsWith('de-')) return 'de';
   if (lower === 'pt-pt' || lower === 'pt' || lower.startsWith('pt-')) return 'pt-PT';
+  if (lower === 'it' || lower.startsWith('it-')) return 'it';
   return null;
 };
 
