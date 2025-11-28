@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - 'src/locales/en.json'
-      - 'locales/app.yml'
+      - 'locales/en.yml'
       - 'crowdin.yml'
 
   # Download translations from Crowdin on schedule
