@@ -24,6 +24,37 @@
     "language": {
       "title": "Sprache",
       "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
+    }
+  },
+  "modMeta": {
+    "title": "Mod-Metadaten hinzufügen",
+    "description": "Gib Metadaten für diesen Mod an, damit er korrekt verwaltet werden kann.",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Mod-Namen eingeben"
+      },
+      "version": {
+        "label": "Version",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Typ",
+        "placeholder": "Mod-Typ auswählen",
+        "detecting": "Mod-Typ wird erkannt..."
+      },
+      "author": {
+        "label": "Autor",
+        "placeholder": "Optionaler Autorenname"
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Optionale Beschreibung"
+      }
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "submit": "Speichern"
     },
     "updates": {
       "title": "Updates",

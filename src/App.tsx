@@ -77,6 +77,7 @@ import {
   type SupportedLocale,
 } from '@/lib/i18n';
 import { useUpdater } from '@/hooks/useUpdater';
+import { UpdateModal } from '@/components/UpdateModal';
 
 type DebugUIProps = {
   metadataDialogOpen: boolean;
@@ -92,52 +93,6 @@ type DebugUIProps = {
   setSelectedMod: (mod: ModWithInfo | null) => void;
   setPendingGraphicsAnalysis: (analysis: GraphicsPackAnalysis | null) => void;
   setPendingGraphicsPath: (path: string | null) => void;
-};
-
-const UpdateModal = ({
-  open,
-  onOpenChange,
-  status,
-  appVersion,
-  onDownload,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  status: UpdateStatusShape;
-  appVersion: string;
-  onDownload: () => void;
-}) => {
-  const { t } = useI18n();
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t('settings.updates.modalTitle')}</DialogTitle>
-          <DialogDescription>
-            {status.latestVersion
-              ? t('settings.updates.modalBody', {
-                  latest: status.latestVersion,
-                  current: (status.currentVersion ?? appVersion) || 'unknown',
-                })
-              : t('settings.updates.modalTitle')}
-          </DialogDescription>
-        </DialogHeader>
-        {status.error && <p className="text-sm text-red-500">{status.error}</p>}
-        <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('settings.updates.later')}
-          </Button>
-          <Button onClick={onDownload} disabled={status.downloading || status.installing}>
-            {status.downloading
-              ? t('settings.updates.downloading')
-              : status.installing
-                ? t('settings.updates.installing')
-                : t('settings.updates.downloadInstall')}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
 };
 
 function DebugUI({
@@ -335,15 +290,6 @@ function App() {
     } catch (error) {
       addLog(`Error saving locale preference: ${formatError(error)}`);
     }
-  };
-
-  const triggerToastTests = () => {
-    toast.success('Toast test: success', { id: 'test-validate' });
-    toast.info('Toast test: info');
-    toast.loading('Toast test: loading...', { id: 'test-migrate' });
-    toast.success('Toast test: success (migrate)', { id: 'test-migrate' });
-    toast.error('Toast test: error example');
-    toast.success('Toast test: name-fix success', { id: 'test-namefix' });
   };
 
   // Dialog states
@@ -1388,7 +1334,7 @@ function App() {
   const TabsHeader = () => {
     const { t } = useI18n();
     return (
-      <div className="border-b px-4 pb-2 flex justify-center">
+      <div className="px-4 pb-2 flex justify-center">
         <TabsList className="mx-0 mt-0 gap-2">
           <TabsTrigger value="mods">{t('nav.mods')}</TabsTrigger>
           <TabsTrigger value="graphics">{t('nav.graphics')}</TabsTrigger>
@@ -1430,7 +1376,7 @@ function App() {
           </div>
 
           {/* Header */}
-          <div className="border-b pt-6">
+          <div className="pt-6">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-4">
                 <svg
@@ -1503,20 +1449,16 @@ function App() {
                   <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                   {t('toolbar.refresh')}
                 </Button>
-                {process.env.NODE_ENV !== 'production' && (
-                  <Button variant="ghost" size="sm" onClick={triggerToastTests}>
-                    🔔 Toast test
-                  </Button>
-                )}
                 <Select
                   value={locale}
                   onValueChange={(val) => handleLocaleChange(val as SupportedLocale)}
                 >
                   <SelectTrigger className="w-[80px] h-9 justify-center">
-                    <div className="w-full text-center" aria-hidden>
+                    <SelectValue
+                      aria-label={localeOptions.find((o) => o.value === locale)?.label ?? locale}
+                    >
                       {localeOptions.find((o) => o.value === locale)?.emoji ?? locale}
-                    </div>
-                    <SelectValue className="sr-only" />
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="w-[40px]">
                     {localeOptions.map((option) => (

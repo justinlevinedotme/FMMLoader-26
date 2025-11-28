@@ -24,6 +24,37 @@
     "language": {
       "title": "Language",
       "description": "Choose your preferred language. Overrides system detection on restart."
+    }
+  },
+  "modMeta": {
+    "title": "Add Mod Metadata",
+    "description": "Provide metadata for this mod so it can be managed correctly.",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter a mod name"
+      },
+      "version": {
+        "label": "Version",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Type",
+        "placeholder": "Select a mod type",
+        "detecting": "Detecting mod type..."
+      },
+      "author": {
+        "label": "Author",
+        "placeholder": "Optional author name"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Optional description"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "submit": "Save"
     },
     "updates": {
       "title": "Updates",

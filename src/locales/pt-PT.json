@@ -24,6 +24,37 @@
     "language": {
       "title": "Idioma",
       "description": "Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar."
+    }
+  },
+  "modMeta": {
+    "title": "Adicionar metadados do mod",
+    "description": "Forneça os metadados deste mod para que possa ser gerido corretamente.",
+    "fields": {
+      "name": {
+        "label": "Nome",
+        "placeholder": "Introduza o nome do mod"
+      },
+      "version": {
+        "label": "Versão",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Tipo",
+        "placeholder": "Selecione um tipo de mod",
+        "detecting": "A detetar tipo de mod..."
+      },
+      "author": {
+        "label": "Autor",
+        "placeholder": "Nome do autor (opcional)"
+      },
+      "description": {
+        "label": "Descrição",
+        "placeholder": "Descrição opcional"
+      }
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "submit": "Guardar"
     },
     "updates": {
       "title": "Atualizações",

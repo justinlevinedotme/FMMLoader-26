@@ -24,6 +24,37 @@
     "language": {
       "title": "Dil",
       "description": "Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar."
+    }
+  },
+  "modMeta": {
+    "title": "Mod metadatası ekle",
+    "description": "Modun doğru yönetilebilmesi için metadatasını girin.",
+    "fields": {
+      "name": {
+        "label": "İsim",
+        "placeholder": "Mod adını girin"
+      },
+      "version": {
+        "label": "Sürüm",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Tür",
+        "placeholder": "Mod türü seçin",
+        "detecting": "Mod türü algılanıyor..."
+      },
+      "author": {
+        "label": "Yazar",
+        "placeholder": "Opsiyonel yazar adı"
+      },
+      "description": {
+        "label": "Açıklama",
+        "placeholder": "Opsiyonel açıklama"
+      }
+    },
+    "actions": {
+      "cancel": "İptal",
+      "submit": "Kaydet"
     },
     "updates": {
       "title": "Güncellemeler",

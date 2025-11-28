@@ -102,6 +102,104 @@ settings:
       tr: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
       pt-PT: Escolha o idioma preferido. Sobrepõe a deteção do sistema ao reiniciar.
       de: Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart.
+modMeta:
+  title:
+    en: Add Mod Metadata
+    ko: 모드 메타데이터 추가
+    tr: Mod metadatası ekle
+    pt-PT: Adicionar metadados do mod
+    de: Mod-Metadaten hinzufügen
+  description:
+    en: Provide metadata for this mod so it can be managed correctly.
+    ko: 모드를 올바르게 관리할 수 있도록 메타데이터를 입력하세요.
+    tr: Modun doğru yönetilebilmesi için metadatasını girin.
+    pt-PT: Forneça os metadados deste mod para que possa ser gerido corretamente.
+    de: Gib Metadaten für diesen Mod an, damit er korrekt verwaltet werden kann.
+  fields:
+    name:
+      label:
+        en: Name
+        ko: 이름
+        tr: İsim
+        pt-PT: Nome
+        de: Name
+      placeholder:
+        en: Enter a mod name
+        ko: 모드 이름을 입력하세요
+        tr: Mod adını girin
+        pt-PT: Introduza o nome do mod
+        de: Mod-Namen eingeben
+    version:
+      label:
+        en: Version
+        ko: 버전
+        tr: Sürüm
+        pt-PT: Versão
+        de: Version
+      placeholder:
+        en: 1.0.0
+        ko: 1.0.0
+        tr: 1.0.0
+        pt-PT: 1.0.0
+        de: 1.0.0
+    type:
+      label:
+        en: Type
+        ko: 타입
+        tr: Tür
+        pt-PT: Tipo
+        de: Typ
+      placeholder:
+        en: Select a mod type
+        ko: 모드 타입을 선택하세요
+        tr: Mod türü seçin
+        pt-PT: Selecione um tipo de mod
+        de: Mod-Typ auswählen
+      detecting:
+        en: Detecting mod type...
+        ko: 모드 타입 감지 중...
+        tr: Mod türü algılanıyor...
+        pt-PT: A detetar tipo de mod...
+        de: Mod-Typ wird erkannt...
+    author:
+      label:
+        en: Author
+        ko: 작성자
+        tr: Yazar
+        pt-PT: Autor
+        de: Autor
+      placeholder:
+        en: Optional author name
+        ko: 선택 사항 (작성자명)
+        tr: Opsiyonel yazar adı
+        pt-PT: Nome do autor (opcional)
+        de: Optionaler Autorenname
+    description:
+      label:
+        en: Description
+        ko: 설명
+        tr: Açıklama
+        pt-PT: Descrição
+        de: Beschreibung
+      placeholder:
+        en: Optional description
+        ko: 선택 사항 (설명)
+        tr: Opsiyonel açıklama
+        pt-PT: Descrição opcional
+        de: Optionale Beschreibung
+  actions:
+    cancel:
+      en: Cancel
+      ko: 취소
+      tr: İptal
+      pt-PT: Cancelar
+      de: Abbrechen
+    submit:
+      en: Save
+      ko: 저장
+      tr: Kaydet
+      pt-PT: Guardar
+      de: Speichern
   updates:
     title:
       en: Updates
