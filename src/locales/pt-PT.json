@@ -57,43 +57,6 @@
       "refresh": "Recarregar lista e estado de mods"
     }
   },
-  "toasts": {
-    "needGameTarget": "Defina primeiro o caminho do jogo",
-    "applyingMods": "A aplicar mods...",
-    "applySuccess": "Mods aplicados com sucesso!",
-    "applyError": "Falha ao aplicar mods: {message}",
-    "removeSuccess": "Removido com sucesso {name}",
-    "removeError": "Falha ao remover mod: {message}",
-    "importLoading": "A importar mod...",
-    "importSuccess": "Importado com sucesso: {name}",
-    "importNeedMetadata": "Forneça os metadados do mod",
-    "importError": "Falha na importação: {message}",
-    "nameFixNeedSelection": "Selecione uma correção de nomes para instalar",
-    "nameFixInstalled": "Correção de nomes instalada com sucesso!",
-    "nameFixInstallError": "Falha ao instalar correção de nomes: {message}",
-    "nameFixImportSuccess": {
-      "message": null
-    },
-    "nameFixImportError": "Falha ao importar correção de nomes: {message}",
-    "graphicsImporting": "A importar gráficos...",
-    "graphicsImportError": "Falha ao importar pacote de gráficos: {message}",
-    "validateGraphics": {
-      "loading": "A validar gráficos...",
-      "success": "Todos os pacotes de gráficos estão corretamente colocados!",
-      "issues": "Encontrado(s) {count} problema(s). Clique para rever.",
-      "error": "Falha ao validar gráficos: {message}"
-    },
-    "migrateGraphics": {
-      "loading": "A mover {name}...",
-      "success": "Pacote de gráficos movido com sucesso!",
-      "error": "Falha ao migrar pacote: {message}"
-    },
-    "migrateAll": {
-      "loading": "A migrar todos os pacotes...",
-      "success": "Todos os pacotes migrados com sucesso!",
-      "error": "Falha ao migrar pacotes: {message}"
-    }
-  },
   "paths": {
     "gameDir": {
       "label": "Diretório do Jogo:",

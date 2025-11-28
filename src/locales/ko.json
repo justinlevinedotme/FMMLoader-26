@@ -57,43 +57,6 @@
       "refresh": "모드 목록 및 상태 새로고침"
     }
   },
-  "toasts": {
-    "needGameTarget": "먼저 게임 경로를 설정하세요",
-    "applyingMods": "모드 적용 중...",
-    "applySuccess": "모드가 성공적으로 적용되었습니다!",
-    "applyError": "모드 적용 실패: {message}",
-    "removeSuccess": "{name} 제거 완료",
-    "removeError": "모드 제거 실패: {message}",
-    "importLoading": "모드 가져오는 중...",
-    "importSuccess": "성공적으로 가져왔습니다: {name}",
-    "importNeedMetadata": "모드 메타데이터를 입력하세요",
-    "importError": "가져오기 실패: {message}",
-    "nameFixNeedSelection": "설치할 이름 수정을 선택하세요",
-    "nameFixInstalled": "이름 수정이 성공적으로 설치되었습니다!",
-    "nameFixInstallError": "이름 수정 설치 실패: {message}",
-    "nameFixImportSuccess": {
-      "message": null
-    },
-    "nameFixImportError": "이름 수정 가져오기 실패: {message}",
-    "graphicsImporting": "그래픽 가져오는 중...",
-    "graphicsImportError": "그래픽 팩 가져오기 실패: {message}",
-    "validateGraphics": {
-      "loading": "그래픽 검증 중...",
-      "success": "모든 그래픽 팩이 올바르게 배치되었습니다!",
-      "issues": "{count}개 문제 발견. 검토하려면 클릭하세요.",
-      "error": "그래픽 검증 실패: {message}"
-    },
-    "migrateGraphics": {
-      "loading": "{name} 이동 중...",
-      "success": "그래픽 팩이 성공적으로 이동되었습니다!",
-      "error": "팩 이동 실패: {message}"
-    },
-    "migrateAll": {
-      "loading": "모든 팩 이동 중...",
-      "success": "모든 팩이 성공적으로 이동되었습니다!",
-      "error": "팩 이동 실패: {message}"
-    }
-  },
   "paths": {
     "gameDir": {
       "label": "게임 디렉터리:",
