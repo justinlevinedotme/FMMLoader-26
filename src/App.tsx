@@ -235,6 +235,30 @@ function App() {
     { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
   ];
 
+  // Log toast emissions to help debug visibility issues in dev
+  useEffect(() => {
+    const kinds: Array<'success' | 'error' | 'info' | 'warning' | 'loading'> = [
+      'success',
+      'error',
+      'info',
+      'warning',
+      'loading',
+    ];
+
+    kinds.forEach((kind) => {
+      const original = (toast as { [key: string]: ((...args: unknown[]) => unknown) | undefined })[
+        kind
+      ];
+      if (!original || (original as { __instrumented?: boolean }).__instrumented) return;
+      const wrapped = (message: unknown, options?: { id?: string }) => {
+        console.log(`[toast:${kind}]`, { id: options?.id, message });
+        return original(message, options);
+      };
+      (wrapped as { __instrumented?: boolean }).__instrumented = true;
+      (toast as { [key: string]: unknown })[kind] = wrapped;
+    });
+  }, []);
+
   const handleLocaleChange = async (nextLocale: SupportedLocale) => {
     setLocale(nextLocale);
     if (!config) return;
