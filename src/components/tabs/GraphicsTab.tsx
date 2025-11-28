@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { RefreshCw, Upload, CheckCircle2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 import type { Config, ExtractionProgress, GraphicsPackMetadata } from '@/types';
 
 interface GraphicsTabProps {
@@ -30,13 +31,16 @@ export function GraphicsTab({
   onImportGraphicsPack,
   onValidateGraphics,
 }: GraphicsTabProps) {
+  const { t } = useI18n();
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Graphics Packs</CardTitle>
-            <CardDescription>{graphicsPacks.length} packs installed</CardDescription>
+            <CardTitle>{t('graphicsTab.title')}</CardTitle>
+            <CardDescription>
+              {t('graphicsTab.subtitle', { count: graphicsPacks.length })}
+            </CardDescription>
           </div>
           <div className="flex gap-2">
             <Button
@@ -44,7 +48,7 @@ export function GraphicsTab({
               disabled={importingGraphics || !config?.user_dir_path}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Import Graphics Pack
+              {t('graphicsTab.import.button')}
             </Button>
             <Button
               variant="outline"
@@ -52,24 +56,27 @@ export function GraphicsTab({
               disabled={validatingGraphics || !config?.user_dir_path}
             >
               <CheckCircle2 className="mr-2 h-4 w-4" />
-              Validate Graphics
+              {t('graphicsTab.validate.button')}
             </Button>
           </div>
         </div>
         {importingGraphics && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            Importing...
+            {t('graphicsTab.progress.importing')}
           </div>
         )}
         {graphicsProgress && (
           <div className="text-sm bg-muted p-3 rounded-md space-y-2">
             <div className="flex justify-between">
-              <strong>Progress:</strong>
+              <strong>{t('graphicsTab.progress.heading')}</strong>
               <span>{Math.round((graphicsProgress.current / graphicsProgress.total) * 100)}%</span>
             </div>
             <div className="text-xs text-muted-foreground">
-              {graphicsProgress.current} / {graphicsProgress.total} files
+              {t('graphicsTab.progress.files', {
+                current: graphicsProgress.current,
+                total: graphicsProgress.total,
+              })}
             </div>
             <div className="w-full bg-secondary rounded-full h-2">
               <div
@@ -83,7 +90,7 @@ export function GraphicsTab({
         )}
         {!config?.user_dir_path && (
           <p className="text-sm text-amber-600 dark:text-amber-400">
-            User directory is required for graphics pack installation
+            {t('graphicsTab.warnings.needUserDir')}
           </p>
         )}
       </CardHeader>
@@ -91,10 +98,10 @@ export function GraphicsTab({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Files</TableHead>
-              <TableHead>Installed</TableHead>
+              <TableHead>{t('graphicsTab.table.name')}</TableHead>
+              <TableHead>{t('graphicsTab.table.type')}</TableHead>
+              <TableHead>{t('graphicsTab.table.files')}</TableHead>
+              <TableHead>{t('graphicsTab.table.installed')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -117,7 +124,7 @@ export function GraphicsTab({
             {graphicsPacks.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} className="text-center text-muted-foreground">
-                  No graphics packs installed yet.
+                  {t('graphicsTab.table.empty')}
                 </TableCell>
               </TableRow>
             )}

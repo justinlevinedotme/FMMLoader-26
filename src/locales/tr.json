@@ -86,11 +86,63 @@
     "table": {
       "name": "İsim",
       "type": "Tür",
+      "author": "Yazar",
       "status": "Durum",
       "version": "Sürüm",
       "actions": "İşlemler"
     },
     "empty": "Mod bulunamadı. Başlamak için bir mod içe aktarın."
+  },
+  "graphicsTab": {
+    "title": "Grafik Paketleri",
+    "subtitle": "{count} paket yüklü",
+    "import": {
+      "button": "Grafik Paketi İçe Aktar",
+      "disabledTip": "İçe aktarmak için kullanıcı dizini gerekli"
+    },
+    "validate": {
+      "button": "Grafikleri Doğrula",
+      "disabledTip": "Doğrulamak için kullanıcı dizini gerekli"
+    },
+    "progress": {
+      "heading": "İlerleme:",
+      "files": "{current} / {total} dosya",
+      "importing": "İçe aktarılıyor..."
+    },
+    "warnings": {
+      "needUserDir": "Grafik paketi kurulumu için kullanıcı dizini gereklidir"
+    },
+    "table": {
+      "name": "İsim",
+      "type": "Tür",
+      "files": "Dosyalar",
+      "installed": "Kurulum Tarihi",
+      "empty": null,
+      "en": "No graphics packs installed yet.",
+      "ko": "아직 설치된 그래픽 팩이 없습니다.",
+      "tr": "Henüz grafik paketi kurulmadı.",
+      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
+      "de": "Noch keine Grafik-Packs installiert."
+    }
+  },
+  "credits": {
+    "title": "Katkıda Bulunanlar",
+    "description": "FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.",
+    "sections": {
+      "contributors": {
+        "title": "Temel Katkıcılar"
+      },
+      "translators": {
+        "title": "Çevirmenler ve Yerelleştirme"
+      },
+      "languages": {
+        "title": "Desteklenen Diller"
+      },
+      "crowdin": {
+        "title": "CrowdIn Katkıcıları",
+        "note": "Çevirileri güncel tutan topluluk üyelerine özel teşekkürler."
+      }
+    }
   },
   "nameFix": {
     "title": "İsim Düzeltme",

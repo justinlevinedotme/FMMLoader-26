@@ -6,7 +6,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -52,7 +58,7 @@ import {
   Upload,
   AlertTriangle,
   History,
-  Settings,
+  Ellipsis,
 } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa6';
 import { SiKofi } from 'react-icons/si';
@@ -218,6 +224,13 @@ function App() {
   const [locale, setLocale] = useState<SupportedLocale>('en');
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
+  const localeOptions: { value: SupportedLocale; emoji: string; label: string }[] = [
+    { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
+    { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
+    { value: 'tr', emoji: '🇹🇷', label: 'Türkçe', contributor: 'AI' },
+    { value: 'pt-PT', emoji: '🇵🇹', label: 'Português (Portugal)', contributor: 'AI' },
+    { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
+  ];
 
   const handleLocaleChange = async (nextLocale: SupportedLocale) => {
     setLocale(nextLocale);
@@ -1287,6 +1300,14 @@ function App() {
 
   const TranslatedUI = () => {
     const { t } = useI18n();
+    const contributors = [
+      { name: 'Justin Levine', role: 'Lead / Creator' },
+      { name: 'Tom (LotsGon)', role: 'Advice and Expertise' },
+      { name: 'Gerko', role: 'Testing and Feedback' },
+      { name: 'BassyBoy', role: 'Community Expert / Feedback' },
+      { name: 'FM Modders Community', role: 'Inspiration and Support' },
+    ];
+    // CrowdIn section removed
     return (
       <TooltipProvider>
         <div className="h-screen flex flex-col bg-background" data-locale-ready={localeReady}>
@@ -1384,13 +1405,38 @@ function App() {
                   <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                   {t('toolbar.refresh')}
                 </Button>
+                <Select
+                  value={locale}
+                  onValueChange={(val) => handleLocaleChange(val as SupportedLocale)}
+                >
+                  <SelectTrigger className="w-[80px] h-9 justify-center">
+                    <SelectValue
+                      renderValue={(selected) => {
+                        const opt = localeOptions.find((o) => o.value === (selected as string));
+                        if (!opt) return selected;
+                        return opt.emoji;
+                      }}
+                    />
+                  </SelectTrigger>
+                  <SelectContent className="w-[40px]">
+                    {localeOptions.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <span className="text-lg">{option.emoji}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setSettingsOpen(true)}
-                  aria-label="Settings"
+                  aria-label="Credits"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Ellipsis className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -1840,69 +1886,43 @@ function App() {
             </SheetContent>
           </Sheet>
 
-          {/* Settings Sheet */}
+          {/* Credits Sheet (repurposed from Settings) */}
           <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>Settings</SheetTitle>
-                <SheetDescription>Configure FMMLoader26 preferences</SheetDescription>
+                <SheetTitle>{t('credits.title')}</SheetTitle>
+                <SheetDescription>{t('credits.description')}</SheetDescription>
               </SheetHeader>
               <div className="mt-6 space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Dark Mode</div>
-                    <div className="text-sm text-muted-foreground">Toggle dark mode theme</div>
+                <div className="space-y-2">
+                  <div className="text-sm font-semibold">
+                    {t('credits.sections.contributors.title')}
                   </div>
-                  <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-                </div>
-
-                <div className="border-t pt-4">
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium">Application Logs</div>
-                    <div className="text-sm text-muted-foreground">
-                      View application logs for troubleshooting. Logs from the last 10 sessions are
-                      kept.
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={async () => {
-                        try {
-                          await tauriCommands.openLogsFolder();
-                          addLog('Opened logs folder');
-                        } catch (error) {
-                          addLog(`Failed to open logs folder: ${formatError(error)}`);
-                        }
-                      }}
-                    >
-                      <FolderOpen className="mr-2 h-4 w-4" />
-                      Open Logs Folder
-                    </Button>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    {contributors.map((person) => (
+                      <div key={person.name} className="flex justify-between">
+                        <span>{person.name}</span>
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground/80">
+                          {person.role}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="border-t pt-4">
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium">Mods Storage</div>
-                    <div className="text-sm text-muted-foreground">
-                      View the folder where imported mods are stored. This is where mods are placed
-                      after import.
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={async () => {
-                        try {
-                          await tauriCommands.openModsFolder();
-                          addLog('Opened mods folder');
-                        } catch (error) {
-                          addLog(`Failed to open mods folder: ${formatError(error)}`);
-                        }
-                      }}
-                    >
-                      <FolderOpen className="mr-2 h-4 w-4" />
-                      Open Mods Folder
-                    </Button>
+                <div className="space-y-2 border-t pt-4">
+                  <div className="text-sm font-semibold">
+                    {t('credits.sections.translators.title')}
+                  </div>
+                  <div className="text-sm text-muted-foreground flex flex-wrap gap-2">
+                    {localeOptions.map((opt) => (
+                      <span
+                        key={opt.value}
+                        className="rounded-full border px-2 py-1 text-xs bg-muted/40 border-border"
+                      >
+                        {opt.emoji} {opt.contributor ?? opt.label}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>

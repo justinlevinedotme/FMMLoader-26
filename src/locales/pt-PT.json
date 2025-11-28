@@ -86,11 +86,63 @@
     "table": {
       "name": "Nome",
       "type": "Tipo",
+      "author": "Autor",
       "status": "Estado",
       "version": "Versão",
       "actions": "Ações"
     },
     "empty": "Nenhum mod encontrado. Importe um mod para começar."
+  },
+  "graphicsTab": {
+    "title": "Pacotes de gráficos",
+    "subtitle": "{count} pacotes instalados",
+    "import": {
+      "button": "Importar pacote de gráficos",
+      "disabledTip": "Diretório do utilizador necessário para importar"
+    },
+    "validate": {
+      "button": "Validar gráficos",
+      "disabledTip": "Diretório do utilizador necessário para validar"
+    },
+    "progress": {
+      "heading": "Progresso:",
+      "files": "{current} / {total} ficheiros",
+      "importing": "A importar..."
+    },
+    "warnings": {
+      "needUserDir": "Diretório do utilizador é necessário para instalar pacotes de gráficos"
+    },
+    "table": {
+      "name": "Nome",
+      "type": "Tipo",
+      "files": "Ficheiros",
+      "installed": "Instalado",
+      "empty": null,
+      "en": "No graphics packs installed yet.",
+      "ko": "아직 설치된 그래픽 팩이 없습니다.",
+      "tr": "Henüz grafik paketi kurulmadı.",
+      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
+      "de": "Noch keine Grafik-Packs installiert."
+    }
+  },
+  "credits": {
+    "title": "Créditos",
+    "description": "Obrigado a todos os que ajudam a construir e traduzir o FMMLoader.",
+    "sections": {
+      "contributors": {
+        "title": "Contribuidores principais"
+      },
+      "translators": {
+        "title": "Tradutores e localização"
+      },
+      "languages": {
+        "title": "Idiomas suportados"
+      },
+      "crowdin": {
+        "title": "Contribuidores CrowdIn",
+        "note": "Agradecimento especial aos membros da comunidade que mantêm as traduções atualizadas."
+      }
+    }
   },
   "nameFix": {
     "title": "Correção de Nomes",

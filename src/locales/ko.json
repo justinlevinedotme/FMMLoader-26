@@ -86,11 +86,63 @@
     "table": {
       "name": "이름",
       "type": "유형",
+      "author": "제작자",
       "status": "상태",
       "version": "버전",
       "actions": "작업"
     },
     "empty": "모드를 찾을 수 없습니다. 모드를 가져와 시작하세요."
+  },
+  "graphicsTab": {
+    "title": "그래픽 팩",
+    "subtitle": "{count}개 팩 설치됨",
+    "import": {
+      "button": "그래픽 팩 가져오기",
+      "disabledTip": "가져오려면 사용자 디렉터리가 필요합니다"
+    },
+    "validate": {
+      "button": "그래픽 검증",
+      "disabledTip": "검증하려면 사용자 디렉터리가 필요합니다"
+    },
+    "progress": {
+      "heading": "진행 상황:",
+      "files": "{current} / {total} 파일",
+      "importing": "가져오는 중..."
+    },
+    "warnings": {
+      "needUserDir": "그래픽 팩 설치에 사용자 디렉터리가 필요합니다"
+    },
+    "table": {
+      "name": "이름",
+      "type": "유형",
+      "files": "파일",
+      "installed": "설치됨",
+      "empty": null,
+      "en": "No graphics packs installed yet.",
+      "ko": "아직 설치된 그래픽 팩이 없습니다.",
+      "tr": "Henüz grafik paketi kurulmadı.",
+      "pt-PT": "Ainda não há pacotes de gráficos instalados.",
+      "de": "Noch keine Grafik-Packs installiert."
+    }
+  },
+  "credits": {
+    "title": "크레딧",
+    "description": "FMMLoader를 만들고 번역해 주신 모든 분께 감사드립니다.",
+    "sections": {
+      "contributors": {
+        "title": "핵심 기여자"
+      },
+      "translators": {
+        "title": "번역 및 현지화"
+      },
+      "languages": {
+        "title": "지원 언어"
+      },
+      "crowdin": {
+        "title": "CrowdIn 기여자",
+        "note": "최신 번역을 유지해 주시는 커뮤니티 여러분께 특별히 감사드립니다."
+      }
+    }
   },
   "nameFix": {
     "title": "이름 수정",

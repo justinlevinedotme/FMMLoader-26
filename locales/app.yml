@@ -338,6 +338,12 @@ modsTab:
       tr: Tür
       pt-PT: Tipo
       de: Typ
+    author:
+      en: Author
+      ko: 제작자
+      tr: Yazar
+      pt-PT: Autor
+      de: Autor
     status:
       en: Status
       ko: 상태
@@ -362,6 +368,152 @@ modsTab:
     tr: Mod bulunamadı. Başlamak için bir mod içe aktarın.
     pt-PT: Nenhum mod encontrado. Importe um mod para começar.
     de: Keine Mods gefunden. Importiere ein Mod, um zu starten.
+
+graphicsTab:
+  title:
+    en: Graphics Packs
+    ko: 그래픽 팩
+    tr: Grafik Paketleri
+    pt-PT: Pacotes de gráficos
+    de: Grafik-Packs
+  subtitle:
+    en: "{count} packs installed"
+    ko: "{count}개 팩 설치됨"
+    tr: "{count} paket yüklü"
+    pt-PT: "{count} pacotes instalados"
+    de: "{count} Packs installiert"
+  import:
+    button:
+      en: Import Graphics Pack
+      ko: 그래픽 팩 가져오기
+      tr: Grafik Paketi İçe Aktar
+      pt-PT: Importar pacote de gráficos
+      de: Grafik-Pack importieren
+    disabledTip:
+      en: User directory required to import
+      ko: 가져오려면 사용자 디렉터리가 필요합니다
+      tr: İçe aktarmak için kullanıcı dizini gerekli
+      pt-PT: Diretório do utilizador necessário para importar
+      de: Benutzerverzeichnis erforderlich zum Import
+  validate:
+    button:
+      en: Validate Graphics
+      ko: 그래픽 검증
+      tr: Grafikleri Doğrula
+      pt-PT: Validar gráficos
+      de: Grafiken validieren
+    disabledTip:
+      en: User directory required to validate
+      ko: 검증하려면 사용자 디렉터리가 필요합니다
+      tr: Doğrulamak için kullanıcı dizini gerekli
+      pt-PT: Diretório do utilizador necessário para validar
+      de: Benutzerverzeichnis erforderlich zur Validierung
+  progress:
+    heading:
+      en: "Progress:"
+      ko: "진행 상황:"
+      tr: "İlerleme:"
+      pt-PT: "Progresso:"
+      de: "Fortschritt:"
+    files:
+      en: "{current} / {total} files"
+      ko: "{current} / {total} 파일"
+      tr: "{current} / {total} dosya"
+      pt-PT: "{current} / {total} ficheiros"
+      de: "{current} / {total} Dateien"
+    importing:
+      en: Importing...
+      ko: 가져오는 중...
+      tr: İçe aktarılıyor...
+      pt-PT: A importar...
+      de: Importiere...
+  warnings:
+    needUserDir:
+      en: User directory is required for graphics pack installation
+      ko: 그래픽 팩 설치에 사용자 디렉터리가 필요합니다
+      tr: Grafik paketi kurulumu için kullanıcı dizini gereklidir
+      pt-PT: Diretório do utilizador é necessário para instalar pacotes de gráficos
+      de: Benutzerverzeichnis wird für die Installation von Grafik-Packs benötigt
+  table:
+    name:
+      en: Name
+      ko: 이름
+      tr: İsim
+      pt-PT: Nome
+      de: Name
+    type:
+      en: Type
+      ko: 유형
+      tr: Tür
+      pt-PT: Tipo
+      de: Typ
+    files:
+      en: Files
+      ko: 파일
+      tr: Dosyalar
+      pt-PT: Ficheiros
+      de: Dateien
+    installed:
+      en: Installed
+      ko: 설치됨
+      tr: Kurulum Tarihi
+      pt-PT: Instalado
+      de: Installiert
+    empty:
+    en: No graphics packs installed yet.
+    ko: 아직 설치된 그래픽 팩이 없습니다.
+    tr: Henüz grafik paketi kurulmadı.
+    pt-PT: Ainda não há pacotes de gráficos instalados.
+    de: Noch keine Grafik-Packs installiert.
+
+credits:
+  title:
+    en: Credits
+    ko: 크레딧
+    tr: Katkıda Bulunanlar
+    pt-PT: Créditos
+    de: Danksagungen
+  description:
+    en: Thanks to everyone who helps build and translate FMMLoader.
+    ko: FMMLoader를 만들고 번역해 주신 모든 분께 감사드립니다.
+    tr: FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.
+    pt-PT: Obrigado a todos os que ajudam a construir e traduzir o FMMLoader.
+    de: Danke an alle, die FMMLoader entwickeln und übersetzen.
+  sections:
+    contributors:
+      title:
+        en: Core Contributors
+        ko: 핵심 기여자
+        tr: Temel Katkıcılar
+        pt-PT: Contribuidores principais
+        de: Kernbeitragende
+    translators:
+      title:
+        en: Translators & Localization
+        ko: 번역 및 현지화
+        tr: Çevirmenler ve Yerelleştirme
+        pt-PT: Tradutores e localização
+        de: Übersetzer & Lokalisierung
+    languages:
+      title:
+        en: Supported Languages
+        ko: 지원 언어
+        tr: Desteklenen Diller
+        pt-PT: Idiomas suportados
+        de: Unterstützte Sprachen
+    crowdin:
+      title:
+        en: CrowdIn Contributors
+        ko: CrowdIn 기여자
+        tr: CrowdIn Katkıcıları
+        pt-PT: Contribuidores CrowdIn
+        de: CrowdIn-Beitragende
+      note:
+        en: Special thanks to the community members who keep translations fresh.
+        ko: 최신 번역을 유지해 주시는 커뮤니티 여러분께 특별히 감사드립니다.
+        tr: Çevirileri güncel tutan topluluk üyelerine özel teşekkürler.
+        pt-PT: Agradecimento especial aos membros da comunidade que mantêm as traduções atualizadas.
+        de: Besonderer Dank an die Community, die die Übersetzungen aktuell hält.
 
 nameFix:
   title:
