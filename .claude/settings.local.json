@@ -60,7 +60,10 @@
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 fetch origin)",
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 branch -a)",
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add -A)",
-      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nrefactor: split name_fix.rs into module structure\n\nSplit the monolithic 1,290-line name_fix.rs into organized submodules:\n- name_fix/mod.rs - Public API and common functions\n- name_fix/db.rs - Platform-specific database path detection\n- name_fix/backup.rs - Backup and restore operations  \n- name_fix/import.rs - Import name fixes from ZIP\n- name_fix/install.rs - Install/uninstall name fixes\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nrefactor: split name_fix.rs into module structure\n\nSplit the monolithic 1,290-line name_fix.rs into organized submodules:\n- name_fix/mod.rs - Public API and common functions\n- name_fix/db.rs - Platform-specific database path detection\n- name_fix/backup.rs - Backup and restore operations  \n- name_fix/import.rs - Import name fixes from ZIP\n- name_fix/install.rs - Install/uninstall name fixes\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add src-tauri/capabilities/)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: make macos-permissions capability platform-specific\n\nMove macos-permissions:default to a separate macOS-only capability\nfile to fix Linux CI builds. The plugin only exports permissions\non macOS.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 log --oneline -3)"
     ],
     "deny": [],
     "ask": []

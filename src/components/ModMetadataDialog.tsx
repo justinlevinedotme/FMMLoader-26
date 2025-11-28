@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { tauriCommands } from '@/hooks/useTauri';
+import { useI18n } from '@/lib/i18n';
 import type { ModMetadata } from '@/types';
 
 interface ModMetadataDialogProps {
@@ -43,6 +44,7 @@ export function ModMetadataDialog({
   sourcePath,
   onSubmit,
 }: ModMetadataDialogProps) {
+  const { t } = useI18n();
   const [name, setName] = useState('');
   const [version, setVersion] = useState('1.0.0');
   const [modType, setModType] = useState('misc');
@@ -100,45 +102,42 @@ export function ModMetadataDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Mod Information Required</DialogTitle>
-          <DialogDescription>
-            This mod doesn&apos;t have a manifest.json file. Please provide some information about
-            it.
-          </DialogDescription>
+          <DialogTitle>{t('modMeta.title')}</DialogTitle>
+          <DialogDescription>{t('modMeta.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="name">
-              Mod Name <span className="text-destructive">*</span>
+              {t('modMeta.fields.name.label')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My Awesome Mod"
+              placeholder={t('modMeta.fields.name.placeholder')}
             />
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="version">
-              Version <span className="text-destructive">*</span>
+              {t('modMeta.fields.version.label')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="version"
               value={version}
               onChange={(e) => setVersion(e.target.value)}
-              placeholder="1.0.0"
+              placeholder={t('modMeta.fields.version.placeholder')}
             />
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="type">
-              Mod Type <span className="text-destructive">*</span>
+              {t('modMeta.fields.type.label')} <span className="text-destructive">*</span>
             </Label>
             <Select value={modType} onValueChange={setModType} disabled={detecting}>
               <SelectTrigger id="type">
-                <SelectValue placeholder="Select mod type" />
+                <SelectValue placeholder={t('modMeta.fields.type.placeholder')} />
               </SelectTrigger>
               <SelectContent>
                 {MOD_TYPES.map((type) => (
@@ -148,36 +147,38 @@ export function ModMetadataDialog({
                 ))}
               </SelectContent>
             </Select>
-            {detecting && <p className="text-xs text-muted-foreground">Auto-detecting type...</p>}
+            {detecting && (
+              <p className="text-xs text-muted-foreground">{t('modMeta.fields.type.detecting')}</p>
+            )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="author">Author (Optional)</Label>
+            <Label htmlFor="author">{t('modMeta.fields.author.label')}</Label>
             <Input
               id="author"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              placeholder="Your Name"
+              placeholder={t('modMeta.fields.author.placeholder')}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="description">{t('modMeta.fields.description.label')}</Label>
             <Input
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What does this mod do?"
+              placeholder={t('modMeta.fields.description.placeholder')}
             />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('modMeta.actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!name || !version || !modType}>
-            Import Mod
+            {t('modMeta.actions.submit')}
           </Button>
         </DialogFooter>
       </DialogContent>
