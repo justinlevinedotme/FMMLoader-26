@@ -6,7 +6,7 @@ import yaml from 'yaml';
 const ROOT = process.cwd();
 const YAML_DIR = path.join(ROOT, 'locales');
 const OUT_DIR = path.join(ROOT, 'src', 'locales');
-const SUPPORTED = ['en', 'ko', 'tr', 'pt-PT', 'de'] as const;
+const SUPPORTED = ['en', 'ko', 'tr', 'pt-PT', 'de', 'it'] as const;
 
 type _Locale = (typeof SUPPORTED)[number];
 
