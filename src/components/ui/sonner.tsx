@@ -1,4 +1,5 @@
 import { Toaster as Sonner } from 'sonner';
+import 'sonner';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -6,6 +7,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="dark"
+      position="top-right"
+      closeButton
+      duration={4000}
+      style={{ zIndex: 15000 }}
       className="toaster"
       toastOptions={{
         classNames: {
