@@ -134,19 +134,7 @@ You can also trigger syncs manually:
 
 Currently configured to translate:
 - ✅ `src/locales/en.json` (Frontend translations)
-
-### Backend Translations (locales/app.yml)
-
-Your backend uses a single YAML file with all languages embedded. This structure doesn't work well with Crowdin. **Recommendation:**
-
-**Option 1: Keep Current Structure (Not Ideal)**
-- Manually manage `locales/app.yml`
-- Copy translations from Crowdin to this file manually
-
-**Option 2: Split Backend Locales (Recommended)**
-- Restructure to match frontend: `locales/en.yml`, `locales/de.yml`, etc.
-- Update your Rust i18n configuration
-- Uncomment the backend section in `crowdin.yml`
+- ✅ `locales/en.yml` (Backend translations)
 
 ---
 

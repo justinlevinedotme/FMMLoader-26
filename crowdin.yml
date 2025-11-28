@@ -15,15 +15,12 @@ files:
         tr: tr
 
   # Backend YAML translations
-  # IMPORTANT: Your current locales/app.yml has all languages embedded.
-  # This config assumes you'll split it into separate language files.
-  # See CROWDIN_SETUP.md for migration instructions.
-  # - source: /locales/en/app.yml
-  #   translation: /locales/%two_letters_code%/app.yml
-  #   update_option: update_as_unapproved
-  #   languages_mapping:
-  #     two_letters_code:
-  #       pt-PT: pt-PT
-  #       de: de
-  #       ko: ko
-  #       tr: tr
+  - source: /locales/en.yml
+    translation: /locales/%locale_with_underscore%.yml
+    update_option: update_as_unapproved
+    languages_mapping:
+      locale_with_underscore:
+        pt-PT: pt-PT
+        de: de
+        ko: ko
+        tr: tr
