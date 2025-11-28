@@ -13,6 +13,7 @@ files:
         de: de
         ko: ko
         tr: tr
+        it: it
 
   # Backend YAML translations
   - source: /locales/en.yml
@@ -24,3 +25,4 @@ files:
         de: de
         ko: ko
         tr: tr
+        it: it

@@ -203,6 +203,20 @@ const formatError = (error: unknown): string => {
   return String(error);
 };
 
+const ALL_LOCALE_OPTIONS: {
+  value: SupportedLocale;
+  emoji: string;
+  label: string;
+  contributor?: string;
+}[] = [
+  { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
+  { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
+  { value: 'tr', emoji: '🇹🇷', label: 'Türkçe', contributor: 'AI' },
+  { value: 'pt-PT', emoji: '🇵🇹', label: 'Português (Portugal)', contributor: 'AI' },
+  { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
+  { value: 'it', emoji: '🇮🇹', label: 'Italiano', contributor: 'AI' },
+];
+
 function App() {
   const [config, setConfig] = useState<Config | null>(null);
   const [mods, setMods] = useState<ModWithInfo[]>([]);
@@ -226,18 +240,26 @@ function App() {
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const localeOptions: {
-    value: SupportedLocale;
-    emoji: string;
-    label: string;
-    contributor?: string;
-  }[] = [
-    { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
-    { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
-    { value: 'tr', emoji: '🇹🇷', label: 'Türkçe', contributor: 'AI' },
-    { value: 'pt-PT', emoji: '🇵🇹', label: 'Português (Portugal)', contributor: 'AI' },
-    { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
-  ];
+  const [availableLocales, setAvailableLocales] = useState<Set<SupportedLocale>>(new Set(['en']));
+
+  // Check which locale files exist
+  useEffect(() => {
+    const checkLocales = async () => {
+      const available = new Set<SupportedLocale>();
+      for (const option of ALL_LOCALE_OPTIONS) {
+        try {
+          await import(/* @vite-ignore */ `./locales/${option.value}.json`);
+          available.add(option.value);
+        } catch {
+          // Locale file doesn't exist
+        }
+      }
+      setAvailableLocales(available);
+    };
+    checkLocales();
+  }, []);
+
+  const localeOptions = ALL_LOCALE_OPTIONS.filter((opt) => availableLocales.has(opt.value));
   const updater = useUpdater();
   useEffect(() => {
     if (updater.status.available) {
