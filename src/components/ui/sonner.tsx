@@ -1,5 +1,5 @@
 import { Toaster as Sonner } from 'sonner';
-import 'sonner';
+import 'sonner/dist/style.css';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
