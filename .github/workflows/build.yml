@@ -211,7 +211,7 @@ jobs:
         run: npm install -g pnpm
         
       - name: install frontend dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Import Apple Developer Certificate
         if: matrix.platform == 'macos-15'
