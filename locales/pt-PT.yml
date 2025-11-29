@@ -1,6 +1,6 @@
 _version: 2
 nav:
-  mods: Mods
+  mods: Modificações
   graphics: Gráficos
   nameFix: Correção de nomes
   settings: Definições
@@ -93,7 +93,7 @@ paths:
     detect: Detetar
 modsTab:
   tabs:
-    mods: Mods
+    mods: Modificações
     graphics: Gráficos
     namefix: Correção de nomes
     settings: Definições
@@ -137,14 +137,12 @@ credits:
       title: Idiomas suportados
     crowdin:
       title: Contribuidores CrowdIn
-      note: Agradecimento especial aos membros da comunidade que mantêm as traduções
-        atualizadas.
+      note: Agradecimento especial aos membros da comunidade que mantêm as traduções atualizadas.
 nameFix:
   title: Correção de Nomes
   subtitle: Gerir correção de nomes FM
   sectionTitle: Correção de nomes FM
-  sectionDescription: Corrige licenças e ativa nomes reais para clubes, jogadores
-    e competições
+  sectionDescription: Corrige licenças e ativa nomes reais para clubes, jogadores e competições
   status:
     checking: A verificar...
     installed: Instalado
@@ -173,8 +171,7 @@ nameFix:
   warnings:
     needGameDir: Defina primeiro o Diretório do Jogo
   notes:
-    community: Pode descarregar correções da comunidade ou criar as suas. Recomendamos
-      as correções do SortItOutSI ou FMScout.
+    community: Pode descarregar correções da comunidade ou criar as suas. Recomendamos as correções do SortItOutSI ou FMScout.
   userDir:
     label: 'Diretório do Utilizador:'
     tooltip: Diretório do Utilizador do FM26 onde ficam saves e definições
