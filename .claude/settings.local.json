@@ -63,7 +63,16 @@
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nrefactor: split name_fix.rs into module structure\n\nSplit the monolithic 1,290-line name_fix.rs into organized submodules:\n- name_fix/mod.rs - Public API and common functions\n- name_fix/db.rs - Platform-specific database path detection\n- name_fix/backup.rs - Backup and restore operations  \n- name_fix/import.rs - Import name fixes from ZIP\n- name_fix/install.rs - Install/uninstall name fixes\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add src-tauri/capabilities/)",
       "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: make macos-permissions capability platform-specific\n\nMove macos-permissions:default to a separate macOS-only capability\nfile to fix Linux CI builds. The plugin only exports permissions\non macOS.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 log --oneline -3)"
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 log --oneline -3)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 add src/locales/*.json)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 commit -m \"$(cat <<''EOF''\nfix: add missing graphicsTab table column translations\n\nConvert graphicsTab.table from string to object with proper column\nheaders (name, type, files, installed, empty) across all locales:\n\n- English: Name, Type, Files, Installed\n- German: Name, Typ, Dateien, Installiert\n- Italian: Nome, Tipo, File, Installato\n- Portuguese: Nome, Tipo, Ficheiros, Instalado\n- Korean: 이름, 유형, 파일, 설치됨\n- Turkish: İsim, Tür, Dosyalar, Kurulu\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 log --oneline -5)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 checkout main)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 pull origin main)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 checkout -b feature/i18n-improvements)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 cherry-pick fc726f5 c28bf02)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 cherry-pick --skip)",
+      "Bash(git -C /Users/jstn/Documents/GitHub/FMMLoader-26 push -u origin feature/i18n-improvements)"
     ],
     "deny": [],
     "ask": []

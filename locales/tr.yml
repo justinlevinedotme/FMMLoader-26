@@ -125,7 +125,12 @@ graphicsTab:
     importing: İçe aktarılıyor...
   warnings:
     needUserDir: Grafik paketi kurulumu için kullanıcı dizini gereklidir
-  table: Henüz grafik paketi kurulmadı.
+  table:
+    name: İsim
+    type: Tür
+    files: Dosyalar
+    installed: Kurulu
+    empty: Henüz grafik paketi kurulmadı.
 credits:
   title: Katkıda Bulunanlar
   description: FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.

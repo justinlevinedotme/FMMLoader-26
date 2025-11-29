@@ -1,0 +1,187 @@
+_version: 2
+nav:
+  mods: Mods
+  graphics: Graphics
+  nameFix: Naamcorrectie
+  settings: Instellingen
+settings:
+  title: Instellingen
+  description: Thema en opslagvoorkeuren
+  darkMode: Donkere Modus
+  darkModeDescription: Schakel donker thema in voor het app-venster.
+  logs:
+    title: Applicatie Logs
+    description: Opent de map waar recente app-logs zijn opgeslagen.
+    open: Open Logs Map
+  modsStorage:
+    title: Mods Opslag
+    description: Opent de map waar geïmporteerde mods zijn opgeslagen.
+    open: Open Mods Map
+  language:
+    title: Taal
+    description: Kies je voorkeurstaal. Overschrijft systeemdetectie bij herstart.
+  updates:
+    title: Updates
+    current: 'Huidige: v{version}'
+    available: 'Update beschikbaar: v{version}'
+    check: Controleer op updates
+    checking: Controleren...
+    modalTitle: Update Beschikbaar
+    modalBody: 'Versie v{latest} is beschikbaar. Huidige: v{current}.'
+    downloadInstall: Download & Installeer
+    downloading: Downloaden...
+    installing: Installeren...
+    later: Later
+modMeta:
+  title: Mod Metadata Toevoegen
+  description: Geef metadata op voor deze mod zodat deze correct kan worden beheerd.
+  fields:
+    name:
+      label: Naam
+      placeholder: Voer een mod naam in
+    version:
+      label: Versie
+      placeholder: '1.0.0'
+    type:
+      label: Type
+      placeholder: Selecteer een mod type
+      detecting: Mod type detecteren...
+    author:
+      label: Auteur
+      placeholder: Optionele auteursnaam
+    description:
+      label: Beschrijving
+      placeholder: Optionele beschrijving
+  actions:
+    cancel: Annuleren
+    submit: Opslaan
+common:
+  open: Openen
+  close: Sluiten
+  language: Taal
+  apply: Toepassen
+  cancel: Annuleren
+errors:
+  generic: Er is iets misgegaan.
+  missingKey: 'Ontbrekende vertaling: {key}'
+overlay:
+  dropTitle: Sleep mod bestand om te importeren
+footer:
+  createdBy: FMMLoader26 v{version} | Gemaakt door JALCO / Justin Levine
+  supportKofi: Steun op Ko-Fi
+  joinDiscord: Word lid van Discord
+toolbar:
+  import: Importeren
+  conflicts: Conflicten
+  restore: Herstellen
+  refresh: Vernieuwen
+  tooltips:
+    import: Importeer een nieuw mod pakket
+    conflicts: Controleer op bestandsconflicten tussen mods
+    restore: Ga terug naar een vorige back-up
+    refresh: Herlaad mod lijst en status
+paths:
+  gameDir:
+    label: 'Spelmap:'
+    tooltip: De FM26 installatiemap met de .bundle bestanden
+    placeholder: Niet ingesteld - klik Selecteer of Detecteer Spel
+    detect: Detecteren
+  userDir:
+    label: 'Gebruikersmap:'
+    tooltip: De FM26 Gebruikersmap waar saves en instellingen zijn opgeslagen
+    placeholder: Automatisch gedetecteerd van systeem
+    detect: Detecteren
+modsTab:
+  tabs:
+    mods: Mods
+    graphics: Graphics
+    namefix: Naamcorrectie
+    settings: Instellingen
+  primaryActions:
+    apply: Pas Geselecteerde Mods Toe
+    enable: Inschakelen
+    disable: Uitschakelen
+  table:
+    name: Naam
+    type: Type
+    author: Auteur
+    status: Status
+    version: Versie
+    actions: Acties
+  empty: Geen mods gevonden. Importeer een mod om te beginnen.
+graphicsTab:
+  title: Graphics Pakketten
+  subtitle: '{count} pakketten geïnstalleerd'
+  import:
+    button: Importeer Graphics Pakket
+    disabledTip: Gebruikersmap vereist om te importeren
+  validate:
+    button: Valideer Graphics
+    disabledTip: Gebruikersmap vereist om te valideren
+  progress:
+    heading: 'Voortgang:'
+    files: '{current} / {total} bestanden'
+    importing: Importeren...
+  warnings:
+    needUserDir: Gebruikersmap is vereist voor graphics pakket installatie
+  table:
+    name: Naam
+    type: Type
+    files: Bestanden
+    installed: Geïnstalleerd
+    empty: Nog geen graphics pakketten geïnstalleerd.
+credits:
+  title: Credits
+  description: Dank aan iedereen die helpt FMMLoader te bouwen en te vertalen.
+  sections:
+    contributors:
+      title: Kernbijdragers
+    translators:
+      title: Vertalers & Lokalisatie
+    languages:
+      title: Ondersteunde Talen
+    crowdin:
+      title: CrowdIn Bijdragers
+      note: Speciale dank aan de communityleden die de vertalingen up-to-date houden.
+nameFix:
+  title: Naamcorrectie
+  subtitle: Beheer FM Naamcorrectie
+  sectionTitle: FM Naamcorrectie
+  sectionDescription: Lost licentieproblemen op en ontgrendelt echte namen voor clubs,
+    spelers en competities
+  status:
+    checking: Controleren...
+    installed: Geïnstalleerd
+    notInstalled: Niet geïnstalleerd
+  whatItDoes:
+    heading: 'Wat het doet:'
+    bullets:
+    - Ontgrendelt echte namen voor clubs zoals AC Milan, Inter en Lazio
+    - Corrigeert Japanse spelersnamen
+    - Verwijdert nep/niet-gelicentieerde content
+    - Werkt met alle competities en leagues
+  active:
+    heading: 'Momenteel Actief:'
+    unknown: Onbekend
+  selectLabel: 'Selecteer Naamcorrectie Bron:'
+  selectPlaceholder: Selecteer een naamcorrectie bron
+  activeSuffix: ' - Actief'
+  noSources: Geen naamcorrectie bronnen beschikbaar. Importeer een naamcorrectie
+    ZIP-bestand om te beginnen.
+  buttons:
+    install: Installeren
+    reinstall: Opnieuw Installeren
+    uninstall: Deïnstalleer van Spel
+    importZip: Importeren van ZIP
+    checkStatus: Controleer Status
+    deleteSource: Verwijder Bron
+  warnings:
+    needGameDir: Stel eerst je Spelmap in
+  notes:
+    community: Je kunt naamcorrecties downloaden van de community of je eigen maken.
+      We raden correcties aan van onze vrienden bij SortItOutSI of FMScout
+  userDir:
+    label: 'Gebruikersmap:'
+    tooltip: De FM26 Gebruikersmap waar saves en instellingen zijn opgeslagen
+    placeholder: Automatisch gedetecteerd van systeem
+    detect: Detecteren

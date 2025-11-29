@@ -44,12 +44,14 @@ export function SettingsTab({
 }: SettingsTabProps) {
   const { t } = useI18n();
   const localeOptions: { value: SupportedLocale; label: string }[] = [
-    { value: 'en', label: 'English' },
+    { value: 'en', label: 'English (US)' },
+    { value: 'en-GB', label: 'English (UK)' },
     { value: 'ko', label: '한국어' },
     { value: 'tr', label: 'Türkçe' },
     { value: 'pt-PT', label: 'Português (Portugal)' },
     { value: 'de', label: 'Deutsch' },
     { value: 'it', label: 'Italiano' },
+    { value: 'nl', label: 'Nederlands' },
   ];
 
   return (

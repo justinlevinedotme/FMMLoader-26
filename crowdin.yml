@@ -9,11 +9,13 @@ files:
     update_option: update_as_unapproved
     languages_mapping:
       locale_with_underscore:
+        en-GB: en-GB
         pt-PT: pt-PT
         de: de
         ko: ko
         tr: tr
         it: it
+        nl: nl
 
   # Backend YAML translations
   - source: /locales/en.yml
@@ -21,8 +23,10 @@ files:
     update_option: update_as_unapproved
     languages_mapping:
       locale_with_underscore:
+        en-GB: en-GB
         pt-PT: pt-PT
         de: de
         ko: ko
         tr: tr
         it: it
+        nl: nl
