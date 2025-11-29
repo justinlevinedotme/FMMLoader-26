@@ -156,7 +156,13 @@
     "warnings": {
       "needUserDir": "Benutzerverzeichnis wird für die Installation von Grafik-Packs benötigt"
     },
-    "table": "Noch keine Grafik-Packs installiert."
+    "table": {
+      "name": "Name",
+      "type": "Typ",
+      "files": "Dateien",
+      "installed": "Installiert",
+      "empty": "Noch keine Grafik-Packs installiert."
+    }
   },
   "credits": {
     "title": "Danksagungen",
