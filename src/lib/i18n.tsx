@@ -36,6 +36,22 @@ const LOCALE_MODULES = import.meta.glob('../locales/*.json', {
   eager: true,
 });
 
+const extractLocaleFromKey = (key: string): SupportedLocale | null => {
+  const match =
+    key.match(/\.\/?\.\/locales\/([^/]+)\.json$/) ?? key.match(/\.{2}\/locales\/([^/]+)\.json$/);
+  if (!match) return null;
+  const candidate = match[1];
+  return SUPPORTED_LOCALES.includes(candidate as SupportedLocale)
+    ? (candidate as SupportedLocale)
+    : null;
+};
+
+export const AVAILABLE_LOCALES = new Set(
+  Object.keys(LOCALE_MODULES)
+    .map(extractLocaleFromKey)
+    .filter((loc): loc is SupportedLocale => Boolean(loc))
+);
+
 const loadLocale = async (locale: SupportedLocale): Promise<Messages> => {
   const key = `../locales/${locale}.json`;
   const mod = LOCALE_MODULES[key];

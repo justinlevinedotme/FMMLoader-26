@@ -72,6 +72,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ModsTab, GraphicsTab, NameFixTab, SettingsTab, type ModWithInfo } from '@/components/tabs';
 import {
   I18nProvider,
+  AVAILABLE_LOCALES,
   detectSystemLocale,
   ensureSupportedLocale,
   useI18n,
@@ -243,23 +244,13 @@ function App() {
   const [localeReady, setLocaleReady] = useState(false);
   const localeInitialized = useRef(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [availableLocales, setAvailableLocales] = useState<Set<SupportedLocale>>(new Set(['en']));
+  const [availableLocales, setAvailableLocales] = useState<Set<SupportedLocale>>(
+    new Set(AVAILABLE_LOCALES)
+  );
 
-  // Check which locale files exist
+  // Refresh available locales in case the bundle changes
   useEffect(() => {
-    const checkLocales = async () => {
-      const available = new Set<SupportedLocale>();
-      for (const option of ALL_LOCALE_OPTIONS) {
-        try {
-          await import(/* @vite-ignore */ `./locales/${option.value}.json`);
-          available.add(option.value);
-        } catch {
-          // Locale file doesn't exist
-        }
-      }
-      setAvailableLocales(available);
-    };
-    checkLocales();
+    setAvailableLocales(new Set(AVAILABLE_LOCALES));
   }, []);
 
   const localeOptions = ALL_LOCALE_OPTIONS.filter((opt) => availableLocales.has(opt.value));
