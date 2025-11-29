@@ -124,7 +124,12 @@ graphicsTab:
     importing: 가져오는 중...
   warnings:
     needUserDir: 그래픽 팩 설치에 사용자 디렉터리가 필요합니다
-  table: 아직 설치된 그래픽 팩이 없습니다.
+  table:
+    name: 이름
+    type: 유형
+    files: 파일
+    installed: 설치됨
+    empty: 아직 설치된 그래픽 팩이 없습니다.
 credits:
   title: 크레딧
   description: FMMLoader를 만들고 번역해 주신 모든 분께 감사드립니다.

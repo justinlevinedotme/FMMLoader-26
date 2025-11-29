@@ -1,0 +1,234 @@
+{
+  "_version": 2,
+  "nav": {
+    "mods": "Mods",
+    "graphics": "Graphics",
+    "nameFix": "Name Fix",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Theme and storage preferences",
+    "darkMode": "Dark Mode",
+    "darkModeDescription": "Toggle dark theme for the app window.",
+    "logs": {
+      "title": "Application Logs",
+      "description": "Opens the folder where recent app logs are stored.",
+      "open": "Open Logs Folder"
+    },
+    "modsStorage": {
+      "title": "Mods Storage",
+      "description": "Opens the folder where imported mods are stored.",
+      "open": "Open Mods Folder"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language. Overrides system detection on restart."
+    },
+    "updates": {
+      "title": "Updates",
+      "current": "Current: v{version}",
+      "available": "Update available: v{version}",
+      "check": "Check for updates",
+      "checking": "Checking...",
+      "modalTitle": "Update Available",
+      "modalBody": "Version v{latest} is available. Current: v{current}.",
+      "downloadInstall": "Download & Install",
+      "downloading": "Downloading...",
+      "installing": "Installing...",
+      "later": "Later"
+    }
+  },
+  "modMeta": {
+    "title": "Add Mod Metadata",
+    "description": "Provide metadata for this mod so it can be managed correctly.",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter a mod name"
+      },
+      "version": {
+        "label": "Version",
+        "placeholder": "1.0.0"
+      },
+      "type": {
+        "label": "Type",
+        "placeholder": "Select a mod type",
+        "detecting": "Detecting mod type..."
+      },
+      "author": {
+        "label": "Author",
+        "placeholder": "Optional author name"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Optional description"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "submit": "Save"
+    }
+  },
+  "common": {
+    "open": "Open",
+    "close": "Close",
+    "language": "Language",
+    "apply": "Apply",
+    "cancel": "Cancel"
+  },
+  "errors": {
+    "generic": "Something went wrong.",
+    "missingKey": "Missing translation: {key}"
+  },
+  "overlay": {
+    "dropTitle": "Drop mod file to import"
+  },
+  "footer": {
+    "createdBy": "FMMLoader26 v{version} | Created by JALCO / Justin Levine",
+    "supportKofi": "Support on Ko-Fi",
+    "joinDiscord": "Join Discord"
+  },
+  "toolbar": {
+    "import": "Import",
+    "conflicts": "Conflicts",
+    "restore": "Restore",
+    "refresh": "Refresh",
+    "tooltips": {
+      "import": "Import a new mod package",
+      "conflicts": "Check for file conflicts between mods",
+      "restore": "Roll back to a previous backup",
+      "refresh": "Reload mod list and state"
+    }
+  },
+  "paths": {
+    "gameDir": {
+      "label": "Game Directory:",
+      "tooltip": "The FM26 installation folder containing the .bundle files",
+      "placeholder": "Not set - click Select or Detect Game",
+      "detect": "Detect"
+    },
+    "userDir": {
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
+    }
+  },
+  "modsTab": {
+    "tabs": {
+      "mods": "Mods",
+      "graphics": "Graphics",
+      "namefix": "Name Fix",
+      "settings": "Settings"
+    },
+    "primaryActions": {
+      "apply": "Apply Selected Mods",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "author": "Author",
+      "status": "Status",
+      "version": "Version",
+      "actions": "Actions"
+    },
+    "empty": "No mods found. Import a mod to get started."
+  },
+  "graphicsTab": {
+    "title": "Graphics Packs",
+    "subtitle": "{count} packs installed",
+    "import": {
+      "button": "Import Graphics Pack",
+      "disabledTip": "User directory required to import"
+    },
+    "validate": {
+      "button": "Validate Graphics",
+      "disabledTip": "User directory required to validate"
+    },
+    "progress": {
+      "heading": "Progress:",
+      "files": "{current} / {total} files",
+      "importing": "Importing..."
+    },
+    "warnings": {
+      "needUserDir": "User directory is required for graphics pack installation"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "files": "Files",
+      "installed": "Installed",
+      "empty": "No graphics packs installed yet."
+    }
+  },
+  "credits": {
+    "title": "Credits",
+    "description": "Thanks to everyone who helps build and translate FMMLoader.",
+    "sections": {
+      "contributors": {
+        "title": "Core Contributors"
+      },
+      "translators": {
+        "title": "Translators & Localization"
+      },
+      "languages": {
+        "title": "Supported Languages"
+      },
+      "crowdin": {
+        "title": "CrowdIn Contributors",
+        "note": "Special thanks to the community members who keep translations fresh."
+      }
+    }
+  },
+  "nameFix": {
+    "title": "Name Fix",
+    "subtitle": "Manage FM Name Fix",
+    "sectionTitle": "FM Name Fix",
+    "sectionDescription": "Fixes licensing issues and unlocks real names for clubs, players, and competitions",
+    "status": {
+      "checking": "Checking...",
+      "installed": "Installed",
+      "notInstalled": "Not installed"
+    },
+    "whatItDoes": {
+      "heading": "What it does:",
+      "bullets": [
+        "Unlocks real names for clubs like AC Milan, Inter, and Lazio",
+        "Fixes Japanese player names",
+        "Removes fake/unlicensed content",
+        "Works with all leagues and competitions"
+      ]
+    },
+    "active": {
+      "heading": "Currently Active:",
+      "unknown": "Unknown"
+    },
+    "selectLabel": "Select Name Fix Source:",
+    "selectPlaceholder": "Select a name fix source",
+    "activeSuffix": " - Active",
+    "noSources": "No name fix sources available. Import a name fix ZIP file to get started.",
+    "buttons": {
+      "install": "Install",
+      "reinstall": "Reinstall",
+      "uninstall": "Uninstall from Game",
+      "importZip": "Import from ZIP",
+      "checkStatus": "Check Status",
+      "deleteSource": "Delete Source"
+    },
+    "warnings": {
+      "needGameDir": "Please set your Game Directory first"
+    },
+    "notes": {
+      "community": "You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout"
+    },
+    "userDir": {
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
+    }
+  }
+}

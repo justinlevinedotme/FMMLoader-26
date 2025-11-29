@@ -3,6 +3,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { open as openUrl } from '@tauri-apps/plugin-shell';
 import { listen } from '@tauri-apps/api/event';
 import { toast } from 'sonner';
+import { US, GB, KR, TR, PT, DE, IT, NL } from 'country-flag-icons/react/3x2';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -205,16 +206,18 @@ const formatError = (error: unknown): string => {
 
 const ALL_LOCALE_OPTIONS: {
   value: SupportedLocale;
-  emoji: string;
+  flag: typeof US;
   label: string;
   contributor?: string;
 }[] = [
-  { value: 'en', emoji: '🇺🇸', label: 'English', contributor: 'Justin Levine' },
-  { value: 'ko', emoji: '🇰🇷', label: '한국어', contributor: 'AI' },
-  { value: 'tr', emoji: '🇹🇷', label: 'Türkçe', contributor: 'AI' },
-  { value: 'pt-PT', emoji: '🇵🇹', label: 'Português (Portugal)', contributor: 'AI' },
-  { value: 'de', emoji: '🇩🇪', label: 'Deutsch', contributor: 'AI' },
-  { value: 'it', emoji: '🇮🇹', label: 'Italiano', contributor: 'AI' },
+  { value: 'en', flag: US, label: 'English (US)', contributor: 'Justin Levine' },
+  { value: 'en-GB', flag: GB, label: 'English (UK)', contributor: 'Justin Levine' },
+  { value: 'ko', flag: KR, label: '한국어', contributor: 'AI' },
+  { value: 'tr', flag: TR, label: 'Türkçe', contributor: 'AI' },
+  { value: 'pt-PT', flag: PT, label: 'Português (Portugal)', contributor: 'AI' },
+  { value: 'de', flag: DE, label: 'Deutsch', contributor: 'AI' },
+  { value: 'it', flag: IT, label: 'Italiano', contributor: 'AI' },
+  { value: 'nl', flag: NL, label: 'Nederlands', contributor: 'AI' },
 ];
 
 function App() {
@@ -1487,19 +1490,27 @@ function App() {
                     <SelectValue
                       aria-label={localeOptions.find((o) => o.value === locale)?.label ?? locale}
                     >
-                      {localeOptions.find((o) => o.value === locale)?.emoji ?? locale}
+                      {(() => {
+                        const option = localeOptions.find((o) => o.value === locale);
+                        if (!option) return locale;
+                        const Flag = option.flag;
+                        return <Flag className="w-5 h-3" />;
+                      })()}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="w-[40px]">
-                    {localeOptions.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        className="flex items-center justify-center gap-2"
-                      >
-                        <span className="text-lg">{option.emoji}</span>
-                      </SelectItem>
-                    ))}
+                    {localeOptions.map((option) => {
+                      const Flag = option.flag;
+                      return (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="flex items-center justify-center gap-2"
+                        >
+                          <Flag className="w-5 h-3" />
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <Button
@@ -2000,14 +2011,18 @@ function App() {
                     {t('credits.sections.translators.title')}
                   </div>
                   <div className="text-sm text-muted-foreground flex flex-wrap gap-2">
-                    {localeOptions.map((opt) => (
-                      <span
-                        key={opt.value}
-                        className="rounded-full border px-2 py-1 text-xs bg-muted/40 border-border"
-                      >
-                        {opt.emoji} {opt.contributor ?? opt.label}
-                      </span>
-                    ))}
+                    {localeOptions.map((opt) => {
+                      const Flag = opt.flag;
+                      return (
+                        <span
+                          key={opt.value}
+                          className="rounded-full border px-2 py-1 text-xs bg-muted/40 border-border flex items-center gap-1.5"
+                        >
+                          <Flag className="w-3.5 h-2.5 inline-block" />
+                          {opt.contributor ?? opt.label}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

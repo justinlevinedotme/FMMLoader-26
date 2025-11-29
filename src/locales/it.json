@@ -1,160 +1,160 @@
 {
   "_version": 2,
   "nav": {
-    "mods": "Mods",
-    "graphics": "Graphics",
-    "nameFix": "Name Fix",
-    "settings": "Settings"
+    "mods": "Mod",
+    "graphics": "Grafica",
+    "nameFix": "Correzione Nomi",
+    "settings": "Impostazioni"
   },
   "settings": {
-    "title": "Settings",
-    "description": "Theme and storage preferences",
-    "darkMode": "Dark Mode",
-    "darkModeDescription": "Toggle dark theme for the app window.",
+    "title": "Impostazioni",
+    "description": "Preferenze tema e archiviazione",
+    "darkMode": "Modalità Scura",
+    "darkModeDescription": "Attiva il tema scuro per la finestra dell'app.",
     "logs": {
-      "title": "Application Logs",
-      "description": "Opens the folder where recent app logs are stored.",
-      "open": "Open Logs Folder"
+      "title": "Log Applicazione",
+      "description": "Apre la cartella dove sono archiviati i log recenti dell'app.",
+      "open": "Apri Cartella Log"
     },
     "modsStorage": {
-      "title": "Mods Storage",
-      "description": "Opens the folder where imported mods are stored.",
-      "open": "Open Mods Folder"
+      "title": "Archiviazione Mod",
+      "description": "Apre la cartella dove sono archiviati i mod importati.",
+      "open": "Apri Cartella Mod"
     },
     "language": {
-      "title": "Language",
-      "description": "Choose your preferred language. Overrides system detection on restart."
+      "title": "Lingua",
+      "description": "Scegli la tua lingua preferita. Sostituisce il rilevamento di sistema al riavvio."
     },
     "updates": {
-      "title": "Updates",
-      "current": "Current: v{version}",
-      "available": "Update available: v{version}",
-      "check": "Check for updates",
-      "checking": "Checking...",
-      "modalTitle": "Update Available",
-      "modalBody": "Version v{latest} is available. Current: v{current}.",
-      "downloadInstall": "Download & Install",
-      "downloading": "Downloading...",
-      "installing": "Installing...",
-      "later": "Later"
+      "title": "Aggiornamenti",
+      "current": "Attuale: v{version}",
+      "available": "Aggiornamento disponibile: v{version}",
+      "check": "Verifica aggiornamenti",
+      "checking": "Verifica in corso...",
+      "modalTitle": "Aggiornamento Disponibile",
+      "modalBody": "È disponibile la versione v{latest}. Attuale: v{current}.",
+      "downloadInstall": "Scarica e Installa",
+      "downloading": "Download in corso...",
+      "installing": "Installazione in corso...",
+      "later": "Dopo"
     }
   },
   "modMeta": {
-    "title": "Add Mod Metadata",
-    "description": "Provide metadata for this mod so it can be managed correctly.",
+    "title": "Aggiungi Metadati Mod",
+    "description": "Fornisci i metadati per questo mod in modo che possa essere gestito correttamente.",
     "fields": {
       "name": {
-        "label": "Name",
-        "placeholder": "Enter a mod name"
+        "label": "Nome",
+        "placeholder": "Inserisci un nome per il mod"
       },
       "version": {
-        "label": "Version",
+        "label": "Versione",
         "placeholder": "1.0.0"
       },
       "type": {
-        "label": "Type",
-        "placeholder": "Select a mod type",
-        "detecting": "Detecting mod type..."
+        "label": "Tipo",
+        "placeholder": "Seleziona un tipo di mod",
+        "detecting": "Rilevamento tipo di mod..."
       },
       "author": {
-        "label": "Author",
-        "placeholder": "Optional author name"
+        "label": "Autore",
+        "placeholder": "Nome autore (opzionale)"
       },
       "description": {
-        "label": "Description",
-        "placeholder": "Optional description"
+        "label": "Descrizione",
+        "placeholder": "Descrizione (opzionale)"
       }
     },
     "actions": {
-      "cancel": "Cancel",
-      "submit": "Save"
+      "cancel": "Annulla",
+      "submit": "Salva"
     }
   },
   "common": {
-    "open": "Open",
-    "close": "Close",
-    "language": "Language",
-    "apply": "Apply",
-    "cancel": "Cancel"
+    "open": "Apri",
+    "close": "Chiudi",
+    "language": "Lingua",
+    "apply": "Applica",
+    "cancel": "Annulla"
   },
   "errors": {
-    "generic": "Something went wrong.",
-    "missingKey": "Missing translation: {key}"
+    "generic": "Qualcosa è andato storto.",
+    "missingKey": "Traduzione mancante: {key}"
   },
   "overlay": {
-    "dropTitle": "Drop mod file to import"
+    "dropTitle": "Trascina il file del mod per importarlo"
   },
   "footer": {
-    "createdBy": "FMMLoader26 v{version} | Created by JALCO / Justin Levine",
-    "supportKofi": "Support on Ko-Fi",
-    "joinDiscord": "Join Discord"
+    "createdBy": "FMMLoader26 v{version} | Creato da JALCO / Justin Levine",
+    "supportKofi": "Supporta su Ko-Fi",
+    "joinDiscord": "Unisciti a Discord"
   },
   "toolbar": {
-    "import": "Import",
-    "conflicts": "Conflicts",
-    "restore": "Restore",
-    "refresh": "Refresh",
+    "import": "Importa",
+    "conflicts": "Conflitti",
+    "restore": "Ripristina",
+    "refresh": "Aggiorna",
     "tooltips": {
-      "import": "Import a new mod package",
-      "conflicts": "Check for file conflicts between mods",
-      "restore": "Roll back to a previous backup",
-      "refresh": "Reload mod list and state"
+      "import": "Importa un nuovo pacchetto di mod",
+      "conflicts": "Verifica conflitti di file tra i mod",
+      "restore": "Torna a un backup precedente",
+      "refresh": "Ricarica elenco e stato dei mod"
     }
   },
   "paths": {
     "gameDir": {
-      "label": "Game Directory:",
-      "tooltip": "The FM26 installation folder containing the .bundle files",
-      "placeholder": "Not set - click Select or Detect Game",
-      "detect": "Detect"
+      "label": "Directory di Gioco:",
+      "tooltip": "La cartella di installazione di FM26 contenente i file .bundle",
+      "placeholder": "Non impostata - clicca Seleziona o Rileva Gioco",
+      "detect": "Rileva"
     },
     "userDir": {
-      "label": "User Directory:",
-      "tooltip": "The FM26 User Directory where saves and settings are stored",
-      "placeholder": "Auto-detected from system",
-      "detect": "Detect"
+      "label": "Directory Utente:",
+      "tooltip": "La Directory Utente di FM26 dove sono archiviati salvataggi e impostazioni",
+      "placeholder": "Rilevata automaticamente dal sistema",
+      "detect": "Rileva"
     }
   },
   "modsTab": {
     "tabs": {
-      "mods": "Mods",
-      "graphics": "Graphics",
-      "namefix": "Name Fix",
-      "settings": "Settings"
+      "mods": "Mod",
+      "graphics": "Grafica",
+      "namefix": "Correzione Nomi",
+      "settings": "Impostazioni"
     },
     "primaryActions": {
-      "apply": "Apply Selected Mods",
-      "enable": "Enable",
-      "disable": "Disable"
+      "apply": "Applica Mod Selezionati",
+      "enable": "Abilita",
+      "disable": "Disabilita"
     },
     "table": {
-      "name": "Name",
-      "type": "Type",
-      "author": "Author",
-      "status": "Status",
-      "version": "Version",
-      "actions": "Actions"
+      "name": "Nome",
+      "type": "Tipo",
+      "author": "Autore",
+      "status": "Stato",
+      "version": "Versione",
+      "actions": "Azioni"
     },
-    "empty": "No mods found. Import a mod to get started."
+    "empty": "Nessun mod trovato. Importa un mod per iniziare."
   },
   "graphicsTab": {
-    "title": "Graphics Packs",
-    "subtitle": "{count} packs installed",
+    "title": "Pacchetti Grafici",
+    "subtitle": "{count} pacchetti installati",
     "import": {
-      "button": "Import Graphics Pack",
-      "disabledTip": "User directory required to import"
+      "button": "Importa Pacchetto Grafico",
+      "disabledTip": "Directory utente richiesta per importare"
     },
     "validate": {
-      "button": "Validate Graphics",
-      "disabledTip": "User directory required to validate"
+      "button": "Valida Grafica",
+      "disabledTip": "Directory utente richiesta per validare"
     },
     "progress": {
-      "heading": "Progress:",
-      "files": "{current} / {total} files",
-      "importing": "Importing..."
+      "heading": "Progresso:",
+      "files": "{current} / {total} file",
+      "importing": "Importazione in corso..."
     },
     "warnings": {
-      "needUserDir": "User directory is required for graphics pack installation"
+      "needUserDir": "È richiesta la directory utente per l'installazione dei pacchetti grafici"
     },
     "table": {
       "name": "Nome",
@@ -165,70 +165,70 @@
     }
   },
   "credits": {
-    "title": "Credits",
-    "description": "Thanks to everyone who helps build and translate FMMLoader.",
+    "title": "Riconoscimenti",
+    "description": "Grazie a tutti coloro che aiutano a sviluppare e tradurre FMMLoader.",
     "sections": {
       "contributors": {
-        "title": "Core Contributors"
+        "title": "Contributori Principali"
       },
       "translators": {
-        "title": "Translators & Localization"
+        "title": "Traduttori e Localizzazione"
       },
       "languages": {
-        "title": "Supported Languages"
+        "title": "Lingue Supportate"
       },
       "crowdin": {
-        "title": "CrowdIn Contributors",
-        "note": "Special thanks to the community members who keep translations fresh."
+        "title": "Contributori CrowdIn",
+        "note": "Un ringraziamento speciale ai membri della community che mantengono aggiornate le traduzioni."
       }
     }
   },
   "nameFix": {
-    "title": "Name Fix",
-    "subtitle": "Manage FM Name Fix",
-    "sectionTitle": "FM Name Fix",
-    "sectionDescription": "Fixes licensing issues and unlocks real names for clubs, players, and competitions",
+    "title": "Correzione Nomi",
+    "subtitle": "Gestisci Correzione Nomi FM",
+    "sectionTitle": "Correzione Nomi FM",
+    "sectionDescription": "Risolve problemi di licenza e sblocca i nomi reali per club, giocatori e competizioni",
     "status": {
-      "checking": "Checking...",
-      "installed": "Installed",
-      "notInstalled": "Not installed"
+      "checking": "Verifica in corso...",
+      "installed": "Installato",
+      "notInstalled": "Non installato"
     },
     "whatItDoes": {
-      "heading": "What it does:",
+      "heading": "Cosa fa:",
       "bullets": [
-        "Unlocks real names for clubs like AC Milan, Inter, and Lazio",
-        "Fixes Japanese player names",
-        "Removes fake/unlicensed content",
-        "Works with all leagues and competitions"
+        "Sblocca i nomi reali per club come AC Milan, Inter e Lazio",
+        "Corregge i nomi dei giocatori giapponesi",
+        "Rimuove contenuti falsi/senza licenza",
+        "Funziona con tutte le leghe e competizioni"
       ]
     },
     "active": {
-      "heading": "Currently Active:",
-      "unknown": "Unknown"
+      "heading": "Attualmente Attivo:",
+      "unknown": "Sconosciuto"
     },
-    "selectLabel": "Select Name Fix Source:",
-    "selectPlaceholder": "Select a name fix source",
-    "activeSuffix": " - Active",
-    "noSources": "No name fix sources available. Import a name fix ZIP file to get started.",
+    "selectLabel": "Seleziona Fonte Correzione Nomi:",
+    "selectPlaceholder": "Seleziona una fonte di correzione nomi",
+    "activeSuffix": " - Attivo",
+    "noSources": "Nessuna fonte di correzione nomi disponibile. Importa un file ZIP di correzione nomi per iniziare.",
     "buttons": {
-      "install": "Install",
-      "reinstall": "Reinstall",
-      "uninstall": "Uninstall from Game",
-      "importZip": "Import from ZIP",
-      "checkStatus": "Check Status",
-      "deleteSource": "Delete Source"
+      "install": "Installa",
+      "reinstall": "Reinstalla",
+      "uninstall": "Disinstalla dal Gioco",
+      "importZip": "Importa da ZIP",
+      "checkStatus": "Verifica Stato",
+      "deleteSource": "Elimina Fonte"
     },
     "warnings": {
-      "needGameDir": "Please set your Game Directory first"
+      "needGameDir": "Imposta prima la tua Directory di Gioco"
     },
     "notes": {
-      "community": "You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout"
+      "community": "Puoi scaricare correzioni di nomi dalla community o crearne di tue. Consigliamo le correzioni dei nostri amici di SortItOutSI o FMScout"
     },
     "userDir": {
-      "label": "User Directory:",
-      "tooltip": "The FM26 User Directory where saves and settings are stored",
-      "placeholder": "Auto-detected from system",
-      "detect": "Detect"
+      "label": "Directory Utente:",
+      "tooltip": "La Directory Utente di FM26 dove sono archiviati salvataggi e impostazioni",
+      "placeholder": "Rilevata automaticamente dal sistema",
+      "detect": "Rileva"
     }
   }
 }
