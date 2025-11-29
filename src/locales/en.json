@@ -156,7 +156,13 @@
     "warnings": {
       "needUserDir": "User directory is required for graphics pack installation"
     },
-    "table": "No graphics packs installed yet."
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "files": "Files",
+      "installed": "Installed",
+      "empty": "No graphics packs installed yet."
+    }
   },
   "credits": {
     "title": "Credits",
