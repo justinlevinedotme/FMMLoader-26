@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -46,20 +46,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Install frontend dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build frontend
-        run: npm run build
+        run: pnpm run build
 
       - name: Run frontend tests with coverage
-        run: npm run test:ui -- --run --coverage
+        run: pnpm run test:ui -- --run --coverage
 
       - name: Run ESLint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Check Prettier formatting
-        run: npm run format
+        run: pnpm run format
+
+      - name: Verify i18n configuration is in sync
+        run: |
+          pnpm run generate:i18n
+          if ! git diff --exit-code src/lib/i18n.tsx src/App.tsx src/components/tabs/SettingsTab.tsx crowdin.yml; then
+            echo "❌ i18n configuration is out of sync!"
+            echo "Please run 'pnpm run generate:i18n' and commit the changes."
+            exit 1
+          fi
 
       - name: Check Rust code
         working-directory: src-tauri

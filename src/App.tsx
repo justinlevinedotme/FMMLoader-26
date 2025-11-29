@@ -3,7 +3,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { open as openUrl } from '@tauri-apps/plugin-shell';
 import { listen } from '@tauri-apps/api/event';
 import { toast } from 'sonner';
-import { US, GB, KR, TR, PT, DE, IT, NL } from 'country-flag-icons/react/3x2';
+import { DE, GB, IT, KR, NL, PT, TR, US } from 'country-flag-icons/react/3x2';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -78,6 +78,7 @@ import {
   useI18n,
   type SupportedLocale,
 } from '@/lib/i18n';
+import { logger } from '@/lib/logger';
 import { useUpdater } from '@/hooks/useUpdater';
 import { UpdateModal } from '@/components/UpdateModal';
 
@@ -211,14 +212,14 @@ const ALL_LOCALE_OPTIONS: {
   label: string;
   contributor?: string;
 }[] = [
-  { value: 'en', flag: US, label: 'English (US)', contributor: 'Justin Levine' },
-  { value: 'en-GB', flag: GB, label: 'English (UK)', contributor: 'Justin Levine' },
-  { value: 'ko', flag: KR, label: '한국어', contributor: 'AI' },
-  { value: 'tr', flag: TR, label: 'Türkçe', contributor: 'AI' },
-  { value: 'pt-PT', flag: PT, label: 'Português (Portugal)', contributor: 'AI' },
+  { value: 'en', flag: US, label: 'English (US)', contributor: 'AI' },
+  { value: 'en-GB', flag: GB, label: 'English (UK)', contributor: 'AI' },
   { value: 'de', flag: DE, label: 'Deutsch', contributor: 'AI' },
   { value: 'it', flag: IT, label: 'Italiano', contributor: 'AI' },
+  { value: 'ko', flag: KR, label: '한국어', contributor: 'AI' },
   { value: 'nl', flag: NL, label: 'Nederlands', contributor: 'AI' },
+  { value: 'pt-PT', flag: PT, label: 'Português (Portugal)', contributor: 'AI' },
+  { value: 'tr', flag: TR, label: 'Türkçe', contributor: 'AI' },
 ];
 
 function App() {
@@ -295,7 +296,7 @@ function App() {
       const original = toastMap[kind];
       if (!original || original.__instrumented) return;
       const wrapped = (message: unknown, options?: { id?: string }) => {
-        console.log(`[toast:${kind}]`, { id: options?.id, message });
+        logger.debug('Toast triggered', { kind, id: options?.id, message });
         return original(message, options);
       };
       wrapped.__instrumented = true;
@@ -860,9 +861,9 @@ function App() {
   };
 
   const handleImportNameFix = async () => {
-    console.log('=== handleImportNameFix START ===');
+    logger.debug('handleImportNameFix started');
     try {
-      console.log('Opening file picker dialog...');
+      logger.debug('Opening file picker dialog');
       const selected = await open({
         multiple: false,
         directory: false,
@@ -874,29 +875,26 @@ function App() {
         ],
       });
 
-      console.log('File picker closed. Selected file:', selected);
+      logger.debug('File picker closed', { selected });
 
       if (!selected) {
-        console.log('No file selected, user cancelled file picker');
+        logger.debug('No file selected, user cancelled file picker');
         return;
       }
 
-      console.log('File was selected, opening name dialog...');
+      logger.debug('File was selected, opening name dialog');
 
       // Open dialog for user to enter name
       setPendingImportFilePath(selected);
       setImportNameFixName('Custom Name Fix');
       setImportNameFixDialogOpen(true);
     } catch (error) {
-      console.error('=== ERROR in handleImportNameFix ===');
-      console.error('Error type:', typeof error);
-      console.error('Error object:', error);
       const errorMsg = formatError(error);
-      console.error('Formatted error message:', errorMsg);
+      logger.error('Error in handleImportNameFix', { error, errorType: typeof error, errorMsg });
       addLog(`Error importing name fix: ${errorMsg}`);
       toast.error(`Failed to import name fix: ${errorMsg}`);
     }
-    console.log('=== handleImportNameFix END ===');
+    logger.debug('handleImportNameFix ended');
   };
 
   const confirmImportNameFix = async () => {
@@ -909,25 +907,20 @@ function App() {
       setImportNameFixDialogOpen(false);
       const name = importNameFixName.trim();
 
-      console.log('Name validated, proceeding with import...');
+      logger.debug('Name validated, proceeding with import', { name });
       addLog(`Importing name fix: ${name}`);
-      console.log(
-        'Calling tauriCommands.importNameFix with path:',
-        pendingImportFilePath,
-        'and name:',
-        name
-      );
+      logger.debug('Calling tauriCommands.importNameFix', { path: pendingImportFilePath, name });
 
       const result = await tauriCommands.importNameFix(pendingImportFilePath, name);
-      console.log('Import completed successfully. Result:', result);
+      logger.info('Name fix import completed successfully', { result });
 
       addLog(result);
       toast.success(result);
 
       // Reload sources
-      console.log('Reloading name fix sources...');
+      logger.debug('Reloading name fix sources');
       await loadNameFixSources();
-      console.log('Sources reloaded successfully');
+      logger.debug('Name fix sources reloaded successfully');
 
       // Check installation status in case the imported fix matches what's in the game
       await checkNameFixStatus();
@@ -936,10 +929,8 @@ function App() {
       setPendingImportFilePath(null);
       setImportNameFixName('');
     } catch (error) {
-      console.error('=== ERROR in confirmImportNameFix ===');
-      console.error('Error object:', error);
       const errorMsg = formatError(error);
-      console.error('Formatted error message:', errorMsg);
+      logger.error('Error in confirmImportNameFix', { error, errorMsg });
       addLog(`Error importing name fix: ${errorMsg}`);
       toast.error(`Failed to import name fix: ${errorMsg}`);
     }
@@ -1270,7 +1261,7 @@ function App() {
           await loadNameFixSources();
         } catch (error) {
           // Silently fail - not critical
-          console.error('Failed to check FM Name Fix status:', error);
+          logger.warn('Failed to check FM Name Fix status', { error });
         }
 
         return () => {

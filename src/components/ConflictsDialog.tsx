@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import { tauriCommands } from '@/hooks/useTauri';
+import { logger } from '@/lib/logger';
 import type { ConflictInfo } from '@/types';
 
 interface ConflictsDialogProps {
@@ -33,7 +34,7 @@ export function ConflictsDialog({ open, onOpenChange, onDisableMod }: ConflictsD
       const result = await tauriCommands.checkConflicts();
       setConflicts(result);
     } catch (error) {
-      console.error('Failed to load conflicts:', error);
+      logger.error('Failed to load conflicts', { error });
     } finally {
       setLoading(false);
     }

@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/table';
 import { History, Undo2 } from 'lucide-react';
 import { tauriCommands } from '@/hooks/useTauri';
+import { logger } from '@/lib/logger';
 import type { RestorePoint } from '@/types';
 
 interface RestorePointsDialogProps {
@@ -58,7 +59,7 @@ export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePo
       const points = await tauriCommands.getRestorePoints();
       setRestorePoints(points);
     } catch (error) {
-      console.error('Failed to load restore points:', error);
+      logger.error('Failed to load restore points', { error });
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePo
       setConfirmingRestore(null);
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to restore:', error);
+      logger.error('Failed to restore from point', { error, pointPath: point.path });
       alert(`Failed to restore: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
@@ -90,7 +91,7 @@ export function RestorePointsDialog({ open, onOpenChange, onRestore }: RestorePo
       setShowCreateForm(false);
       await loadRestorePoints();
     } catch (error) {
-      console.error('Failed to create restore point:', error);
+      logger.error('Failed to create restore point', { error, name: newPointName });
       alert(
         `Failed to create restore point: ${error instanceof Error ? error.message : String(error)}`
       );

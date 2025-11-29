@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { tauriCommands } from '@/hooks/useTauri';
 import { useI18n } from '@/lib/i18n';
+import { logger } from '@/lib/logger';
 import type { ModMetadata } from '@/types';
 
 interface ModMetadataDialogProps {
@@ -61,7 +62,7 @@ export function ModMetadataDialog({
           const detectedType = await tauriCommands.detectModType(sourcePath);
           setModType(detectedType);
         } catch (err) {
-          console.error('Failed to detect mod type:', err);
+          logger.error('Failed to detect mod type', { error: err, sourcePath });
         } finally {
           setDetecting(false);
         }

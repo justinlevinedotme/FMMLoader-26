@@ -183,7 +183,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: npm
+          cache: pnpm
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable

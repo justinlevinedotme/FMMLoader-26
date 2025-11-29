@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { tauriCommands } from './useTauri';
+import { logger } from '@/lib/logger';
 
 export interface UpdateStatus {
   checking: boolean;
@@ -31,13 +32,16 @@ export const useUpdater = () => {
 
   // Get app version on mount
   useEffect(() => {
-    tauriCommands.getAppVersion().then(setAppVersion).catch(console.error);
+    tauriCommands
+      .getAppVersion()
+      .then(setAppVersion)
+      .catch((error) => logger.error('Failed to get app version', { error }));
   }, []);
 
   const addLog = useCallback((message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     const logMessage = `[${timestamp}] ${message}`;
-    console.log(`[Updater] ${logMessage}`);
+    logger.debug(logMessage, { component: 'Updater' });
     setStatus((prev) => ({
       ...prev,
       logs: [...prev.logs, logMessage],
@@ -52,7 +56,9 @@ export const useUpdater = () => {
       if (!appVersion) return;
       tauriCommands
         .logUpdateEvent(eventType, appVersion, latestVersion, message, details)
-        .catch((err) => console.error('Failed to log update event to backend:', err));
+        .catch((err) =>
+          logger.error('Failed to log update event to backend', { error: err, eventType, message })
+        );
     },
     [appVersion]
   );
@@ -116,7 +122,7 @@ export const useUpdater = () => {
             ? `${error.name}: ${error.message}\nStack: ${error.stack || 'No stack trace'}`
             : `Non-Error object: ${JSON.stringify(error)}`;
 
-        console.error('[Updater] Full error details:', error);
+        logger.error('Error checking for updates', { error, errorMessage, errorDetails });
         addLog(`Error checking for updates: ${errorMessage}`);
         logToBackend('ERROR', `Error checking for updates: ${errorMessage}`, null, errorDetails);
         setStatus((prev) => ({
@@ -201,7 +207,7 @@ export const useUpdater = () => {
           ? `${error.name}: ${error.message}\nStack: ${error.stack || 'No stack trace'}`
           : `Non-Error object: ${JSON.stringify(error)}`;
 
-      console.error('[Updater] Full error details:', error);
+      logger.error('Error downloading/installing update', { error, errorMessage, errorDetails });
       addLog(`Error downloading/installing update: ${errorMessage}`);
       logToBackend(
         'ERROR',

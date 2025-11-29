@@ -10,12 +10,12 @@ files:
     languages_mapping:
       locale_with_underscore:
         en-GB: en-GB
-        pt-PT: pt-PT
         de: de
-        ko: ko
-        tr: tr
         it: it
+        ko: ko
         nl: nl
+        pt-PT: pt-PT
+        tr: tr
 
   # Backend YAML translations
   - source: /locales/en.yml

@@ -46,12 +46,12 @@ export function SettingsTab({
   const localeOptions: { value: SupportedLocale; label: string }[] = [
     { value: 'en', label: 'English (US)' },
     { value: 'en-GB', label: 'English (UK)' },
-    { value: 'ko', label: '한국어' },
-    { value: 'tr', label: 'Türkçe' },
-    { value: 'pt-PT', label: 'Português (Portugal)' },
     { value: 'de', label: 'Deutsch' },
     { value: 'it', label: 'Italiano' },
+    { value: 'ko', label: '한국어' },
     { value: 'nl', label: 'Nederlands' },
+    { value: 'pt-PT', label: 'Português (Portugal)' },
+    { value: 'tr', label: 'Türkçe' },
   ];
 
   return (

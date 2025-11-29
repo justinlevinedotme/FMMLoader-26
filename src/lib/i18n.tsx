@@ -10,10 +10,11 @@ import {
   useRef,
   useState,
 } from 'react';
+import { logger } from './logger';
 
 type Messages = Record<string, unknown>;
 
-export const SUPPORTED_LOCALES = ['en', 'en-GB', 'ko', 'tr', 'pt-PT', 'de', 'it', 'nl'] as const;
+export const SUPPORTED_LOCALES = ['en', 'en-GB', 'de', 'it', 'ko', 'nl', 'pt-PT', 'tr'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const FALLBACK_LOCALE: SupportedLocale = 'en';
@@ -21,14 +22,14 @@ const FALLBACK_LOCALE: SupportedLocale = 'en';
 export const normalizeLocale = (input?: string | null): SupportedLocale | null => {
   if (!input) return null;
   const lower = input.toLowerCase();
-  if (lower === 'en-gb' || lower.startsWith('en-gb')) return 'en-GB';
   if (lower === 'en' || lower.startsWith('en-')) return 'en';
-  if (lower === 'ko' || lower.startsWith('ko-')) return 'ko';
-  if (lower === 'tr' || lower.startsWith('tr-')) return 'tr';
+  if (lower === 'en-gb' || lower.startsWith('en-gb')) return 'en-GB';
   if (lower === 'de' || lower.startsWith('de-')) return 'de';
-  if (lower === 'pt-pt' || lower === 'pt' || lower.startsWith('pt-')) return 'pt-PT';
   if (lower === 'it' || lower.startsWith('it-')) return 'it';
+  if (lower === 'ko' || lower.startsWith('ko-')) return 'ko';
   if (lower === 'nl' || lower.startsWith('nl-')) return 'nl';
+  if (lower === 'pt-pt' || lower.startsWith('pt-pt')) return 'pt-PT';
+  if (lower === 'tr' || lower.startsWith('tr-')) return 'tr';
   return null;
 };
 
@@ -57,7 +58,7 @@ const loadLocale = async (locale: SupportedLocale): Promise<Messages> => {
   const mod = LOCALE_MODULES[key];
 
   if (!mod) {
-    console.warn(`[i18n] Locale '${locale}' not found in bundle`);
+    logger.warn('Locale not found in bundle', { locale, key });
     return {};
   }
 
@@ -189,7 +190,7 @@ export function I18nProvider({
         if (onLocaleChange) {
           onLocaleChange(next);
         } else {
-          console.warn('[i18n] No onLocaleChange handler provided; locale not updated');
+          logger.warn('No onLocaleChange handler provided; locale not updated', { locale: next });
         }
       },
     }),
