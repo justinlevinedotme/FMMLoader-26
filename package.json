@@ -22,6 +22,7 @@
     "generate:locales": "node scripts/generate-locales.ts",
     "build:debug": "npm run build && tauri build --debug",
     "build:release": "npm run build && tauri build",
+    "build:unsigned": "npm run build && tauri build --debug --bundles app --config src-tauri/tauri.conf.nosign.json",
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:debugui": "VITE_ENABLE_DEBUG_UI=true tauri dev",

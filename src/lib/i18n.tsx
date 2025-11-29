@@ -32,15 +32,21 @@ export const normalizeLocale = (input?: string | null): SupportedLocale | null =
   return null;
 };
 
+const LOCALE_MODULES = import.meta.glob('../locales/*.json', {
+  eager: true,
+});
+
 const loadLocale = async (locale: SupportedLocale): Promise<Messages> => {
-  try {
-    const mod = await import(/* @vite-ignore */ `../locales/${locale}.json`);
-    const messages = mod.default ?? mod;
-    return messages;
-  } catch (error) {
-    console.warn(`[i18n] Failed to load locale '${locale}':`, error);
+  const key = `../locales/${locale}.json`;
+  const mod = LOCALE_MODULES[key];
+
+  if (!mod) {
+    console.warn(`[i18n] Locale '${locale}' not found in bundle`);
     return {};
   }
+
+  const messages = (mod as { default?: Messages }).default ?? (mod as Messages);
+  return messages;
 };
 
 export const detectSystemLocale = async (): Promise<SupportedLocale | null> => {
