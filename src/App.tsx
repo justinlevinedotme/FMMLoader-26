@@ -360,7 +360,9 @@ function App() {
   const [graphicsPrefixRenameFiles, setGraphicsPrefixRenameFiles] = useState(true);
   const [graphicsPrefixUpdateConfig, setGraphicsPrefixUpdateConfig] = useState(true);
   const [graphicsPrefixManualPath, setGraphicsPrefixManualPath] = useState('');
-  const [graphicsPrefixDialogError, setGraphicsPrefixDialogError] = useState<string | null>(null);
+  const [graphicsPrefixDialogError, setGraphicsPrefixDialogError] = useState<string | undefined>(
+    undefined
+  );
   const [graphicsPrefixUseManualOnly, setGraphicsPrefixUseManualOnly] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [pendingInstall, setPendingInstall] = useState<{
@@ -1135,7 +1137,7 @@ function App() {
 
     try {
       setGraphicsPrefixing(true);
-      setGraphicsPrefixDialogError(null);
+      setGraphicsPrefixDialogError(undefined);
 
       let selected = selectedPathOverride;
 
