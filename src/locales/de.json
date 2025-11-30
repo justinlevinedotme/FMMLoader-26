@@ -148,23 +148,6 @@
       "button": "Grafiken validieren",
       "disabledTip": "Benutzerverzeichnis erforderlich zur Validierung"
     },
-    "prefix": {
-      "label": "Datei-Präfix",
-      "placeholder": "face_",
-      "helper": "Benennt alle .png-Dateien (rekursiv) im ausgewählten Ordner mit diesem Präfix um.",
-      "button": "Ordnerinhalt präfixen",
-      "dialogTitle": "Grafik-Ordnerinhalt präfixen",
-      "dialogDescription": "Wähle das Präfix und anschließend den Faces-Ordner. Nur .png-Dateien werden umbenannt; bereits präfixte Dateien werden übersprungen.",
-      "confirm": "Ordnerinhalt präfixen",
-      "loadingTitle": "Dateien werden umbenannt",
-      "loadingBody": "Bitte warten – große Packs können etwas dauern. Die App reagiert, sobald es fertig ist.",
-      "toast": {
-        "loading": "Grafikdateien werden umbenannt...",
-        "success": "{count} Datei(en) umbenannt",
-        "none": "Keine Dateien mussten umbenannt werden",
-        "error": "Dateien konnten nicht umbenannt werden: {message}"
-      }
-    },
     "progress": {
       "heading": "Fortschritt:",
       "files": "{current} / {total} Dateien",

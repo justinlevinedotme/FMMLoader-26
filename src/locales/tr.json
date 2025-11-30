@@ -148,23 +148,6 @@
       "button": "Grafikleri Doğrula",
       "disabledTip": "Doğrulamak için kullanıcı dizini gerekli"
     },
-    "prefix": {
-      "label": "Dosya ön eki",
-      "placeholder": "face_",
-      "helper": "Seçilen klasör ve alt klasörlerdeki tüm .png dosyalarının başına bu ön eki ekler.",
-      "button": "Klasör içeriğini ön ekle",
-      "dialogTitle": "Grafik klasör içeriğini ön ekle",
-      "dialogDescription": "Uygulanacak ön eki seçin ve ardından yeniden adlandırılacak faces klasörünü seçin. Sadece .png dosyaları yeniden adlandırılır; zaten ön ekli dosyalar atlanır.",
-      "confirm": "Klasör içeriğini ön ekle",
-      "loadingTitle": "Dosyalar yeniden adlandırılıyor",
-      "loadingBody": "Lütfen bekleyin — büyük paketler biraz sürebilir. İşlem bitince uygulama yanıt verecek.",
-      "toast": {
-        "loading": "Grafik dosyaları yeniden adlandırılıyor...",
-        "success": "{count} dosya yeniden adlandırıldı",
-        "none": "Yeniden adlandırılması gereken dosya yok",
-        "error": "Dosyalar yeniden adlandırılamadı: {message}"
-      }
-    },
     "progress": {
       "heading": "İlerleme:",
       "files": "{current} / {total} dosya",

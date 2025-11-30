@@ -148,23 +148,6 @@
       "button": "Valida Grafica",
       "disabledTip": "Directory utente richiesta per validare"
     },
-    "prefix": {
-      "label": "Prefisso file",
-      "placeholder": "face_",
-      "helper": "Rinomina tutti i file .png (in modo ricorsivo) nella cartella scelta aggiungendo questo prefisso.",
-      "button": "Prefissa contenuti cartella",
-      "dialogTitle": "Prefissa contenuto cartella grafica",
-      "dialogDescription": "Seleziona il prefisso da applicare e poi scegli la cartella faces da rinominare. Solo i file .png vengono rinominati; quelli già prefissati vengono ignorati.",
-      "confirm": "Prefissa contenuti cartella",
-      "loadingTitle": "Rinominando i file",
-      "loadingBody": "Attendi — i pacchetti grandi possono richiedere un po'. L'app risponderà al termine.",
-      "toast": {
-        "loading": "Rinominando i file grafici...",
-        "success": "Rinominati {count} file",
-        "none": "Nessun file da rinominare",
-        "error": "Impossibile rinominare i file: {message}"
-      }
-    },
     "progress": {
       "heading": "Progresso:",
       "files": "{current} / {total} file",

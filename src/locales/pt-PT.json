@@ -148,23 +148,6 @@
       "button": "Validar gráficos",
       "disabledTip": "Diretório do utilizador necessário para validar"
     },
-    "prefix": {
-      "label": "Prefixo do ficheiro",
-      "placeholder": "face_",
-      "helper": "Renomeia todos os ficheiros .png (de forma recursiva) na pasta escolhida com este prefixo.",
-      "button": "Prefixar conteúdo da pasta",
-      "dialogTitle": "Prefixar conteúdo da pasta de gráficos",
-      "dialogDescription": "Escolha o prefixo e depois selecione a pasta faces para renomear. Apenas ficheiros .png são renomeados; os já prefixados são ignorados.",
-      "confirm": "Prefixar conteúdo da pasta",
-      "loadingTitle": "A renomear ficheiros",
-      "loadingBody": "Aguarde — pacotes grandes podem demorar um pouco. A aplicação responde quando terminar.",
-      "toast": {
-        "loading": "A renomear ficheiros de gráficos...",
-        "success": "{count} ficheiro(s) renomeado(s)",
-        "none": "Nenhum ficheiro precisou de ser renomeado",
-        "error": "Falha ao renomear ficheiros: {message}"
-      }
-    },
     "progress": {
       "heading": "Progresso:",
       "files": "{current} / {total} ficheiros",

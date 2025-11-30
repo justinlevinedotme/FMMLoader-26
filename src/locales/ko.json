@@ -148,23 +148,6 @@
       "button": "그래픽 검증",
       "disabledTip": "검증하려면 사용자 디렉터리가 필요합니다"
     },
-    "prefix": {
-      "label": "파일 접두사",
-      "placeholder": "face_",
-      "helper": "선택한 폴더와 하위 폴더의 모든 .png 파일 이름 앞에 이 접두사를 붙입니다.",
-      "button": "폴더 내용 접두사 추가",
-      "dialogTitle": "그래픽 폴더 내용 접두사 추가",
-      "dialogDescription": "적용할 접두사를 정한 뒤, 이름을 바꿀 faces 폴더를 선택하세요. 이미 접두사가 있는 파일은 건너뜁니다.",
-      "confirm": "폴더 내용 접두사 추가",
-      "loadingTitle": "파일 이름 변경 중",
-      "loadingBody": "잠시만 기다려 주세요 — 큰 팩은 시간이 걸릴 수 있습니다. 완료되면 앱이 다시 응답합니다.",
-      "toast": {
-        "loading": "그래픽 파일 이름을 변경하는 중...",
-        "success": "{count}개 파일 이름을 변경했습니다",
-        "none": "변경할 파일이 없습니다",
-        "error": "파일 이름 변경 실패: {message}"
-      }
-    },
     "progress": {
       "heading": "진행 상황:",
       "files": "{current} / {total} 파일",
