@@ -118,6 +118,21 @@ graphicsTab:
   validate:
     button: Valideer Graphics
     disabledTip: Gebruikersmap vereist om te valideren
+  prefix:
+    label: Bestandsvoorvoegsel
+    placeholder: face_
+    helper: Hernoemt alle .png-bestanden (recursief) in de gekozen map met dit voorvoegsel.
+    button: Voorvoegsel op mapinhoud
+    dialogTitle: Voorvoegsel op graphics-map
+    dialogDescription: Kies het voorvoegsel en selecteer daarna de faces-map om te hernoemen. Alleen .png-bestanden worden hernoemd; bestaande voorvoegsels worden overgeslagen.
+    confirm: Voorvoegsel op mapinhoud
+    loadingTitle: Bestanden hernoemen
+    loadingBody: Even geduld — grote pakketten kunnen even duren. De app reageert weer zodra het klaar is.
+    toast:
+      loading: Graphics-bestanden hernoemen...
+      success: '{count} bestand(en) hernoemd'
+      none: Geen bestanden hoefden te worden hernoemd
+      error: Bestanden hernoemen mislukt: {message}
   progress:
     heading: 'Voortgang:'
     files: '{current} / {total} bestanden'
