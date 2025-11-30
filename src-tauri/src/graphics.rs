@@ -152,6 +152,92 @@ pub fn validate_graphics() -> Result<Vec<GraphicsPackIssue>, String> {
     Ok(issues)
 }
 
+/// Adds a prefix to all PNG files in the provided directory (non-recursive).
+/// Useful for quickly migrating face packs from `123.png` to `face_123.png`.
+#[tauri::command]
+pub fn prefix_graphics_files(directory: String, prefix: String) -> Result<usize, String> {
+    if prefix.is_empty() {
+        return Err("Prefix cannot be empty".to_string());
+    }
+
+    let dir_path = PathBuf::from(&directory);
+    if !dir_path.exists() || !dir_path.is_dir() {
+        return Err("Provided path is not a directory".to_string());
+    }
+
+    tracing::info!(
+        "Prefixing graphics files (recursive) in {:?} with '{}'",
+        dir_path,
+        prefix
+    );
+
+    let mut files_to_rename: Vec<(PathBuf, PathBuf)> = Vec::new();
+    let mut seen_targets = std::collections::HashSet::new();
+
+    for entry in WalkDir::new(&dir_path).into_iter().filter_map(|e| e.ok()) {
+        let path = entry.path().to_path_buf();
+        if !path.is_file() {
+            continue;
+        }
+
+        let extension = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+
+        if extension != "png" {
+            continue;
+        }
+
+        let file_name = match path.file_name().and_then(|n| n.to_str()) {
+            Some(name) => name,
+            None => continue,
+        };
+
+        if file_name.starts_with(&prefix) {
+            continue;
+        }
+
+        let parent = path
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_else(|| dir_path.clone());
+        let target_path = parent.join(format!("{}{}", prefix, file_name));
+
+        if target_path.exists() {
+            return Err(format!(
+                "Target file already exists and would conflict: {}",
+                target_path.display()
+            ));
+        }
+
+        if !seen_targets.insert(target_path.clone()) {
+            return Err(format!(
+                "Duplicate target filename detected: {}",
+                target_path.display()
+            ));
+        }
+
+        files_to_rename.push((path, target_path));
+    }
+
+    for (source, target) in &files_to_rename {
+        let file_name = source
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("unknown.png");
+        fs::rename(source, target).map_err(|e| format!("Failed to rename {}: {}", file_name, e))?;
+    }
+
+    tracing::info!(
+        "Prefixed {} file(s) in {:?}",
+        files_to_rename.len(),
+        dir_path
+    );
+    Ok(files_to_rename.len())
+}
+
 /// Migrates a graphics pack to the correct subdirectory
 #[tauri::command]
 pub async fn migrate_graphics_pack(

@@ -97,6 +97,14 @@ type DebugUIProps = {
   setPendingGraphicsPath: (path: string | null) => void;
 };
 
+type PrefixMessages = {
+  dialogTitle: string;
+  loading: string;
+  success: (count: number) => string;
+  none: string;
+  error: (message: string) => string;
+};
+
 function DebugUI({
   metadataDialogOpen,
   conflictsDialogOpen,
@@ -322,6 +330,7 @@ function App() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modDetailsOpen, setModDetailsOpen] = useState(false);
+  const [prefixDialogOpen, setPrefixDialogOpen] = useState(false);
   const [pendingImportPath, setPendingImportPath] = useState<string | null>(null);
 
   // FM Name Fix states
@@ -345,6 +354,8 @@ function App() {
   const [migrationProgress, setMigrationProgress] = useState<ExtractionProgress | null>(null);
   const [migratingPack, setMigratingPack] = useState(false);
   const [graphicsConflict, setGraphicsConflict] = useState<GraphicsConflictInfo | null>(null);
+  const [graphicsPrefix, setGraphicsPrefix] = useState('face_');
+  const [graphicsPrefixing, setGraphicsPrefixing] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [pendingInstall, setPendingInstall] = useState<{
     path: string;
@@ -1096,6 +1107,52 @@ function App() {
     }
   };
 
+  const handlePrefixGraphics = async (messages?: PrefixMessages, onComplete?: () => void) => {
+    const prefix = graphicsPrefix.trim();
+    if (!prefix) {
+      toast.error(messages?.error('Prefix cannot be empty') ?? 'Prefix cannot be empty', {
+        id: 'graphics-prefix',
+      });
+      return;
+    }
+
+    try {
+      setGraphicsPrefixing(true);
+      const selected = await open({
+        multiple: false,
+        directory: true,
+        title: messages?.dialogTitle ?? 'Select folder to rename',
+      });
+
+      if (!selected) {
+        return;
+      }
+
+      toast.loading(messages?.loading ?? 'Renaming graphics files...', { id: 'graphics-prefix' });
+      const renamed = await tauriCommands.prefixGraphicsFiles(selected, prefix);
+
+      if (renamed === 0) {
+        toast.dismiss('graphics-prefix');
+        toast.info(messages?.none ?? 'No files needed renaming', { id: 'graphics-prefix' });
+      } else {
+        toast.success(messages?.success(renamed) ?? `Renamed ${renamed} file(s)`, {
+          id: 'graphics-prefix',
+        });
+      }
+
+      addLog(`Prefixed ${renamed} file(s) in ${selected}`);
+      onComplete?.();
+    } catch (error) {
+      const errorMsg = formatError(error);
+      toast.error(messages?.error(errorMsg) ?? `Failed to prefix files: ${errorMsg}`, {
+        id: 'graphics-prefix',
+      });
+      addLog(`Error prefixing graphics: ${errorMsg}`);
+    } finally {
+      setGraphicsPrefixing(false);
+    }
+  };
+
   const handleMigrateGraphicsPack = async (packName: string, targetSubdir: string) => {
     try {
       setMigratingPack(true);
@@ -1378,6 +1435,13 @@ function App() {
       { name: 'BassyBoy', role: 'Community Expert / Feedback' },
       { name: 'FM Modders Community', role: 'Inspiration and Support' },
     ];
+    const prefixMessages: PrefixMessages = {
+      dialogTitle: t('graphicsTab.prefix.dialogTitle'),
+      loading: t('graphicsTab.prefix.toast.loading'),
+      success: (count) => t('graphicsTab.prefix.toast.success', { count }),
+      none: t('graphicsTab.prefix.toast.none'),
+      error: (message) => t('graphicsTab.prefix.toast.error', { message }),
+    };
     // CrowdIn section removed
     return (
       <TooltipProvider>
@@ -1646,6 +1710,7 @@ function App() {
                   validatingGraphics={validatingGraphics}
                   onImportGraphicsPack={handleImportGraphicsPack}
                   onValidateGraphics={handleValidateGraphics}
+                  onOpenPrefixDialog={() => setPrefixDialogOpen(true)}
                 />
               </TabsContent>
 
@@ -1748,6 +1813,60 @@ function App() {
             onCancel={handleGraphicsCancel}
             userDirPath={config?.user_dir_path}
           />
+
+          {/* Graphics Prefix Dialog */}
+          <Dialog open={prefixDialogOpen} onOpenChange={setPrefixDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t('graphicsTab.prefix.dialogTitle')}</DialogTitle>
+                <DialogDescription>{t('graphicsTab.prefix.dialogDescription')}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2">
+                <Label htmlFor="graphics-prefix">{t('graphicsTab.prefix.label')}</Label>
+                <Input
+                  id="graphics-prefix"
+                  value={graphicsPrefix}
+                  onChange={(e) => setGraphicsPrefix(e.target.value)}
+                  placeholder={t('graphicsTab.prefix.placeholder')}
+                  autoFocus
+                  onFocus={(e) => {
+                    const len = e.currentTarget.value.length;
+                    e.currentTarget.setSelectionRange(len, len);
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">{t('graphicsTab.prefix.helper')}</p>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setPrefixDialogOpen(false)}>
+                  {t('common.cancel') || 'Cancel'}
+                </Button>
+                <Button
+                  onClick={() =>
+                    void handlePrefixGraphics(prefixMessages, () => setPrefixDialogOpen(false))
+                  }
+                  disabled={!graphicsPrefix.trim() || graphicsPrefixing}
+                >
+                  {t('graphicsTab.prefix.confirm')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Graphics Prefix Loading */}
+          <Dialog open={graphicsPrefixing}>
+            <DialogContent className="sm:max-w-sm">
+              <DialogHeader>
+                <DialogTitle>{t('graphicsTab.prefix.loadingTitle')}</DialogTitle>
+                <DialogDescription>{t('graphicsTab.prefix.loadingBody')}</DialogDescription>
+              </DialogHeader>
+              <div className="flex items-center gap-3 py-4">
+                <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  {t('graphicsTab.prefix.toast.loading')}
+                </span>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Graphics Conflict Confirmation Dialog */}
           <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
