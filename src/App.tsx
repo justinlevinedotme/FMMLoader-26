@@ -1879,7 +1879,7 @@ function App() {
             onOpenChange={(open) => {
               setPrefixDialogOpen(open);
               if (!open) {
-                setGraphicsPrefixDialogError(null);
+                setGraphicsPrefixDialogError(undefined);
                 setGraphicsPrefixManualPath('');
               }
             }}
