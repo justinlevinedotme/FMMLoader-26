@@ -178,8 +178,17 @@ export const tauriCommands = {
   migrateGraphicsPack: (packName: string, targetSubdir: string) =>
     safeInvoke<string>('migrate_graphics_pack', { packName, targetSubdir }),
 
-  prefixGraphicsFiles: (directory: string, prefix: string) =>
-    safeInvoke<number>('prefix_graphics_files', { directory, prefix }),
+  prefixGraphicsFiles: (
+    directory: string,
+    prefix: string,
+    options?: { renameFiles?: boolean; updateConfig?: boolean }
+  ) =>
+    safeInvoke<number>('prefix_graphics_files', {
+      directory,
+      prefix,
+      renameFiles: options?.renameFiles,
+      updateConfig: options?.updateConfig,
+    }),
 
   openAppManagementSettings: () => safeInvoke<void>('open_app_management_settings'),
 };

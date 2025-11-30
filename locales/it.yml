@@ -130,6 +130,15 @@ graphicsTab:
     confirm: Prefissa contenuti cartella
     loadingTitle: Rinominando i file
     loadingBody: Attendi — i pacchetti grandi possono richiedere un po'. L'app risponderà al termine.
+    renameFiles: Rinomina i file PNG
+    updateConfig: Aggiorna i mapping in config.xml
+    nothingSelected: Seleziona almeno un'opzione per procedere.
+    manualLabel: Percorso cartella manuale
+    manualPlaceholder: /Users/tu/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces
+    manualHelper: Usa questo se il selettore cartelle fallisce. Il percorso deve puntare alla cartella con PNG/config.xml.
+    manualButton: Esegui con percorso manuale
+    dialogError: Impossibile aprire il selettore cartelle. Inserisci il percorso manualmente e riprova.
+    manualOnly: Salta il selettore di sistema (usa percorso manuale) – utile se il selettore è lento
     toast:
       loading: Rinominando i file grafici...
       success: Rinominati {count} file

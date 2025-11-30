@@ -155,9 +155,21 @@ pub fn validate_graphics() -> Result<Vec<GraphicsPackIssue>, String> {
 /// Adds a prefix to all PNG files in the provided directory (non-recursive).
 /// Useful for quickly migrating face packs from `123.png` to `face_123.png`.
 #[tauri::command]
-pub fn prefix_graphics_files(directory: String, prefix: String) -> Result<usize, String> {
+pub fn prefix_graphics_files(
+    directory: String,
+    prefix: String,
+    rename_files: Option<bool>,
+    update_config: Option<bool>,
+) -> Result<usize, String> {
     if prefix.is_empty() {
         return Err("Prefix cannot be empty".to_string());
+    }
+
+    let do_rename = rename_files.unwrap_or(true);
+    let do_config = update_config.unwrap_or(true);
+
+    if !do_rename && !do_config {
+        return Err("Nothing to do: enable file renaming and/or config updates".to_string());
     }
 
     let dir_path = PathBuf::from(&directory);
@@ -166,12 +178,15 @@ pub fn prefix_graphics_files(directory: String, prefix: String) -> Result<usize,
     }
 
     tracing::info!(
-        "Prefixing graphics files (recursive) in {:?} with '{}'",
+        "Prefixing graphics files (recursive) in {:?} with '{}' (rename_files={}, update_config={})",
         dir_path,
-        prefix
+        prefix,
+        do_rename,
+        do_config
     );
 
     let mut files_to_rename: Vec<(PathBuf, PathBuf)> = Vec::new();
+    let mut config_files: Vec<PathBuf> = Vec::new();
     let mut seen_targets = std::collections::HashSet::new();
 
     for entry in WalkDir::new(&dir_path).into_iter().filter_map(|e| e.ok()) {
@@ -180,13 +195,18 @@ pub fn prefix_graphics_files(directory: String, prefix: String) -> Result<usize,
             continue;
         }
 
-        let extension = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("")
-            .to_ascii_lowercase();
+        let extension = path.extension().and_then(|e| e.to_str()).unwrap_or("");
+        let extension_lower = extension.to_ascii_lowercase();
 
-        if extension != "png" {
+        if do_config && extension_lower == "xml" {
+            if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                if name.eq_ignore_ascii_case("config.xml") {
+                    config_files.push(path.clone());
+                }
+            }
+        }
+
+        if !do_rename || extension_lower != "png" {
             continue;
         }
 
@@ -222,12 +242,15 @@ pub fn prefix_graphics_files(directory: String, prefix: String) -> Result<usize,
         files_to_rename.push((path, target_path));
     }
 
-    for (source, target) in &files_to_rename {
-        let file_name = source
-            .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("unknown.png");
-        fs::rename(source, target).map_err(|e| format!("Failed to rename {}: {}", file_name, e))?;
+    if do_rename {
+        for (source, target) in &files_to_rename {
+            let file_name = source
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("unknown.png");
+            fs::rename(source, target)
+                .map_err(|e| format!("Failed to rename {}: {}", file_name, e))?;
+        }
     }
 
     tracing::info!(
@@ -235,6 +258,38 @@ pub fn prefix_graphics_files(directory: String, prefix: String) -> Result<usize,
         files_to_rename.len(),
         dir_path
     );
+
+    if do_config && !config_files.is_empty() {
+        // Match from="..."; we skip if already prefixed.
+        let from_regex = regex::Regex::new("from=\"([^\"]+)\"")
+            .map_err(|e| format!("Failed to build regex: {e}"))?;
+
+        for config_path in config_files {
+            let contents = fs::read_to_string(&config_path)
+                .map_err(|e| format!("Failed to read {}: {}", config_path.display(), e))?;
+
+            let replaced = from_regex.replace_all(&contents, |caps: &regex::Captures| {
+                let current = &caps[1];
+                if current.starts_with(&prefix) {
+                    format!("from=\"{}\"", current)
+                } else {
+                    format!("from=\"{}{}\"", prefix, current)
+                }
+            });
+
+            if replaced != contents {
+                fs::write(&config_path, replaced.as_ref()).map_err(|e| {
+                    format!(
+                        "Failed to write updated config.xml at {}: {}",
+                        config_path.display(),
+                        e
+                    )
+                })?;
+                tracing::info!("Updated config.xml prefixes at {}", config_path.display());
+            }
+        }
+    }
+
     Ok(files_to_rename.len())
 }
 

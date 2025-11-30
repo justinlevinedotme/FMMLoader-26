@@ -52,6 +52,8 @@ sessions/transcripts/
 sessions/.archived/
 
 .tmp/
-/agents
-/.ai-context
-/.claude
+agents/
+.ai-context/
+.claude/
+.gemini/
+.clavix/
