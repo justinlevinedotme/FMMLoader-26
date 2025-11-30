@@ -132,7 +132,7 @@ graphicsTab:
       loading: A renomear ficheiros de gráficos...
       success: '{count} ficheiro(s) renomeado(s)'
       none: Nenhum ficheiro precisou de ser renomeado
-      error: Falha ao renomear ficheiros: {message}
+      error: "Falha ao renomear ficheiros: {message}"
   progress:
     heading: 'Progresso:'
     files: '{current} / {total} ficheiros'

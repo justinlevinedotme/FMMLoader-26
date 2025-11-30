@@ -134,7 +134,7 @@ graphicsTab:
       loading: Grafikdateien werden umbenannt...
       success: '{count} Datei(en) umbenannt'
       none: Keine Dateien mussten umbenannt werden
-      error: Dateien konnten nicht umbenannt werden: {message}
+      error: "Dateien konnten nicht umbenannt werden: {message}"
   progress:
     heading: 'Fortschritt:'
     files: '{current} / {total} Dateien'

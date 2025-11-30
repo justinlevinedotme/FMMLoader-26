@@ -133,7 +133,7 @@ graphicsTab:
       loading: Grafik dosyaları yeniden adlandırılıyor...
       success: '{count} dosya yeniden adlandırıldı'
       none: Yeniden adlandırılması gereken dosya yok
-      error: Dosyalar yeniden adlandırılamadı: {message}
+      error: "Dosyalar yeniden adlandırılamadı: {message}"
   progress:
     heading: 'İlerleme:'
     files: '{current} / {total} dosya'

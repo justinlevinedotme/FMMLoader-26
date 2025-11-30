@@ -132,7 +132,7 @@ graphicsTab:
       loading: Renaming graphics files...
       success: Renamed {count} file(s)
       none: No files needed renaming
-      error: Failed to rename files: {message}
+      error: "Failed to rename files: {message}"
   progress:
     heading: 'Progress:'
     files: '{current} / {total} files'

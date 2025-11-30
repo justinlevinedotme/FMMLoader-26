@@ -134,7 +134,7 @@ graphicsTab:
       loading: Rinominando i file grafici...
       success: Rinominati {count} file
       none: Nessun file da rinominare
-      error: Impossibile rinominare i file: {message}
+      error: "Impossibile rinominare i file: {message}"
   progress:
     heading: 'Progresso:'
     files: '{current} / {total} file'

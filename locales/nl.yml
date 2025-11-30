@@ -132,7 +132,7 @@ graphicsTab:
       loading: Graphics-bestanden hernoemen...
       success: '{count} bestand(en) hernoemd'
       none: Geen bestanden hoefden te worden hernoemd
-      error: Bestanden hernoemen mislukt: {message}
+      error: "Bestanden hernoemen mislukt: {message}"
   progress:
     heading: 'Voortgang:'
     files: '{current} / {total} bestanden'

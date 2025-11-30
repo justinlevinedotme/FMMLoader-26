@@ -132,7 +132,7 @@ graphicsTab:
       loading: 그래픽 파일 이름을 변경하는 중...
       success: '{count}개 파일 이름을 변경했습니다'
       none: 변경할 파일이 없습니다
-      error: 파일 이름 변경 실패: {message}
+      error: "파일 이름 변경 실패: {message}"
   progress:
     heading: '진행 상황:'
     files: '{current} / {total} 파일'
