@@ -360,9 +360,7 @@ function App() {
   const [graphicsPrefixRenameFiles, setGraphicsPrefixRenameFiles] = useState(true);
   const [graphicsPrefixUpdateConfig, setGraphicsPrefixUpdateConfig] = useState(true);
   const [graphicsPrefixManualPath, setGraphicsPrefixManualPath] = useState('');
-  const [graphicsPrefixDialogError, setGraphicsPrefixDialogError] = useState<string | undefined>(
-    undefined
-  );
+  const [graphicsPrefixDialogError, setGraphicsPrefixDialogError] = useState<string | undefined>();
   const [graphicsPrefixUseManualOnly, setGraphicsPrefixUseManualOnly] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [pendingInstall, setPendingInstall] = useState<{
@@ -1143,8 +1141,8 @@ function App() {
 
       if (!selected) {
         if (graphicsPrefixUseManualOnly) {
-          selected = graphicsPrefixManualPath.trim();
-          if (!selected) {
+          const manual = graphicsPrefixManualPath.trim();
+          if (!manual) {
             setGraphicsPrefixDialogError(
               messages?.dialogError ||
                 'Failed to open folder picker. Enter the path manually and try again.'
@@ -1152,6 +1150,7 @@ function App() {
             setGraphicsPrefixing(false);
             return;
           }
+          selected = manual;
         } else {
           try {
             selected = await open({
@@ -1165,8 +1164,9 @@ function App() {
                 'Failed to open folder picker. Enter the path manually and try again.'
             );
             // Fallback: if OS dialog fails intermittently, allow manual path without crashing
-            if (graphicsPrefixManualPath.trim()) {
-              selected = graphicsPrefixManualPath.trim();
+            const manual = graphicsPrefixManualPath.trim();
+            if (manual) {
+              selected = manual;
             } else {
               setGraphicsPrefixUseManualOnly(true);
               setGraphicsPrefixing(false);
