@@ -166,6 +166,7 @@
       "manualHelper": "Gebruik dit als de mapkiezer faalt. Pad moet naar de map met PNG's/config.xml wijzen.",
       "manualButton": "Uitvoeren met handmatig pad",
       "dialogError": "Mapkiezer kon niet worden geopend. Vul het pad handmatig in en probeer opnieuw.",
+      "manualOnly": "OS-kiezer overslaan (handmatig pad) – handig als de kiezer traag is",
       "toast": {
         "loading": "Graphics-bestanden hernoemen...",
         "success": "{count} bestand(en) hernoemd",

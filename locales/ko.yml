@@ -136,6 +136,7 @@ graphicsTab:
     manualHelper: 폴더 선택이 실패한 경우 사용하세요. PNG/config.xml이 있는 폴더를 가리켜야 합니다.
     manualButton: 수동 경로로 실행
     dialogError: 폴더 선택을 열 수 없습니다. 경로를 직접 입력하고 다시 시도하세요.
+    manualOnly: OS 선택기 건너뛰기(수동 경로 사용) – 느리게 뜨거나 멈출 때 사용
     toast:
       loading: 그래픽 파일 이름을 변경하는 중...
       success: '{count}개 파일 이름을 변경했습니다'

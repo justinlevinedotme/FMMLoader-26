@@ -166,6 +166,7 @@
       "manualHelper": "Use isto se o seletor falhar. O caminho deve apontar para a pasta com os PNG/config.xml.",
       "manualButton": "Executar com caminho manual",
       "dialogError": "Não foi possível abrir o seletor de pastas. Introduza o caminho manualmente e tente novamente.",
+      "manualOnly": "Ignorar seletor do sistema (usar caminho manual) – útil se o seletor estiver lento",
       "toast": {
         "loading": "A renomear ficheiros de gráficos...",
         "success": "{count} ficheiro(s) renomeado(s)",

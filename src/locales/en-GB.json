@@ -166,6 +166,7 @@
       "manualHelper": "Use this if the folder picker fails. Path must point to the folder containing your PNGs/config.xml.",
       "manualButton": "Run with manual path",
       "dialogError": "Failed to open folder picker. Enter the path manually and try again.",
+      "manualOnly": "Skip OS picker (use manual path) – helpful if the picker hangs or is slow",
       "toast": {
         "loading": "Renaming graphics files...",
         "success": "Renamed {count} file(s)",

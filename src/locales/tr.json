@@ -166,6 +166,7 @@
       "manualHelper": "Klasör seçici başarısız olursa kullanın. PNG/config.xml içeren klasörü göstermelidir.",
       "manualButton": "Manuel yolla çalıştır",
       "dialogError": "Klasör seçici açılamadı. Yolu manuel girip tekrar deneyin.",
+      "manualOnly": "OS seçiciyi atla (manuel yol kullan) – seçici yavaşsa işe yarar",
       "toast": {
         "loading": "Grafik dosyaları yeniden adlandırılıyor...",
         "success": "{count} dosya yeniden adlandırıldı",

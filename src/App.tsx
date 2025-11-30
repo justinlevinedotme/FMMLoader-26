@@ -1162,9 +1162,14 @@ function App() {
               messages?.dialogError ||
                 'Failed to open folder picker. Enter the path manually and try again.'
             );
-            setGraphicsPrefixUseManualOnly(true);
-            setGraphicsPrefixing(false);
-            return;
+            // Fallback: if OS dialog fails intermittently, allow manual path without crashing
+            if (graphicsPrefixManualPath.trim()) {
+              selected = graphicsPrefixManualPath.trim();
+            } else {
+              setGraphicsPrefixUseManualOnly(true);
+              setGraphicsPrefixing(false);
+              return;
+            }
           }
         }
       }
@@ -1490,6 +1495,9 @@ function App() {
       success: (count) => t('graphicsTab.prefix.toast.success', { count }),
       none: t('graphicsTab.prefix.toast.none'),
       error: (message) => t('graphicsTab.prefix.toast.error', { message }),
+      dialogError:
+        t('graphicsTab.prefix.dialogError') ||
+        'Failed to open folder picker. Enter the path manually and try again.',
     };
     // CrowdIn section removed
     return (

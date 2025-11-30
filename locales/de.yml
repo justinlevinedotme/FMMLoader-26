@@ -138,6 +138,7 @@ graphicsTab:
     manualHelper: Nutze dies, falls der Ordnerdialog fehlschlägt. Pfad muss auf den Ordner mit PNGs/config.xml zeigen.
     manualButton: Mit manuellem Pfad ausführen
     dialogError: Ordnerdialog konnte nicht geöffnet werden. Gib den Pfad manuell ein und versuche es erneut.
+    manualOnly: OS-Dialog überspringen (manuellen Pfad nutzen) – hilfreich bei langem Laden
     toast:
       loading: Grafikdateien werden umbenannt...
       success: '{count} Datei(en) umbenannt'

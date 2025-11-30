@@ -138,6 +138,7 @@ graphicsTab:
     manualHelper: Usa questo se il selettore cartelle fallisce. Il percorso deve puntare alla cartella con PNG/config.xml.
     manualButton: Esegui con percorso manuale
     dialogError: Impossibile aprire il selettore cartelle. Inserisci il percorso manualmente e riprova.
+    manualOnly: Salta il selettore di sistema (usa percorso manuale) – utile se il selettore è lento
     toast:
       loading: Rinominando i file grafici...
       success: Rinominati {count} file
