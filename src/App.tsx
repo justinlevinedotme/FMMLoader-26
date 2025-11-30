@@ -103,6 +103,7 @@ type PrefixMessages = {
   success: (count: number) => string;
   none: string;
   error: (message: string) => string;
+  dialogError: string;
 };
 
 function DebugUI({
@@ -356,6 +357,11 @@ function App() {
   const [graphicsConflict, setGraphicsConflict] = useState<GraphicsConflictInfo | null>(null);
   const [graphicsPrefix, setGraphicsPrefix] = useState('face_');
   const [graphicsPrefixing, setGraphicsPrefixing] = useState(false);
+  const [graphicsPrefixRenameFiles, setGraphicsPrefixRenameFiles] = useState(true);
+  const [graphicsPrefixUpdateConfig, setGraphicsPrefixUpdateConfig] = useState(true);
+  const [graphicsPrefixManualPath, setGraphicsPrefixManualPath] = useState('');
+  const [graphicsPrefixDialogError, setGraphicsPrefixDialogError] = useState<string | null>(null);
+  const [graphicsPrefixUseManualOnly, setGraphicsPrefixUseManualOnly] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [pendingInstall, setPendingInstall] = useState<{
     path: string;
@@ -1107,7 +1113,11 @@ function App() {
     }
   };
 
-  const handlePrefixGraphics = async (messages?: PrefixMessages, onComplete?: () => void) => {
+  const handlePrefixGraphics = async (
+    messages?: PrefixMessages,
+    onComplete?: () => void,
+    selectedPathOverride?: string
+  ) => {
     const prefix = graphicsPrefix.trim();
     if (!prefix) {
       toast.error(messages?.error('Prefix cannot be empty') ?? 'Prefix cannot be empty', {
@@ -1116,20 +1126,59 @@ function App() {
       return;
     }
 
+    if (!graphicsPrefixRenameFiles && !graphicsPrefixUpdateConfig) {
+      toast.error(messages?.error('Select at least one option') ?? 'Select at least one option', {
+        id: 'graphics-prefix',
+      });
+      return;
+    }
+
     try {
       setGraphicsPrefixing(true);
-      const selected = await open({
-        multiple: false,
-        directory: true,
-        title: messages?.dialogTitle ?? 'Select folder to rename',
-      });
+      setGraphicsPrefixDialogError(null);
+
+      let selected = selectedPathOverride;
 
       if (!selected) {
+        if (graphicsPrefixUseManualOnly) {
+          selected = graphicsPrefixManualPath.trim();
+          if (!selected) {
+            setGraphicsPrefixDialogError(
+              messages?.dialogError ||
+                'Failed to open folder picker. Enter the path manually and try again.'
+            );
+            setGraphicsPrefixing(false);
+            return;
+          }
+        } else {
+          try {
+            selected = await open({
+              multiple: false,
+              directory: true,
+              title: messages?.dialogTitle ?? 'Select folder to rename',
+            });
+          } catch (_error) {
+            setGraphicsPrefixDialogError(
+              messages?.dialogError ||
+                'Failed to open folder picker. Enter the path manually and try again.'
+            );
+            setGraphicsPrefixUseManualOnly(true);
+            setGraphicsPrefixing(false);
+            return;
+          }
+        }
+      }
+
+      if (!selected) {
+        setGraphicsPrefixing(false);
         return;
       }
 
       toast.loading(messages?.loading ?? 'Renaming graphics files...', { id: 'graphics-prefix' });
-      const renamed = await tauriCommands.prefixGraphicsFiles(selected, prefix);
+      const renamed = await tauriCommands.prefixGraphicsFiles(selected, prefix, {
+        renameFiles: graphicsPrefixRenameFiles,
+        updateConfig: graphicsPrefixUpdateConfig,
+      });
 
       if (renamed === 0) {
         toast.dismiss('graphics-prefix');
@@ -1815,7 +1864,16 @@ function App() {
           />
 
           {/* Graphics Prefix Dialog */}
-          <Dialog open={prefixDialogOpen} onOpenChange={setPrefixDialogOpen}>
+          <Dialog
+            open={prefixDialogOpen}
+            onOpenChange={(open) => {
+              setPrefixDialogOpen(open);
+              if (!open) {
+                setGraphicsPrefixDialogError(null);
+                setGraphicsPrefixManualPath('');
+              }
+            }}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t('graphicsTab.prefix.dialogTitle')}</DialogTitle>
@@ -1835,6 +1893,61 @@ function App() {
                   }}
                 />
                 <p className="text-xs text-muted-foreground">{t('graphicsTab.prefix.helper')}</p>
+                <div className="space-y-2 pt-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4"
+                      checked={graphicsPrefixRenameFiles}
+                      onChange={(e) => setGraphicsPrefixRenameFiles(e.target.checked)}
+                    />
+                    <span>{t('graphicsTab.prefix.renameFiles')}</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4"
+                      checked={graphicsPrefixUpdateConfig}
+                      onChange={(e) => setGraphicsPrefixUpdateConfig(e.target.checked)}
+                    />
+                    <span>{t('graphicsTab.prefix.updateConfig')}</span>
+                  </label>
+                  {!graphicsPrefixRenameFiles && !graphicsPrefixUpdateConfig && (
+                    <p className="text-xs text-amber-600">
+                      {t('graphicsTab.prefix.nothingSelected')}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2 pt-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4"
+                      checked={graphicsPrefixUseManualOnly}
+                      onChange={(e) => setGraphicsPrefixUseManualOnly(e.target.checked)}
+                    />
+                    <span>{t('graphicsTab.prefix.manualOnly')}</span>
+                  </label>
+                </div>
+                <div className="space-y-2 pt-3">
+                  <Label htmlFor="graphics-prefix-manual">
+                    {t('graphicsTab.prefix.manualLabel')}
+                  </Label>
+                  <Input
+                    id="graphics-prefix-manual"
+                    value={graphicsPrefixManualPath}
+                    onChange={(e) => setGraphicsPrefixManualPath(e.target.value)}
+                    placeholder={t('graphicsTab.prefix.manualPlaceholder')}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('graphicsTab.prefix.manualHelper')}
+                  </p>
+                </div>
+                {graphicsPrefixDialogError && (
+                  <div className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded p-2">
+                    {graphicsPrefixDialogError}
+                  </div>
+                )}
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setPrefixDialogOpen(false)}>
@@ -1844,9 +1957,30 @@ function App() {
                   onClick={() =>
                     void handlePrefixGraphics(prefixMessages, () => setPrefixDialogOpen(false))
                   }
-                  disabled={!graphicsPrefix.trim() || graphicsPrefixing}
+                  disabled={
+                    !graphicsPrefix.trim() ||
+                    graphicsPrefixing ||
+                    (!graphicsPrefixRenameFiles && !graphicsPrefixUpdateConfig)
+                  }
                 >
                   {t('graphicsTab.prefix.confirm')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() =>
+                    void handlePrefixGraphics(
+                      prefixMessages,
+                      () => setPrefixDialogOpen(false),
+                      graphicsPrefixManualPath.trim() || undefined
+                    )
+                  }
+                  disabled={
+                    !graphicsPrefixManualPath.trim() ||
+                    graphicsPrefixing ||
+                    (!graphicsPrefixRenameFiles && !graphicsPrefixUpdateConfig)
+                  }
+                >
+                  {t('graphicsTab.prefix.manualButton')}
                 </Button>
               </DialogFooter>
             </DialogContent>
