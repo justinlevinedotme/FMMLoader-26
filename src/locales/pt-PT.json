@@ -1,7 +1,7 @@
 {
   "_version": 2,
   "nav": {
-    "mods": "Mods",
+    "mods": "Modificações",
     "graphics": "Gráficos",
     "nameFix": "Correção de nomes",
     "settings": "Definições"
@@ -117,7 +117,7 @@
   },
   "modsTab": {
     "tabs": {
-      "mods": "Mods",
+      "mods": "Modificações",
       "graphics": "Gráficos",
       "namefix": "Correção de nomes",
       "settings": "Definições"
@@ -157,11 +157,11 @@
       "needUserDir": "Diretório do utilizador é necessário para instalar pacotes de gráficos"
     },
     "table": {
-      "name": "Nome",
-      "type": "Tipo",
-      "files": "Ficheiros",
-      "installed": "Instalado",
-      "empty": "Ainda não há pacotes de gráficos instalados."
+      "name": "Name",
+      "type": "Type",
+      "files": "Files",
+      "installed": "Installed",
+      "empty": "No graphics packs installed yet."
     }
   },
   "credits": {

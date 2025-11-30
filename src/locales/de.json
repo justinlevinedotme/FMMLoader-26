@@ -26,7 +26,7 @@
       "description": "Bevorzugte Sprache wählen. Überschreibt die Systemerkennung beim Neustart."
     },
     "updates": {
-      "title": "Updates",
+      "title": "Update",
       "current": "Aktuell: v{version}",
       "available": "Update verfügbar: v{version}",
       "check": "Nach Updates suchen",
@@ -131,7 +131,7 @@
       "name": "Name",
       "type": "Typ",
       "author": "Autor",
-      "status": "Status",
+      "status": "Stati",
       "version": "Version",
       "actions": "Aktionen"
     },
@@ -157,11 +157,11 @@
       "needUserDir": "Benutzerverzeichnis wird für die Installation von Grafik-Packs benötigt"
     },
     "table": {
-      "name": "Name",
+      "name": "Namen",
       "type": "Typ",
       "files": "Dateien",
       "installed": "Installiert",
-      "empty": "Noch keine Grafik-Packs installiert."
+      "empty": "Es sind noch keine Grafikpakete installiert."
     }
   },
   "credits": {

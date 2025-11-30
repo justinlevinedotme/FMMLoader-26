@@ -19,8 +19,7 @@ settings:
     open: Modlar Klasörünü Aç
   language:
     title: Dil
-    description: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını
-      geçersiz kılar.
+    description: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
   updates:
     title: Güncellemeler
     current: 'Mevcut: v{version}'
@@ -126,11 +125,11 @@ graphicsTab:
   warnings:
     needUserDir: Grafik paketi kurulumu için kullanıcı dizini gereklidir
   table:
-    name: İsim
-    type: Tür
-    files: Dosyalar
-    installed: Kurulu
-    empty: Henüz grafik paketi kurulmadı.
+    name: Name
+    type: Type
+    files: Files
+    installed: Installed
+    empty: No graphics packs installed yet.
 credits:
   title: Katkıda Bulunanlar
   description: FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.
@@ -148,8 +147,7 @@ nameFix:
   title: İsim Düzeltme
   subtitle: FM İsim Düzeltmesini yönet
   sectionTitle: FM İsim Düzeltme
-  sectionDescription: Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek
-    isimlerini açar
+  sectionDescription: Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek isimlerini açar
   status:
     checking: Kontrol ediliyor...
     installed: Kurulu
@@ -178,8 +176,7 @@ nameFix:
   warnings:
     needGameDir: Önce Oyun Dizininizi ayarlayın
   notes:
-    community: Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz.
-      SortItOutSI veya FMScout düzeltmelerini öneririz.
+    community: Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz. SortItOutSI veya FMScout düzeltmelerini öneririz.
   userDir:
     label: 'Kullanıcı Dizini:'
     tooltip: Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini

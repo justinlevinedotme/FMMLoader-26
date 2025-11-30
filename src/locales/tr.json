@@ -157,11 +157,11 @@
       "needUserDir": "Grafik paketi kurulumu için kullanıcı dizini gereklidir"
     },
     "table": {
-      "name": "İsim",
-      "type": "Tür",
-      "files": "Dosyalar",
-      "installed": "Kurulu",
-      "empty": "Henüz grafik paketi kurulmadı."
+      "name": "Name",
+      "type": "Type",
+      "files": "Files",
+      "installed": "Installed",
+      "empty": "No graphics packs installed yet."
     }
   },
   "credits": {
