@@ -1153,11 +1153,12 @@ function App() {
           selected = manual;
         } else {
           try {
-            selected = await open({
+            const picked = await open({
               multiple: false,
               directory: true,
               title: messages?.dialogTitle ?? 'Select folder to rename',
             });
+            selected = picked ?? undefined;
           } catch (_error) {
             setGraphicsPrefixDialogError(
               messages?.dialogError ||
