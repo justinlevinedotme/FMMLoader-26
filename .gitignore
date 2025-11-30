@@ -53,3 +53,5 @@ sessions/.archived/
 
 .tmp/
 /agents
+/.ai-context
+/.claude

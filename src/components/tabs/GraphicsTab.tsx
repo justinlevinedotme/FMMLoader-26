@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { RefreshCw, Upload, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, Upload, CheckCircle2, Sparkles } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import type { Config, ExtractionProgress, GraphicsPackMetadata } from '@/types';
 
@@ -20,6 +20,7 @@ interface GraphicsTabProps {
   validatingGraphics: boolean;
   onImportGraphicsPack: () => void;
   onValidateGraphics: () => void;
+  onOpenPrefixDialog: () => void;
 }
 
 export function GraphicsTab({
@@ -30,6 +31,7 @@ export function GraphicsTab({
   validatingGraphics,
   onImportGraphicsPack,
   onValidateGraphics,
+  onOpenPrefixDialog,
 }: GraphicsTabProps) {
   const { t } = useI18n();
   return (
@@ -54,9 +56,19 @@ export function GraphicsTab({
               variant="outline"
               onClick={() => void onValidateGraphics()}
               disabled={validatingGraphics || !config?.user_dir_path}
+              className="h-10"
             >
               <CheckCircle2 className="mr-2 h-4 w-4" />
               {t('graphicsTab.validate.button')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onOpenPrefixDialog}
+              disabled={importingGraphics || !config?.user_dir_path}
+              className="h-10"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              {t('graphicsTab.prefix.button')}
             </Button>
           </div>
         </div>

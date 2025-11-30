@@ -581,6 +581,7 @@ fn main() {
             graphics::list_graphics_packs,
             graphics::analyze_graphics_pack_cmd,
             graphics::validate_graphics,
+            graphics::prefix_graphics_files,
             graphics::migrate_graphics_pack,
             graphics::check_graphics_conflicts,
             preview_mod_install,

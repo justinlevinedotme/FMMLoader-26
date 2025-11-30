@@ -108,7 +108,7 @@ const formatMessage = (
   if (typeof value !== 'string') return '';
   if (!params) return value;
   return Object.entries(params).reduce((msg, [k, v]) => {
-    return msg.replace(new RegExp(`{${k}}`, 'g'), String(v));
+    return msg.split(`{${k}}`).join(String(v));
   }, value);
 };
 
