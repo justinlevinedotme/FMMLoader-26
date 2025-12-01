@@ -37,7 +37,7 @@ const safeInvoke = async <T>(cmd: string, args?: InvokeArgs): Promise<T> => {
     // Try waiting for Tauri to load
     const ready = await waitForTauri();
     if (!ready) {
-      throw new Error('Not running in Tauri context. Please run with "npm run tauri dev"');
+      throw new Error('Not running in Tauri context. Please run with "pnpm run tauri dev"');
     }
   }
   return invoke<T>(cmd, args);
