@@ -10,11 +10,11 @@ echo ""
 
 # Build the frontend
 echo "📦 Building frontend..."
-npm run build
+pnpm run build
 
 # Build the Tauri app in debug mode (faster compilation)
 echo "🦀 Building Tauri app (debug mode)..."
-npm run tauri build -- --debug
+pnpm run tauri build -- --debug
 
 echo ""
 echo "✅ Build complete!"
@@ -45,5 +45,5 @@ echo "💡 To run the app directly:"
 echo "   cd src-tauri/target/debug && ./fmmloader26"
 echo ""
 echo "🚀 For a release build (slower but optimized), run:"
-echo "   npm run build:release"
+echo "   pnpm run build:release"
 echo ""

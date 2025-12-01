@@ -8,7 +8,7 @@ echo.
 
 REM Build the frontend
 echo 📦 Building frontend...
-call npm run build
+call pnpm run build
 
 if %errorlevel% neq 0 (
     echo ❌ Frontend build failed!
@@ -18,7 +18,7 @@ if %errorlevel% neq 0 (
 REM Build the Tauri app in debug mode (faster compilation)
 echo.
 echo 🦀 Building Tauri app (debug mode)...
-call npm run tauri build -- --debug
+call pnpm run tauri build -- --debug
 
 if %errorlevel% neq 0 (
     echo ❌ Tauri build failed!
@@ -39,6 +39,6 @@ echo    cd src-tauri\target\debug
 echo    fmmloader26.exe
 echo.
 echo 🚀 For a release build (slower but optimized), run:
-echo    npm run build:release
+echo    pnpm run build:release
 echo.
 pause

@@ -36,6 +36,12 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.21.0
 
       - name: Sync version files to tag
         id: sync
@@ -98,7 +104,7 @@ jobs:
 
           if [[ "$CHANGED" == "true" ]]; then
             # Update package.json
-            npm version "$VERSION" --no-git-tag-version --allow-same-version
+            pnpm version "$VERSION" --no-git-tag-version --allow-same-version
 
             # Update Cargo.toml
             sed -i '0,/^version = "[0-9]\+\.[0-9]\+\.[0-9]\+"/s//version = "'"$VERSION"'"/' src-tauri/Cargo.toml
@@ -183,7 +189,12 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: npm
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.21.0
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -207,11 +218,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Install pnpm
-        run: npm install -g pnpm
-        
       - name: install frontend dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Import Apple Developer Certificate
         if: matrix.platform == 'macos-15'

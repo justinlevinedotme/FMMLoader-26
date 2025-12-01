@@ -62,9 +62,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      flagpack:
-        specifier: ^1.0.5
-        version: 1.0.5
+      country-flag-icons:
+        specifier: ^1.6.4
+        version: 1.6.4
       lucide-react:
         specifier: ^0.553.0
         version: 0.553.0(react@18.3.1)
@@ -1513,6 +1513,9 @@ packages:
       typescript:
         optional: true
 
+  country-flag-icons@1.6.4:
+    resolution: {integrity: sha512-Z3Zi419FI889tlElMsVhCIS5eRkiLDWixr576J5DPiTe5RGxpbRi+enMpHdYVp5iK5WFjr8P/RgyIFAGhFsiFg==}
+
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -1732,9 +1735,6 @@ packages:
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
-
-  flagpack@1.0.5:
-    resolution: {integrity: sha512-jrb3OEoVXPBXjmhwZq6C9DTH6Axarh+rfnT3kA5T4xQ2FD9MogwCasqNJnMvhHHkaEVryXwQf1MQvqVv8UsK3g==}
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -3975,6 +3975,8 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
+  country-flag-icons@1.6.4: {}
+
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -4216,8 +4218,6 @@ snapshots:
     dependencies:
       locate-path: 6.0.0
       path-exists: 4.0.0
-
-  flagpack@1.0.5: {}
 
   flat-cache@4.0.1:
     dependencies:
