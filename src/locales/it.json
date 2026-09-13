@@ -1,260 +1,260 @@
 {
   "_version": 2,
   "nav": {
-    "mods": "Mod",
-    "graphics": "Grafica",
-    "nameFix": "Correzione Nomi",
-    "settings": "Impostazioni"
+    "mods": "Mods",
+    "graphics": "Graphics",
+    "nameFix": "Name Fix",
+    "settings": "Settings"
   },
   "settings": {
-    "title": "Impostazioni",
-    "description": "Preferenze tema e archiviazione",
-    "darkMode": "Modalità Scura",
-    "darkModeDescription": "Attiva il tema scuro per la finestra dell'app.",
+    "title": "Settings",
+    "description": "Theme and storage preferences",
+    "darkMode": "Dark Mode",
+    "darkModeDescription": "Toggle dark theme for the app window.",
     "logs": {
-      "title": "Log Applicazione",
-      "description": "Apre la cartella dove sono archiviati i log recenti dell'app.",
-      "open": "Apri Cartella Log"
+      "title": "Application Logs",
+      "description": "Opens the folder where recent app logs are stored.",
+      "open": "Open Logs Folder"
     },
     "modsStorage": {
-      "title": "Archiviazione Mod",
-      "description": "Apre la cartella dove sono archiviati i mod importati.",
-      "open": "Apri Cartella Mod"
+      "title": "Mods Storage",
+      "description": "Opens the folder where imported mods are stored.",
+      "open": "Open Mods Folder"
     },
     "language": {
-      "title": "Lingua",
-      "description": "Scegli la tua lingua preferita. Sostituisce il rilevamento di sistema al riavvio."
+      "title": "Language",
+      "description": "Choose your preferred language. Overrides system detection on restart."
     },
     "updates": {
-      "title": "Aggiornamenti",
-      "current": "Attuale: v{version}",
-      "available": "Aggiornamento disponibile: v{version}",
-      "check": "Verifica aggiornamenti",
-      "checking": "Verifica in corso...",
-      "modalTitle": "Aggiornamento Disponibile",
-      "modalBody": "È disponibile la versione v{latest}. Attuale: v{current}.",
-      "downloadInstall": "Scarica e Installa",
-      "downloading": "Download in corso...",
-      "installing": "Installazione in corso...",
-      "later": "Dopo"
+      "title": "Updates",
+      "current": "Current: v{version}",
+      "available": "Update available: v{version}",
+      "check": "Check for updates",
+      "checking": "Checking...",
+      "modalTitle": "Update Available",
+      "modalBody": "Version v{latest} is available. Current: v{current}.",
+      "downloadInstall": "Download & Install",
+      "downloading": "Downloading...",
+      "installing": "Installing...",
+      "later": "Later"
     }
   },
   "modMeta": {
-    "title": "Aggiungi Metadati Mod",
-    "description": "Fornisci i metadati per questo mod in modo che possa essere gestito correttamente.",
+    "title": "Add Mod Metadata",
+    "description": "Provide metadata for this mod so it can be managed correctly.",
     "fields": {
       "name": {
-        "label": "Nome",
-        "placeholder": "Inserisci un nome per il mod"
+        "label": "Name",
+        "placeholder": "Enter a mod name"
       },
       "version": {
-        "label": "Versione",
+        "label": "Version",
         "placeholder": "1.0.0"
       },
       "type": {
-        "label": "Tipo",
-        "placeholder": "Seleziona un tipo di mod",
-        "detecting": "Rilevamento tipo di mod..."
+        "label": "Type",
+        "placeholder": "Select a mod type",
+        "detecting": "Detecting mod type..."
       },
       "author": {
-        "label": "Autore",
-        "placeholder": "Nome autore (opzionale)"
+        "label": "Author",
+        "placeholder": "Optional author name"
       },
       "description": {
-        "label": "Descrizione",
-        "placeholder": "Descrizione (opzionale)"
+        "label": "Description",
+        "placeholder": "Optional description"
       }
     },
     "actions": {
-      "cancel": "Annulla",
-      "submit": "Salva"
+      "cancel": "Cancel",
+      "submit": "Save"
     }
   },
   "common": {
-    "open": "Apri",
-    "close": "Chiudi",
-    "language": "Lingua",
-    "apply": "Applica",
-    "cancel": "Annulla"
+    "open": "Open",
+    "close": "Close",
+    "language": "Language",
+    "apply": "Apply",
+    "cancel": "Cancel"
   },
   "errors": {
-    "generic": "Qualcosa è andato storto.",
-    "missingKey": "Traduzione mancante: {key}"
+    "generic": "Something went wrong.",
+    "missingKey": "Missing translation: {key}"
   },
   "overlay": {
-    "dropTitle": "Trascina il file del mod per importarlo"
+    "dropTitle": "Drop mod file to import"
   },
   "footer": {
-    "createdBy": "FMMLoader26 v{version} | Creato da JALCO / Justin Levine",
-    "supportKofi": "Supporta su Ko-Fi",
-    "joinDiscord": "Unisciti a Discord"
+    "createdBy": "FMMLoader26 v{version} | Created by JALCO / Justin Levine",
+    "supportKofi": "Support on Ko-Fi",
+    "joinDiscord": "Join Discord"
   },
   "toolbar": {
-    "import": "Importa",
-    "conflicts": "Conflitti",
-    "restore": "Ripristina",
-    "refresh": "Aggiorna",
+    "import": "Import",
+    "conflicts": "Conflicts",
+    "restore": "Restore",
+    "refresh": "Refresh",
     "tooltips": {
-      "import": "Importa un nuovo pacchetto di mod",
-      "conflicts": "Verifica conflitti di file tra i mod",
-      "restore": "Torna a un backup precedente",
-      "refresh": "Ricarica elenco e stato dei mod"
+      "import": "Import a new mod package",
+      "conflicts": "Check for file conflicts between mods",
+      "restore": "Roll back to a previous backup",
+      "refresh": "Reload mod list and state"
     }
   },
   "paths": {
     "gameDir": {
-      "label": "Directory di Gioco:",
-      "tooltip": "La cartella di installazione di FM26 contenente i file .bundle",
-      "placeholder": "Non impostata - clicca Seleziona o Rileva Gioco",
-      "detect": "Rileva"
+      "label": "Game Directory:",
+      "tooltip": "The FM26 installation folder containing the .bundle files",
+      "placeholder": "Not set - click Select or Detect Game",
+      "detect": "Detect"
     },
     "userDir": {
-      "label": "Directory Utente:",
-      "tooltip": "La Directory Utente di FM26 dove sono archiviati salvataggi e impostazioni",
-      "placeholder": "Rilevata automaticamente dal sistema",
-      "detect": "Rileva"
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
     }
   },
   "modsTab": {
     "tabs": {
-      "mods": "Mod",
-      "graphics": "Grafica",
-      "namefix": "Correzione Nomi",
-      "settings": "Impostazioni"
+      "mods": "Mods",
+      "graphics": "Graphics",
+      "namefix": "Name Fix",
+      "settings": "Settings"
     },
     "primaryActions": {
-      "apply": "Applica Mod Selezionati",
-      "enable": "Abilita",
-      "disable": "Disabilita"
+      "apply": "Apply Selected Mods",
+      "enable": "Enable",
+      "disable": "Disable"
     },
     "table": {
-      "name": "Nome",
-      "type": "Tipo",
-      "author": "Autore",
-      "status": "Stato",
-      "version": "Versione",
-      "actions": "Azioni"
+      "name": "Name",
+      "type": "Type",
+      "author": "Author",
+      "status": "Status",
+      "version": "Version",
+      "actions": "Actions"
     },
-    "empty": "Nessun mod trovato. Importa un mod per iniziare."
+    "empty": "No mods found. Import a mod to get started."
   },
   "graphicsTab": {
-    "title": "Pacchetti Grafici",
-    "subtitle": "{count} pacchetti installati",
+    "title": "Graphics Packs",
+    "subtitle": "{count} packs installed",
     "import": {
-      "button": "Importa Pacchetto Grafico",
-      "disabledTip": "Directory utente richiesta per importare"
+      "button": "Import Graphics Pack",
+      "disabledTip": "User directory required to import"
     },
     "validate": {
-      "button": "Valida Grafica",
-      "disabledTip": "Directory utente richiesta per validare"
+      "button": "Validate Graphics",
+      "disabledTip": "User directory required to validate"
     },
     "prefix": {
-      "label": "Prefisso file",
+      "label": "Filename prefix",
       "placeholder": "face_",
-      "helper": "Rinomina tutti i file .png (in modo ricorsivo) nella cartella scelta aggiungendo questo prefisso.",
-      "button": "Prefissa contenuti cartella",
-      "dialogTitle": "Prefissa contenuto cartella grafica",
-      "dialogDescription": "Seleziona il prefisso da applicare e poi scegli la cartella faces da rinominare. Solo i file .png vengono rinominati; quelli già prefissati vengono ignorati.",
-      "confirm": "Prefissa contenuti cartella",
-      "loadingTitle": "Rinominando i file",
-      "loadingBody": "Attendi — i pacchetti grandi possono richiedere un po'. L'app risponderà al termine.",
-      "renameFiles": "Rinomina i file PNG",
-      "updateConfig": "Aggiorna i mapping in config.xml",
-      "nothingSelected": "Seleziona almeno un'opzione per procedere.",
-      "manualLabel": "Percorso cartella manuale",
-      "manualPlaceholder": "/Users/tu/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces",
-      "manualHelper": "Usa questo se il selettore cartelle fallisce. Il percorso deve puntare alla cartella con PNG/config.xml.",
-      "manualButton": "Esegui con percorso manuale",
-      "dialogError": "Impossibile aprire il selettore cartelle. Inserisci il percorso manualmente e riprova.",
-      "manualOnly": "Salta il selettore di sistema (usa percorso manuale) – utile se il selettore è lento",
+      "helper": "Renames all .png files (recursively) in the chosen folder with this prefix.",
+      "button": "Prefix folder contents",
+      "dialogTitle": "Prefix graphics folder contents",
+      "dialogDescription": "Select the prefix to apply, then choose the faces folder to rename. Only .png files are renamed; existing prefixed files are skipped.",
+      "confirm": "Prefix folder contents",
+      "loadingTitle": "Renaming files",
+      "loadingBody": "Hang tight — large packs can take a minute. The app will respond when done.",
+      "renameFiles": "Rename PNG files",
+      "updateConfig": "Update config.xml mappings",
+      "nothingSelected": "Select at least one option to run.",
+      "manualLabel": "Manual folder path",
+      "manualPlaceholder": "/Users/you/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces",
+      "manualHelper": "Use this if the folder picker fails. Path must point to the folder containing your PNGs/config.xml.",
+      "manualButton": "Run with manual path",
+      "dialogError": "Failed to open folder picker. Enter the path manually and try again.",
+      "manualOnly": "Skip OS picker (use manual path) – helpful if the picker hangs or is slow",
       "toast": {
-        "loading": "Rinominando i file grafici...",
-        "success": "Rinominati {count} file",
-        "none": "Nessun file da rinominare",
-        "error": "Impossibile rinominare i file: {message}"
+        "loading": "Renaming graphics files...",
+        "success": "Renamed {count} file(s)",
+        "none": "No files needed renaming",
+        "error": "Failed to rename files: {message}"
       }
     },
     "progress": {
-      "heading": "Progresso:",
-      "files": "{current} / {total} file",
-      "importing": "Importazione in corso..."
+      "heading": "Progress:",
+      "files": "{current} / {total} files",
+      "importing": "Importing..."
     },
     "warnings": {
-      "needUserDir": "È richiesta la directory utente per l'installazione dei pacchetti grafici"
+      "needUserDir": "User directory is required for graphics pack installation"
     },
     "table": {
-      "name": "Nome",
-      "type": "Tipo",
-      "files": "File",
-      "installed": "Installato",
-      "empty": "Nessun pacchetto grafico installato."
+      "name": "Name",
+      "type": "Type",
+      "files": "Files",
+      "installed": "Installed",
+      "empty": "No graphics packs installed yet."
     }
   },
   "credits": {
-    "title": "Riconoscimenti",
-    "description": "Grazie a tutti coloro che aiutano a sviluppare e tradurre FMMLoader.",
+    "title": "Credits",
+    "description": "Thanks to everyone who helps build and translate FMMLoader.",
     "sections": {
       "contributors": {
-        "title": "Contributori Principali"
+        "title": "Core Contributors"
       },
       "translators": {
-        "title": "Traduttori e Localizzazione"
+        "title": "Translators & Localization"
       },
       "languages": {
-        "title": "Lingue Supportate"
+        "title": "Supported Languages"
       },
       "crowdin": {
-        "title": "Contributori CrowdIn",
-        "note": "Un ringraziamento speciale ai membri della community che mantengono aggiornate le traduzioni."
+        "title": "CrowdIn Contributors",
+        "note": "Special thanks to the community members who keep translations fresh."
       }
     }
   },
   "nameFix": {
-    "title": "Correzione Nomi",
-    "subtitle": "Gestisci Correzione Nomi FM",
-    "sectionTitle": "Correzione Nomi FM",
-    "sectionDescription": "Risolve problemi di licenza e sblocca i nomi reali per club, giocatori e competizioni",
+    "title": "Name Fix",
+    "subtitle": "Manage FM Name Fix",
+    "sectionTitle": "FM Name Fix",
+    "sectionDescription": "Fixes licensing issues and unlocks real names for clubs, players, and competitions",
     "status": {
-      "checking": "Verifica in corso...",
-      "installed": "Installato",
-      "notInstalled": "Non installato"
+      "checking": "Checking...",
+      "installed": "Installed",
+      "notInstalled": "Not installed"
     },
     "whatItDoes": {
-      "heading": "Cosa fa:",
+      "heading": "What it does:",
       "bullets": [
-        "Sblocca i nomi reali per club come AC Milan, Inter e Lazio",
-        "Corregge i nomi dei giocatori giapponesi",
-        "Rimuove contenuti falsi/senza licenza",
-        "Funziona con tutte le leghe e competizioni"
+        "Unlocks real names for clubs like AC Milan, Inter, and Lazio",
+        "Fixes Japanese player names",
+        "Removes fake/unlicensed content",
+        "Works with all leagues and competitions"
       ]
     },
     "active": {
-      "heading": "Attualmente Attivo:",
-      "unknown": "Sconosciuto"
+      "heading": "Currently Active:",
+      "unknown": "Unknown"
     },
-    "selectLabel": "Seleziona Fonte Correzione Nomi:",
-    "selectPlaceholder": "Seleziona una fonte di correzione nomi",
-    "activeSuffix": " - Attivo",
-    "noSources": "Nessuna fonte di correzione nomi disponibile. Importa un file ZIP di correzione nomi per iniziare.",
+    "selectLabel": "Select Name Fix Source:",
+    "selectPlaceholder": "Select a name fix source",
+    "activeSuffix": " - Active",
+    "noSources": "No name fix sources available. Import a name fix ZIP file to get started.",
     "buttons": {
-      "install": "Installa",
-      "reinstall": "Reinstalla",
-      "uninstall": "Disinstalla dal Gioco",
-      "importZip": "Importa da ZIP",
-      "checkStatus": "Verifica Stato",
-      "deleteSource": "Elimina Fonte"
+      "install": "Install",
+      "reinstall": "Reinstall",
+      "uninstall": "Uninstall from Game",
+      "importZip": "Import from ZIP",
+      "checkStatus": "Check Status",
+      "deleteSource": "Delete Source"
     },
     "warnings": {
-      "needGameDir": "Imposta prima la tua Directory di Gioco"
+      "needGameDir": "Please set your Game Directory first"
     },
     "notes": {
-      "community": "Puoi scaricare correzioni di nomi dalla community o crearne di tue. Consigliamo le correzioni dei nostri amici di SortItOutSI o FMScout"
+      "community": "You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout"
     },
     "userDir": {
-      "label": "Directory Utente:",
-      "tooltip": "La Directory Utente di FM26 dove sono archiviati salvataggi e impostazioni",
-      "placeholder": "Rilevata automaticamente dal sistema",
-      "detect": "Rileva"
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
     }
   }
 }

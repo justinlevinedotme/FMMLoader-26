@@ -3,258 +3,258 @@
   "nav": {
     "mods": "Mods",
     "graphics": "Graphics",
-    "nameFix": "Naamcorrectie",
-    "settings": "Instellingen"
+    "nameFix": "Name Fix",
+    "settings": "Settings"
   },
   "settings": {
-    "title": "Instellingen",
-    "description": "Thema en opslagvoorkeuren",
-    "darkMode": "Donkere Modus",
-    "darkModeDescription": "Schakel donker thema in voor het app-venster.",
+    "title": "Settings",
+    "description": "Theme and storage preferences",
+    "darkMode": "Dark Mode",
+    "darkModeDescription": "Toggle dark theme for the app window.",
     "logs": {
-      "title": "Applicatie Logs",
-      "description": "Opent de map waar recente app-logs zijn opgeslagen.",
-      "open": "Open Logs Map"
+      "title": "Application Logs",
+      "description": "Opens the folder where recent app logs are stored.",
+      "open": "Open Logs Folder"
     },
     "modsStorage": {
-      "title": "Mods Opslag",
-      "description": "Opent de map waar geïmporteerde mods zijn opgeslagen.",
-      "open": "Open Mods Map"
+      "title": "Mods Storage",
+      "description": "Opens the folder where imported mods are stored.",
+      "open": "Open Mods Folder"
     },
     "language": {
-      "title": "Taal",
-      "description": "Kies je voorkeurstaal. Overschrijft systeemdetectie bij herstart."
+      "title": "Language",
+      "description": "Choose your preferred language. Overrides system detection on restart."
     },
     "updates": {
       "title": "Updates",
-      "current": "Huidige: v{version}",
-      "available": "Update beschikbaar: v{version}",
-      "check": "Controleer op updates",
-      "checking": "Controleren...",
-      "modalTitle": "Update Beschikbaar",
-      "modalBody": "Versie v{latest} is beschikbaar. Huidige: v{current}.",
-      "downloadInstall": "Download & Installeer",
-      "downloading": "Downloaden...",
-      "installing": "Installeren...",
+      "current": "Current: v{version}",
+      "available": "Update available: v{version}",
+      "check": "Check for updates",
+      "checking": "Checking...",
+      "modalTitle": "Update Available",
+      "modalBody": "Version v{latest} is available. Current: v{current}.",
+      "downloadInstall": "Download & Install",
+      "downloading": "Downloading...",
+      "installing": "Installing...",
       "later": "Later"
     }
   },
   "modMeta": {
-    "title": "Mod Metadata Toevoegen",
-    "description": "Geef metadata op voor deze mod zodat deze correct kan worden beheerd.",
+    "title": "Add Mod Metadata",
+    "description": "Provide metadata for this mod so it can be managed correctly.",
     "fields": {
       "name": {
-        "label": "Naam",
-        "placeholder": "Voer een mod naam in"
+        "label": "Name",
+        "placeholder": "Enter a mod name"
       },
       "version": {
-        "label": "Versie",
+        "label": "Version",
         "placeholder": "1.0.0"
       },
       "type": {
         "label": "Type",
-        "placeholder": "Selecteer een mod type",
-        "detecting": "Mod type detecteren..."
+        "placeholder": "Select a mod type",
+        "detecting": "Detecting mod type..."
       },
       "author": {
-        "label": "Auteur",
-        "placeholder": "Optionele auteursnaam"
+        "label": "Author",
+        "placeholder": "Optional author name"
       },
       "description": {
-        "label": "Beschrijving",
-        "placeholder": "Optionele beschrijving"
+        "label": "Description",
+        "placeholder": "Optional description"
       }
     },
     "actions": {
-      "cancel": "Annuleren",
-      "submit": "Opslaan"
+      "cancel": "Cancel",
+      "submit": "Save"
     }
   },
   "common": {
-    "open": "Openen",
-    "close": "Sluiten",
-    "language": "Taal",
-    "apply": "Toepassen",
-    "cancel": "Annuleren"
+    "open": "Open",
+    "close": "Close",
+    "language": "Language",
+    "apply": "Apply",
+    "cancel": "Cancel"
   },
   "errors": {
-    "generic": "Er is iets misgegaan.",
-    "missingKey": "Ontbrekende vertaling: {key}"
+    "generic": "Something went wrong.",
+    "missingKey": "Missing translation: {key}"
   },
   "overlay": {
-    "dropTitle": "Sleep mod bestand om te importeren"
+    "dropTitle": "Drop mod file to import"
   },
   "footer": {
-    "createdBy": "FMMLoader26 v{version} | Gemaakt door JALCO / Justin Levine",
-    "supportKofi": "Steun op Ko-Fi",
-    "joinDiscord": "Word lid van Discord"
+    "createdBy": "FMMLoader26 v{version} | Created by JALCO / Justin Levine",
+    "supportKofi": "Support on Ko-Fi",
+    "joinDiscord": "Join Discord"
   },
   "toolbar": {
-    "import": "Importeren",
-    "conflicts": "Conflicten",
-    "restore": "Herstellen",
-    "refresh": "Vernieuwen",
+    "import": "Import",
+    "conflicts": "Conflicts",
+    "restore": "Restore",
+    "refresh": "Refresh",
     "tooltips": {
-      "import": "Importeer een nieuw mod pakket",
-      "conflicts": "Controleer op bestandsconflicten tussen mods",
-      "restore": "Ga terug naar een vorige back-up",
-      "refresh": "Herlaad mod lijst en status"
+      "import": "Import a new mod package",
+      "conflicts": "Check for file conflicts between mods",
+      "restore": "Roll back to a previous backup",
+      "refresh": "Reload mod list and state"
     }
   },
   "paths": {
     "gameDir": {
-      "label": "Spelmap:",
-      "tooltip": "De FM26 installatiemap met de .bundle bestanden",
-      "placeholder": "Niet ingesteld - klik Selecteer of Detecteer Spel",
-      "detect": "Detecteren"
+      "label": "Game Directory:",
+      "tooltip": "The FM26 installation folder containing the .bundle files",
+      "placeholder": "Not set - click Select or Detect Game",
+      "detect": "Detect"
     },
     "userDir": {
-      "label": "Gebruikersmap:",
-      "tooltip": "De FM26 Gebruikersmap waar saves en instellingen zijn opgeslagen",
-      "placeholder": "Automatisch gedetecteerd van systeem",
-      "detect": "Detecteren"
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
     }
   },
   "modsTab": {
     "tabs": {
       "mods": "Mods",
       "graphics": "Graphics",
-      "namefix": "Naamcorrectie",
-      "settings": "Instellingen"
+      "namefix": "Name Fix",
+      "settings": "Settings"
     },
     "primaryActions": {
-      "apply": "Pas Geselecteerde Mods Toe",
-      "enable": "Inschakelen",
-      "disable": "Uitschakelen"
+      "apply": "Apply Selected Mods",
+      "enable": "Enable",
+      "disable": "Disable"
     },
     "table": {
-      "name": "Naam",
+      "name": "Name",
       "type": "Type",
-      "author": "Auteur",
+      "author": "Author",
       "status": "Status",
-      "version": "Versie",
-      "actions": "Acties"
+      "version": "Version",
+      "actions": "Actions"
     },
-    "empty": "Geen mods gevonden. Importeer een mod om te beginnen."
+    "empty": "No mods found. Import a mod to get started."
   },
   "graphicsTab": {
-    "title": "Graphics Pakketten",
-    "subtitle": "{count} pakketten geïnstalleerd",
+    "title": "Graphics Packs",
+    "subtitle": "{count} packs installed",
     "import": {
-      "button": "Importeer Graphics Pakket",
-      "disabledTip": "Gebruikersmap vereist om te importeren"
+      "button": "Import Graphics Pack",
+      "disabledTip": "User directory required to import"
     },
     "validate": {
-      "button": "Valideer Graphics",
-      "disabledTip": "Gebruikersmap vereist om te valideren"
+      "button": "Validate Graphics",
+      "disabledTip": "User directory required to validate"
     },
     "prefix": {
-      "label": "Bestandsvoorvoegsel",
+      "label": "Filename prefix",
       "placeholder": "face_",
-      "helper": "Hernoemt alle .png-bestanden (recursief) in de gekozen map met dit voorvoegsel.",
-      "button": "Voorvoegsel op mapinhoud",
-      "dialogTitle": "Voorvoegsel op graphics-map",
-      "dialogDescription": "Kies het voorvoegsel en selecteer daarna de faces-map om te hernoemen. Alleen .png-bestanden worden hernoemd; bestaande voorvoegsels worden overgeslagen.",
-      "confirm": "Voorvoegsel op mapinhoud",
-      "loadingTitle": "Bestanden hernoemen",
-      "loadingBody": "Even geduld — grote pakketten kunnen even duren. De app reageert weer zodra het klaar is.",
-      "renameFiles": "PNG-bestanden hernoemen",
-      "updateConfig": "config.xml-koppelingen bijwerken",
-      "nothingSelected": "Selecteer minimaal één optie om te starten.",
-      "manualLabel": "Handmatig pad naar map",
-      "manualPlaceholder": "/Users/jij/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces",
-      "manualHelper": "Gebruik dit als de mapkiezer faalt. Pad moet naar de map met PNG's/config.xml wijzen.",
-      "manualButton": "Uitvoeren met handmatig pad",
-      "dialogError": "Mapkiezer kon niet worden geopend. Vul het pad handmatig in en probeer opnieuw.",
-      "manualOnly": "OS-kiezer overslaan (handmatig pad) – handig als de kiezer traag is",
+      "helper": "Renames all .png files (recursively) in the chosen folder with this prefix.",
+      "button": "Prefix folder contents",
+      "dialogTitle": "Prefix graphics folder contents",
+      "dialogDescription": "Select the prefix to apply, then choose the faces folder to rename. Only .png files are renamed; existing prefixed files are skipped.",
+      "confirm": "Prefix folder contents",
+      "loadingTitle": "Renaming files",
+      "loadingBody": "Hang tight — large packs can take a minute. The app will respond when done.",
+      "renameFiles": "Rename PNG files",
+      "updateConfig": "Update config.xml mappings",
+      "nothingSelected": "Select at least one option to run.",
+      "manualLabel": "Manual folder path",
+      "manualPlaceholder": "/Users/you/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces",
+      "manualHelper": "Use this if the folder picker fails. Path must point to the folder containing your PNGs/config.xml.",
+      "manualButton": "Run with manual path",
+      "dialogError": "Failed to open folder picker. Enter the path manually and try again.",
+      "manualOnly": "Skip OS picker (use manual path) – helpful if the picker hangs or is slow",
       "toast": {
-        "loading": "Graphics-bestanden hernoemen...",
-        "success": "{count} bestand(en) hernoemd",
-        "none": "Geen bestanden hoefden te worden hernoemd",
-        "error": "Bestanden hernoemen mislukt: {message}"
+        "loading": "Renaming graphics files...",
+        "success": "Renamed {count} file(s)",
+        "none": "No files needed renaming",
+        "error": "Failed to rename files: {message}"
       }
     },
     "progress": {
-      "heading": "Voortgang:",
-      "files": "{current} / {total} bestanden",
-      "importing": "Importeren..."
+      "heading": "Progress:",
+      "files": "{current} / {total} files",
+      "importing": "Importing..."
     },
     "warnings": {
-      "needUserDir": "Gebruikersmap is vereist voor graphics pakket installatie"
+      "needUserDir": "User directory is required for graphics pack installation"
     },
     "table": {
-      "name": "Naam",
+      "name": "Name",
       "type": "Type",
-      "files": "Bestanden",
-      "installed": "Geïnstalleerd",
-      "empty": "Nog geen graphics pakketten geïnstalleerd."
+      "files": "Files",
+      "installed": "Installed",
+      "empty": "No graphics packs installed yet."
     }
   },
   "credits": {
     "title": "Credits",
-    "description": "Dank aan iedereen die helpt FMMLoader te bouwen en te vertalen.",
+    "description": "Thanks to everyone who helps build and translate FMMLoader.",
     "sections": {
       "contributors": {
-        "title": "Kernbijdragers"
+        "title": "Core Contributors"
       },
       "translators": {
-        "title": "Vertalers & Lokalisatie"
+        "title": "Translators & Localization"
       },
       "languages": {
-        "title": "Ondersteunde Talen"
+        "title": "Supported Languages"
       },
       "crowdin": {
-        "title": "CrowdIn Bijdragers",
-        "note": "Speciale dank aan de communityleden die de vertalingen up-to-date houden."
+        "title": "CrowdIn Contributors",
+        "note": "Special thanks to the community members who keep translations fresh."
       }
     }
   },
   "nameFix": {
-    "title": "Naamcorrectie",
-    "subtitle": "Beheer FM Naamcorrectie",
-    "sectionTitle": "FM Naamcorrectie",
-    "sectionDescription": "Lost licentieproblemen op en ontgrendelt echte namen voor clubs, spelers en competities",
+    "title": "Name Fix",
+    "subtitle": "Manage FM Name Fix",
+    "sectionTitle": "FM Name Fix",
+    "sectionDescription": "Fixes licensing issues and unlocks real names for clubs, players, and competitions",
     "status": {
-      "checking": "Controleren...",
-      "installed": "Geïnstalleerd",
-      "notInstalled": "Niet geïnstalleerd"
+      "checking": "Checking...",
+      "installed": "Installed",
+      "notInstalled": "Not installed"
     },
     "whatItDoes": {
-      "heading": "Wat het doet:",
+      "heading": "What it does:",
       "bullets": [
-        "Ontgrendelt echte namen voor clubs zoals AC Milan, Inter en Lazio",
-        "Corrigeert Japanse spelersnamen",
-        "Verwijdert nep/niet-gelicentieerde content",
-        "Werkt met alle competities en leagues"
+        "Unlocks real names for clubs like AC Milan, Inter, and Lazio",
+        "Fixes Japanese player names",
+        "Removes fake/unlicensed content",
+        "Works with all leagues and competitions"
       ]
     },
     "active": {
-      "heading": "Momenteel Actief:",
-      "unknown": "Onbekend"
+      "heading": "Currently Active:",
+      "unknown": "Unknown"
     },
-    "selectLabel": "Selecteer Naamcorrectie Bron:",
-    "selectPlaceholder": "Selecteer een naamcorrectie bron",
-    "activeSuffix": " - Actief",
-    "noSources": "Geen naamcorrectie bronnen beschikbaar. Importeer een naamcorrectie ZIP-bestand om te beginnen.",
+    "selectLabel": "Select Name Fix Source:",
+    "selectPlaceholder": "Select a name fix source",
+    "activeSuffix": " - Active",
+    "noSources": "No name fix sources available. Import a name fix ZIP file to get started.",
     "buttons": {
-      "install": "Installeren",
-      "reinstall": "Opnieuw Installeren",
-      "uninstall": "Deïnstalleer van Spel",
-      "importZip": "Importeren van ZIP",
-      "checkStatus": "Controleer Status",
-      "deleteSource": "Verwijder Bron"
+      "install": "Install",
+      "reinstall": "Reinstall",
+      "uninstall": "Uninstall from Game",
+      "importZip": "Import from ZIP",
+      "checkStatus": "Check Status",
+      "deleteSource": "Delete Source"
     },
     "warnings": {
-      "needGameDir": "Stel eerst je Spelmap in"
+      "needGameDir": "Please set your Game Directory first"
     },
     "notes": {
-      "community": "Je kunt naamcorrecties downloaden van de community of je eigen maken. We raden correcties aan van onze vrienden bij SortItOutSI of FMScout"
+      "community": "You can download name fixes from the community or create your own. We recommend fixes from our friends at SortItOutSI or FMScout"
     },
     "userDir": {
-      "label": "Gebruikersmap:",
-      "tooltip": "De FM26 Gebruikersmap waar saves en instellingen zijn opgeslagen",
-      "placeholder": "Automatisch gedetecteerd van systeem",
-      "detect": "Detecteren"
+      "label": "User Directory:",
+      "tooltip": "The FM26 User Directory where saves and settings are stored",
+      "placeholder": "Auto-detected from system",
+      "detect": "Detect"
     }
   }
 }
