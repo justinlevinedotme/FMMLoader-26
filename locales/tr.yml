@@ -19,8 +19,7 @@ settings:
     open: Modlar Klasörünü Aç
   language:
     title: Dil
-    description: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını
-      geçersiz kılar.
+    description: Tercih ettiğiniz dili seçin. Yeniden başlatmada sistem algılamasını geçersiz kılar.
   updates:
     title: Güncellemeler
     current: 'Mevcut: v{version}'
@@ -120,29 +119,29 @@ graphicsTab:
     button: Grafikleri Doğrula
     disabledTip: Doğrulamak için kullanıcı dizini gerekli
   prefix:
-    label: Dosya ön eki
+    label: Filename prefix
     placeholder: face_
-    helper: Seçilen klasör ve alt klasörlerdeki tüm .png dosyalarının başına bu ön eki ekler.
-    button: Klasör içeriğini ön ekle
-    dialogTitle: Grafik klasör içeriğini ön ekle
-    dialogDescription: Uygulanacak ön eki seçin ve ardından yeniden adlandırılacak faces klasörünü seçin. Sadece .png dosyaları yeniden adlandırılır; zaten ön ekli dosyalar atlanır.
-    confirm: Klasör içeriğini ön ekle
-    loadingTitle: Dosyalar yeniden adlandırılıyor
-    loadingBody: Lütfen bekleyin — büyük paketler biraz sürebilir. İşlem bitince uygulama yanıt verecek.
-    renameFiles: PNG dosyalarını yeniden adlandır
-    updateConfig: config.xml eşlemelerini güncelle
-    nothingSelected: Devam etmek için en az bir seçenek seçin.
-    manualLabel: Manuel klasör yolu
+    helper: Renames all .png files (recursively) in the chosen folder with this prefix.
+    button: Prefix folder contents
+    dialogTitle: Prefix graphics folder contents
+    dialogDescription: Select the prefix to apply, then choose the faces folder to rename. Only .png files are renamed; existing prefixed files are skipped.
+    confirm: Prefix folder contents
+    loadingTitle: Renaming files
+    loadingBody: Hang tight — large packs can take a minute. The app will respond when done.
+    renameFiles: Rename PNG files
+    updateConfig: Update config.xml mappings
+    nothingSelected: Select at least one option to run.
+    manualLabel: Manual folder path
     manualPlaceholder: /Users/you/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces
-    manualHelper: Klasör seçici başarısız olursa kullanın. PNG/config.xml içeren klasörü göstermelidir.
-    manualButton: Manuel yolla çalıştır
-    dialogError: Klasör seçici açılamadı. Yolu manuel girip tekrar deneyin.
-    manualOnly: OS seçiciyi atla (manuel yol kullan) – seçici yavaşsa işe yarar
+    manualHelper: Use this if the folder picker fails. Path must point to the folder containing your PNGs/config.xml.
+    manualButton: Run with manual path
+    dialogError: Failed to open folder picker. Enter the path manually and try again.
+    manualOnly: Skip OS picker (use manual path) – helpful if the picker hangs or is slow
     toast:
-      loading: Grafik dosyaları yeniden adlandırılıyor...
-      success: '{count} dosya yeniden adlandırıldı'
-      none: Yeniden adlandırılması gereken dosya yok
-      error: "Dosyalar yeniden adlandırılamadı: {message}"
+      loading: Renaming graphics files...
+      success: Renamed {count} file(s)
+      none: No files needed renaming
+      error: "Failed to rename files: {message}"
   progress:
     heading: 'İlerleme:'
     files: '{current} / {total} dosya'
@@ -150,11 +149,11 @@ graphicsTab:
   warnings:
     needUserDir: Grafik paketi kurulumu için kullanıcı dizini gereklidir
   table:
-    name: İsim
-    type: Tür
-    files: Dosyalar
-    installed: Kurulu
-    empty: Henüz grafik paketi kurulmadı.
+    name: Name
+    type: Type
+    files: Files
+    installed: Installed
+    empty: No graphics packs installed yet.
 credits:
   title: Katkıda Bulunanlar
   description: FMMLoader'ı geliştiren ve çeviren herkese teşekkürler.
@@ -172,8 +171,7 @@ nameFix:
   title: İsim Düzeltme
   subtitle: FM İsim Düzeltmesini yönet
   sectionTitle: FM İsim Düzeltme
-  sectionDescription: Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek
-    isimlerini açar
+  sectionDescription: Lisans sorunlarını düzeltir ve kulüp, oyuncu, turnuva gerçek isimlerini açar
   status:
     checking: Kontrol ediliyor...
     installed: Kurulu
@@ -202,8 +200,7 @@ nameFix:
   warnings:
     needGameDir: Önce Oyun Dizininizi ayarlayın
   notes:
-    community: Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz.
-      SortItOutSI veya FMScout düzeltmelerini öneririz.
+    community: Topluluktan isim düzeltmeleri indirebilir veya kendiniz oluşturabilirsiniz. SortItOutSI veya FMScout düzeltmelerini öneririz.
   userDir:
     label: 'Kullanıcı Dizini:'
     tooltip: Kayıtların ve ayarların saklandığı FM26 Kullanıcı Dizini

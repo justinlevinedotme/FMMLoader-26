@@ -119,29 +119,29 @@ graphicsTab:
     button: 그래픽 검증
     disabledTip: 검증하려면 사용자 디렉터리가 필요합니다
   prefix:
-    label: 파일 접두사
+    label: Filename prefix
     placeholder: face_
-    helper: 선택한 폴더와 하위 폴더의 모든 .png 파일 이름 앞에 이 접두사를 붙입니다.
-    button: 폴더 내용 접두사 추가
-    dialogTitle: 그래픽 폴더 내용 접두사 추가
-    dialogDescription: 적용할 접두사를 정한 뒤, 이름을 바꿀 faces 폴더를 선택하세요. 이미 접두사가 있는 파일은 건너뜁니다.
-    confirm: 폴더 내용 접두사 추가
-    loadingTitle: 파일 이름 변경 중
-    loadingBody: 잠시만 기다려 주세요 — 큰 팩은 시간이 걸릴 수 있습니다. 완료되면 앱이 다시 응답합니다.
-    renameFiles: PNG 파일 이름 변경
-    updateConfig: config.xml 매핑 업데이트
-    nothingSelected: 최소 한 가지 옵션을 선택하세요.
-    manualLabel: 수동 폴더 경로
+    helper: Renames all .png files (recursively) in the chosen folder with this prefix.
+    button: Prefix folder contents
+    dialogTitle: Prefix graphics folder contents
+    dialogDescription: Select the prefix to apply, then choose the faces folder to rename. Only .png files are renamed; existing prefixed files are skipped.
+    confirm: Prefix folder contents
+    loadingTitle: Renaming files
+    loadingBody: Hang tight — large packs can take a minute. The app will respond when done.
+    renameFiles: Rename PNG files
+    updateConfig: Update config.xml mappings
+    nothingSelected: Select at least one option to run.
+    manualLabel: Manual folder path
     manualPlaceholder: /Users/you/Library/Application Support/Sports Interactive/Football Manager 26/graphics/faces
-    manualHelper: 폴더 선택이 실패한 경우 사용하세요. PNG/config.xml이 있는 폴더를 가리켜야 합니다.
-    manualButton: 수동 경로로 실행
-    dialogError: 폴더 선택을 열 수 없습니다. 경로를 직접 입력하고 다시 시도하세요.
-    manualOnly: OS 선택기 건너뛰기(수동 경로 사용) – 느리게 뜨거나 멈출 때 사용
+    manualHelper: Use this if the folder picker fails. Path must point to the folder containing your PNGs/config.xml.
+    manualButton: Run with manual path
+    dialogError: Failed to open folder picker. Enter the path manually and try again.
+    manualOnly: Skip OS picker (use manual path) – helpful if the picker hangs or is slow
     toast:
-      loading: 그래픽 파일 이름을 변경하는 중...
-      success: '{count}개 파일 이름을 변경했습니다'
-      none: 변경할 파일이 없습니다
-      error: "파일 이름 변경 실패: {message}"
+      loading: Renaming graphics files...
+      success: Renamed {count} file(s)
+      none: No files needed renaming
+      error: "Failed to rename files: {message}"
   progress:
     heading: '진행 상황:'
     files: '{current} / {total} 파일'
@@ -149,11 +149,11 @@ graphicsTab:
   warnings:
     needUserDir: 그래픽 팩 설치에 사용자 디렉터리가 필요합니다
   table:
-    name: 이름
-    type: 유형
-    files: 파일
-    installed: 설치됨
-    empty: 아직 설치된 그래픽 팩이 없습니다.
+    name: Name
+    type: Type
+    files: Files
+    installed: Installed
+    empty: No graphics packs installed yet.
 credits:
   title: 크레딧
   description: FMMLoader를 만들고 번역해 주신 모든 분께 감사드립니다.
